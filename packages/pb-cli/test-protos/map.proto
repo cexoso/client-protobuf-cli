@@ -1,0 +1,19 @@
+syntax = "proto2";
+package map;
+
+message Book {
+  optional int32 id = 1;
+}
+
+// Destination 指定网关转发的目标实例信息
+message Destination {
+    map<int32, int32> ports = 1;
+    map<string, string> tags = 2;
+    map<string, Book> books = 3;
+}
+
+// 标准的通用头定义
+message Head
+{
+    optional Destination destination = 1;
+};

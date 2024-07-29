@@ -1,0 +1,36 @@
+{
+  "name": "@protobuf-es/cli",
+  "version": "0.0.25",
+  "publishConfig": {
+    "directory": "dist",
+    "linkDirectory": false
+  },
+  "scripts": {
+    "test": "vitest --reporter=dot",
+    "build": "ts-pkg-build build --format CommonJS",
+    "ts-lint": "tsc --noEmit",
+    "release": "npm run ts-lint && vitest --run && npm run build",
+    "prepublishOnly": "npm run release"
+  },
+  "main": "src/index.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@prettier/sync": "^0.5.2",
+    "commander": "^12.1.0",
+    "glob": "^11.0.0",
+    "inversify": "^6.1.5",
+    "prettier": "^3.4.2",
+    "protobufjs": "^7.3.2",
+    "radash": "^12.1.0",
+    "reflect-metadata": "^0.2.2",
+    "ts-dedent": "^2.2.0",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@cexoso/ts-pkg-build": "workspace: *",
+    "@protobuf-es/core": "workspace: *",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.4"
+  }
+}

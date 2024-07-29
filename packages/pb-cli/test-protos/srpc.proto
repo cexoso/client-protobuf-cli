@@ -1,0 +1,33 @@
+syntax = "proto2";
+package xrpc;
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.ServiceOptions {
+  optional uint32 service_option_id    = 10001;
+}
+
+extend google.protobuf.MethodOptions {
+  optional uint32 method_option_id     = 10002;
+}
+
+extend google.protobuf.MethodOptions {
+    optional bool method_option_retry = 10004;
+}
+
+message CRpcHead
+{
+    optional uint32 server_ip         = 1;   
+    map<string, string> customized_header = 2;
+};
+
+extend google.protobuf.MessageOptions {
+  optional bool is_json_array = 10005;
+}
+
+extend google.protobuf.FieldOptions {
+  optional bool emit_default = 10006;
+}
+extend google.protobuf.FileOptions {
+    optional bool use_gogo   = 10001;
+}

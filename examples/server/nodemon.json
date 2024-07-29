@@ -1,0 +1,6 @@
+{
+  "watch": ["src", "../grpc-utils", "../grpc-frame-work"],
+  "ext": "ts,json",
+  "ignore": ["**/*.spec.ts"],
+  "exec": "npm run server"
+}

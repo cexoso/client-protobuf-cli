@@ -1,0 +1,46 @@
+syntax = "proto2";
+package example_service;
+import "people.proto";
+
+message GetDataReq {
+  required int64 uid = 1;
+  optional Pagination pagination = 2;
+}
+
+message Pagination {
+  required uint32 index = 1;
+  optional uint32 pageSize = 10;
+}
+
+enum Status {
+  on_sale = 1; // 在售
+  discontinued = 2; // 停产
+}
+
+message Book {
+  required int32 book_id = 1; // 书的 ID
+  required string book_name = 2; // 书名
+  required float price = 3; // 单价
+  optional bool is_favorite = 4; // 是否添加到了收藏清单中
+  required People author = 5; // 作者
+  required Status status = 6;
+}
+
+message Data {
+  repeated Book books = 1;
+}
+
+message GetDataRes {
+  required int32 code = 1; // 0 表示成功，当成功时，data 会被填充返回值
+  required string message = 2; // 失败时的消息
+  optional Data data = 3;
+}
+
+service ExampleService
+{
+
+  rpc GetData(GetDataReq) returns (GetDataRes) {
+  }
+
+}
+

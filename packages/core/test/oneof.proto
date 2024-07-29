@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+
+// 获取操作日志响应
+message Log {
+    oneof new_data {
+        BankCard bank_card = 1;
+        LogProof log_proof = 2;
+    }
+}
+
+message BankCard {
+  optional string a = 1;
+}
+
+message LogProof {
+  optional uint32 b = 1;
+}
