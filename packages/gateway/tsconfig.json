@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "CommonJS",
+    "types": ["node"],
+    "declaration": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "sourceMap": true,
+    "isolatedModules": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "ts-node": {
+    "transpileOnly": true
+  }
+}

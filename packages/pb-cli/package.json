@@ -1,0 +1,24 @@
+{
+  "name": "pb-cli",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "bash dev.sh",
+    "test": "vitest --reporter=dot"
+  },
+  "dependencies": {
+    "@prettier/sync": "^0.5.2",
+    "commander": "^12.1.0",
+    "dedent": "^1.5.3",
+    "glob": "^11.0.0",
+    "protobufjs": "^7.3.2",
+    "radash": "^12.1.0",
+    "ts-dedent": "^2.2.0",
+    "tslib": "^2.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.4"
+  }
+}
