@@ -22,6 +22,8 @@ import {
   readString,
   readUint32,
 } from '../src/reader'
+import { loadSync } from 'protobufjs'
+import { join } from 'path'
 
 describe('repeat encode', async () => {
   describe('packed', () => {
@@ -270,5 +272,25 @@ describe('repeat encode', async () => {
         })),
       })
     })
+  })
+})
+
+describe('oneof', async () => {
+  it.only('normal', () => {
+    const root = loadSync(join(__dirname, './oneof.proto'))
+    const log = root.lookupType('Log')
+    const data = {
+      bankCard: {
+        a: '1',
+      },
+      logProof: {
+        b: 1,
+      },
+    }
+    console.log('调用校验时，有校验不通过:', log.verify(data)) // 校验通过的会返回 null
+    const buffer = log.encode(data).finish()
+    console.log('不符合预期的数据依然可以正常编码, buffer:', buffer)
+    const result = log.decode(buffer).toJSON()
+    console.log('不符合预期的 Buffer 仍然可以正常解码: decode result', result)
   })
 })
