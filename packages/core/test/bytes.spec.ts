@@ -8,21 +8,19 @@ import { readAsBytes, readTag } from '../src/reader'
 const message = new Type('XMessage').add(new Field('x', 1, 'bytes'))
 
 describe('bytes', async () => {
-  it.only('一段文本', async () => {
+  it('一段文本', async () => {
     const encoder = new TextEncoder()
     const decoder = new TextDecoder()
-    // decode
-    // new Buffer('hello world')
-    const value = encoder.encode('hello world')
+    const expectedValue = encoder.encode('hello world')
 
     const obj = message.fromObject({
-      x: value,
+      x: expectedValue,
     })
     const writer = createWriter()
     expect(message.verify(obj)).eq(null, '通过校验')
 
     // 直接传递 uint8array
-    encodeByteToBuffer({ value, tag: 1, writer })
+    encodeByteToBuffer({ value: expectedValue, tag: 1, writer })
 
     const buffer = toHexString(writer)
 
@@ -35,6 +33,24 @@ describe('bytes', async () => {
     )
     const reader = hexstringToReader(buffer)
     readTag(reader)
-    expect(readAsBytes(reader)).deep.eq(value)
+    const value = readAsBytes(reader)
+    expect(value).deep.eq(expectedValue)
+    expect(decoder.decode(value)).eq('hello world')
+  })
+
+  it('同时支持传入 base64', () => {
+    const str = 'hello world'
+    const base64Value = btoa(str)
+    const encoder = new TextEncoder()
+    const expectedValue = encoder.encode('hello world')
+    const writer = createWriter()
+    const obj = message.fromObject({
+      x: expectedValue,
+    })
+    encodeByteToBuffer({ value: base64Value, tag: 1, writer })
+    const expectedBuffer = message.encode(obj).finish()
+
+    const buffer = toHexString(writer)
+    expect(buffer).deep.eq(Uint8ArrayToHexString(expectedBuffer))
   })
 })

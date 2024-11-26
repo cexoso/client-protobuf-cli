@@ -2,6 +2,7 @@
 
 import { int64FromString, varint32write, varint64write } from './google/varint'
 import { assertInt32, assertInt64String, assertUInt32, assertUInt64String } from './private/assert'
+import { decode, length } from './private/base64'
 import { WireType } from './wire-type'
 
 type Byte = number
@@ -83,16 +84,23 @@ export const writeInt32 = (writer: Writer, value: number) => {
   varint32write(value, getCurrenctBytes(writer))
 }
 
+const base64ToUint8Array = (base64: string) => {
+  const len = length(base64)
+  const uint8Array = new Uint8Array(len)
+  decode(base64, uint8Array, 0)
+  return uint8Array
+}
+
 export const writeBytes = (writer: Writer, value: Uint8Array | string) => {
-  writeUint32(writer, value.length)
-  if (typeof value === 'string') {
-    return
-  }
+  const uint8Array = typeof value === 'string' ? base64ToUint8Array(value) : value
+
+  writeUint32(writer, uint8Array.length)
+
   // 本来底层想不使用 uint8Araay 的目的就是想兼容老旧浏览器
   // 结果需要在 node 上使用，又得重新考虑 uint8Array
   // 需要再思考一下要怎么处理这两者的矛盾
-  for (let index = 0; index < value.length; index++) {
-    const byte = value.at(index)!
+  for (let index = 0; index < uint8Array.length; index++) {
+    const byte = uint8Array[index]
     raw(writer, byte)
   }
 }
