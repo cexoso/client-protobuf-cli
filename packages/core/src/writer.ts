@@ -83,6 +83,20 @@ export const writeInt32 = (writer: Writer, value: number) => {
   varint32write(value, getCurrenctBytes(writer))
 }
 
+export const writeBytes = (writer: Writer, value: Uint8Array | string) => {
+  writeUint32(writer, value.length)
+  if (typeof value === 'string') {
+    return
+  }
+  // 本来底层想不使用 uint8Araay 的目的就是想兼容老旧浏览器
+  // 结果需要在 node 上使用，又得重新考虑 uint8Array
+  // 需要再思考一下要怎么处理这两者的矛盾
+  for (let index = 0; index < value.length; index++) {
+    const byte = value.at(index)!
+    raw(writer, byte)
+  }
+}
+
 export const writeUint32 = (writer: Writer, value: number) => {
   assertUInt32(value)
   // write value as varint 32, inlined for speed

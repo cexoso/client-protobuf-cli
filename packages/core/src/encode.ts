@@ -3,6 +3,7 @@ import {
   forkWriter,
   joinWriter,
   writeBool,
+  writeBytes,
   writeDouble,
   writeFixed32,
   writeFixed64,
@@ -110,6 +111,13 @@ export const encodeBoolToBuffer: ScalarEncoder<boolean> = ({ value, tag, writer 
     writeTag(writer, tag, WireType.Varint)
   }
   writeBool(writer, value)
+}
+
+export const encodeByteToBuffer: ScalarEncoder<string | Uint8Array> = ({ value, tag, writer }) => {
+  if (tag) {
+    writeTag(writer, tag, WireType.LengthDelimited)
+  }
+  writeBytes(writer, value)
 }
 
 export const encodeStringToBuffer: ScalarEncoder<string> = ({ value, tag, writer }) => {
