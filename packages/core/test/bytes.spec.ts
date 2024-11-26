@@ -53,4 +53,17 @@ describe('bytes', async () => {
     const buffer = toHexString(writer)
     expect(buffer).deep.eq(Uint8ArrayToHexString(expectedBuffer))
   })
+
+  it('empty', () => {
+    const arrayBuffer = new Uint8Array()
+    const writer = createWriter()
+    const obj = message.fromObject({
+      x: arrayBuffer,
+    })
+    encodeByteToBuffer({ value: arrayBuffer, tag: 1, writer })
+    const expectedBuffer = message.encode(obj).finish()
+
+    const buffer = toHexString(writer)
+    expect(buffer).deep.eq(Uint8ArrayToHexString(expectedBuffer))
+  })
 })
