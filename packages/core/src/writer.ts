@@ -15,7 +15,7 @@ export const createWriter = (): Writer => {
   }
 }
 
-const writeBytes = (writer: Writer, bytes: Byte[] | Byte) => {
+const raw = (writer: Writer, bytes: Byte[] | Byte) => {
   const byteList = Array.isArray(bytes) ? bytes : [bytes]
 
   const currenctBytes = writer.stackBytes[writer.stackBytes.length - 1]
@@ -27,7 +27,7 @@ const writeBytes = (writer: Writer, bytes: Byte[] | Byte) => {
 const getCurrenctBytes = (writer: Writer) => writer.stackBytes[writer.stackBytes.length - 1]
 
 export const writeTag = (writer: Writer, tag: number, wireType: WireType) => {
-  writeBytes(writer, ((tag << 3) | wireType) >>> 0)
+  raw(writer, ((tag << 3) | wireType) >>> 0)
 }
 
 export const toUint8Array = (writer: Writer) => {
@@ -87,10 +87,10 @@ export const writeUint32 = (writer: Writer, value: number) => {
   assertUInt32(value)
   // write value as varint 32, inlined for speed
   while (value > 0x7f) {
-    writeBytes(writer, (value & 0x7f) | 0x80)
+    raw(writer, (value & 0x7f) | 0x80)
     value = value >>> 7
   }
-  writeBytes(writer, value)
+  raw(writer, value)
 }
 
 export const writeFixed32 = (writer: Writer, value: number) => {
@@ -148,7 +148,7 @@ export const writeSint32 = (writer: Writer, value: number) => {
 }
 
 export const writeBool = (writer: Writer, value: boolean) => {
-  writeBytes(writer, value ? 1 : 0)
+  raw(writer, value ? 1 : 0)
   return this
 }
 
@@ -160,7 +160,7 @@ export const writeString = (writer: Writer, value: string) => {
 
   for (let i = 0; i < result.length; i++) {
     const byte = result[i]
-    writeBytes(writer, byte)
+    raw(writer, byte)
   }
 }
 
@@ -172,6 +172,6 @@ export const joinWriter = (writer: Writer) => {
   let prev = writer.stackBytes.pop()
   if (!prev) throw new Error('invalid state, fork stack empty')
 
-  writeBytes(writer, prev.length)
-  writeBytes(writer, prev)
+  raw(writer, prev.length)
+  raw(writer, prev)
 }
