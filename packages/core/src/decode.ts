@@ -1,10 +1,12 @@
-import { forkReader, ReaderLike, readTag, readUint32, skip } from './reader'
+import { forkReader, ReaderLike, readInt32, readTag, readUint32, skip } from './reader'
 import { WireType } from './wire-type'
 
 interface TagHandler {
   decode: (...o: any) => any
   type: 'scalar' | 'message'
   isRepeat?: boolean
+  // map 是特殊的 repeat, map 和 repeat 是互斥的
+  isMap?: boolean
   name: string
   isPacked?: boolean
 }
@@ -59,9 +61,20 @@ function decodeAsMessage(opts: {
     len,
   })
 
-  if (handler.isRepeat) {
-    result[handler.name] = result[handler.name] || []
-    result[handler.name].push(handler.decode(newReader))
+  const { isMap, isRepeat } = handler
+  const isArrayEncoding = isRepeat || isMap
+
+  if (isArrayEncoding) {
+    // 这里已经可以使用 ES6 的 map 来实现了，但是目前仍使用字面量对象来实现
+    // 目的是为了跟 protobuf.js 的实现对齐
+    result[handler.name] = result[handler.name] || (isMap ? {} : [])
+    const x = handler.decode(newReader)
+    if (isMap) {
+      const { mapKey, mapValue } = x
+      result[handler.name][mapKey] = mapValue
+    } else {
+      result[handler.name].push(x)
+    }
   } else {
     result[handler.name] = handler.decode(newReader)
   }
@@ -101,3 +114,22 @@ export const defineMessage =
       tagMap,
       reader,
     })
+
+export const defineMap = <T>(opts: {
+  keyReader: any
+  valueReader: any
+  valueType: 'message' | 'scalar'
+}) => {
+  const { keyReader, valueReader } = opts
+  const tagMap: Map<number, TagHandler> = new Map([
+    [1, { type: 'scalar', decode: keyReader, name: 'mapKey' }],
+    [2, { type: opts.valueType, decode: valueReader, name: 'mapValue' }],
+  ])
+  return (reader: ReaderLike) => {
+    const result = decodeMessage<T>({
+      tagMap,
+      reader,
+    })
+    return result
+  }
+}

@@ -1,4 +1,3 @@
-import { isScalarType } from '../../pb-cli/src/generate-service-code/scalar'
 import { WireType } from './wire-type'
 import {
   forkWriter,
@@ -157,18 +156,17 @@ export const encodeRepeatToBuffer = <T>(
     })
   }
 }
-type Type = typeof String | typeof Number
 export const encodeMapToBuffer = <T extends Record<string, any>>(
   value: T,
   opts: {
-    keyType: Type
+    isKeyNumber?: boolean
     tag: number
     writer: Writer
     keyEncoderWithTag: EncoderWithTag<any>
     valueEncoderWithTag: EncoderWithTag<any>
   }
 ) => {
-  const { tag, writer, keyType, keyEncoderWithTag, valueEncoderWithTag } = opts
+  const { tag, writer, isKeyNumber, keyEncoderWithTag, valueEncoderWithTag } = opts
   const record = value
   const keys = Object.keys(record)
 
@@ -189,10 +187,11 @@ export const encodeMapToBuffer = <T extends Record<string, any>>(
         },
         ({ value, writer }) => {
           keyEncoderWithTag({
-            value: keyType(value.key) as any,
+            value: isKeyNumber ? Number(value.key) : value.key,
             tag: 1,
             writer,
           })
+
           valueEncoderWithTag({
             value: value.value,
             tag: 2,
