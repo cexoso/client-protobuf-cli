@@ -4,15 +4,21 @@ import { isAbsolute, join } from 'path'
 
 @injectable()
 export class ProjectInfo {
+  // PB 存放的位置
   #pbRootPath: string = ''
-  setPbRootPath(path: string) {
+  // 最后产物生成的项目位置
+  #projectRoot: string = ''
+  #getPathSafely(path: string) {
     const absolutePath = isAbsolute(path)
       ? path
       : // 从执行的路径开始查找
         join(process.cwd(), path)
 
     this.#assertIsDirectory(absolutePath)
-    this.#pbRootPath = path
+    return absolutePath
+  }
+  setPbRootPath(path: string) {
+    this.#pbRootPath = this.#getPathSafely(path)
   }
   #assertIsDirectory(absolutePath: string) {
     if (!existsSync(absolutePath)) {
@@ -26,5 +32,11 @@ export class ProjectInfo {
   }
   get pbRootPath() {
     return this.#pbRootPath
+  }
+  setProjectRoot(path: string) {
+    this.#projectRoot = this.#getPathSafely(path)
+  }
+  get projectRoot() {
+    return this.#projectRoot
   }
 }
