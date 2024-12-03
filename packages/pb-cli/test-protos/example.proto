@@ -1,5 +1,6 @@
 syntax = "proto2";
 package example_service;
+import "people.proto";
 
 message GetDataReq {
   required int64 uid = 1;
@@ -23,11 +24,6 @@ message Book {
   optional bool is_favorite = 4; // 是否添加到了收藏清单中
   required People author = 5; // 作者
   required Status status = 6;
-}
-
-message People {
-  required int32 user_id = 1;
-  optional string name = 2;
 }
 
 message Data {

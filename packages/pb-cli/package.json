@@ -10,8 +10,10 @@
     "commander": "^12.1.0",
     "dedent": "^1.5.3",
     "glob": "^11.0.0",
+    "inversify": "^6.1.5",
     "protobufjs": "^7.3.2",
     "radash": "^12.1.0",
+    "reflect-metadata": "^0.2.2",
     "ts-dedent": "^2.2.0",
     "tslib": "^2.6.3"
   },

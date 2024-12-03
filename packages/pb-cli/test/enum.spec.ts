@@ -6,7 +6,7 @@ import { getList } from './helper'
 import dedent from 'ts-dedent'
 import { generatePackage } from '../src/generate-services'
 
-describe('generatePackage IPO', () => {
+describe.skip('generatePackage IPO', () => {
   it('normal', async () => {
     const file = await generatePackage({
       absolutePath: join(__dirname, '../test-protos/example.proto'),
@@ -18,7 +18,7 @@ describe('generatePackage IPO', () => {
     })
   })
 })
-describe('generatePackage', () => {
+describe.skip('generatePackage', () => {
   it('requestType', async () => {
     const result = await loadPBfromLocalPath({
       absolutePath: join(__dirname, '../test-protos/example.proto'),

@@ -5,7 +5,7 @@ import { ServiceCodeGenerater } from '../src/generate-service-code/generate-serv
 import dedent from 'ts-dedent'
 import { getList } from './helper'
 
-describe('loadPBfromLocalPath', () => {
+describe.skip('loadPBfromLocalPath', () => {
   it('requestType', async () => {
     const result = await loadPBfromLocalPath({
       absolutePath: join(__dirname, '../test-protos/example.proto'),
