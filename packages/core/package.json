@@ -25,6 +25,9 @@
     "release": "vitest --run && npm run build",
     "prepublishOnly": "npm run release"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
