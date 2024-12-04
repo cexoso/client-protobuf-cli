@@ -11,7 +11,7 @@ export class EncoderGenerater {
   constructor(@inject(FilesManager) private filesManager: FilesManager) {}
   #messageEncodeMap = new Map<string, { content: string; file: File }>()
   #addImport(field: Field, modulePath: string, member: string) {
-    const file = this.filesManager.getFilesByPath(field.filename)
+    const file = this.filesManager.getFileByPath(field.filename)
     file.addImport({ absolutePath: modulePath, member })
   }
   #genRepeatFieldContent(field: Field) {
@@ -88,7 +88,7 @@ export class EncoderGenerater {
     let result = this.#messageEncodeMap.get(name)
 
     if (result === undefined) {
-      const currentFile = this.filesManager.getFilesByPath(type.filename)
+      const currentFile = this.filesManager.getFileByPath(type.filename)
       result = { content: '', file: currentFile }
       this.#messageEncodeMap.set(name, result)
       const genFieldEncode = (field: Field) => {

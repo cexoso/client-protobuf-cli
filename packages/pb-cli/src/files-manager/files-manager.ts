@@ -1,13 +1,15 @@
 import { inject, injectable } from 'inversify'
 import { ProjectInfo } from '../project'
 import { File } from './file'
+import { join, isAbsolute } from 'path'
 
 @injectable()
 export class FilesManager {
   #files = new Map<string, File>()
   constructor(@inject(ProjectInfo) private projectInfo: ProjectInfo) {}
 
-  getFilesByPath(absolutePath: string) {
+  getFileByPath(path: string) {
+    const absolutePath = isAbsolute(path) ? path : join(this.projectInfo.pbRootPath, path)
     let file = this.#files.get(absolutePath)
     if (!file) {
       file = new File(absolutePath, {

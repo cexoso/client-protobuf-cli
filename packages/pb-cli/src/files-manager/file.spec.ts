@@ -7,7 +7,7 @@ describe('files', async () => {
   it('normal', async () => {
     const container = createContainer()
     const filesManager = container.get(FilesManager)
-    const x = filesManager.getFilesByPath('./x.ts')
+    const x = filesManager.getFileByPath('./x.ts')
     x.addImport({
       absolutePath: 'radash',
       member: 'get',
@@ -33,7 +33,7 @@ describe('files', async () => {
 
     expect(x.toString()).deep.eq(
       dedent`
-        // ./x.ts
+        // x.ts
         import { get, map, map as xMap, default as _ } from 'radash'
         import { add } from './a'
         const a = get({ a: 1 }, 'a')

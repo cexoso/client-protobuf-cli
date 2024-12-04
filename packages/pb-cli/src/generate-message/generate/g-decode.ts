@@ -11,7 +11,7 @@ import { File } from '../../files-manager/file'
 export class DecoderGenerater {
   constructor(@inject(FilesManager) private filesManager: FilesManager) {}
   #addImport(field: Field, modulePath: string, member: string) {
-    const file = this.filesManager.getFilesByPath(field.filename)
+    const file = this.filesManager.getFileByPath(field.filename)
     file.addImport({ absolutePath: modulePath, member })
   }
   #messageDecodeMap = new Map<
@@ -41,7 +41,7 @@ export class DecoderGenerater {
   #generateMessageDecodeCodeIfNeed(type: Type) {
     let result = this.#messageDecodeMap.get(type.name)
     if (result === undefined) {
-      const currentFile = this.filesManager.getFilesByPath(type.filename)
+      const currentFile = this.filesManager.getFileByPath(type.filename)
       result = {
         content: '',
         file: currentFile,
