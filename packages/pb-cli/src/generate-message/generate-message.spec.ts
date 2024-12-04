@@ -220,4 +220,71 @@ describe('generate', () => {
       
     `)
   })
+
+  it('decode', async () => {
+    const container = createContainer()
+    const pbLoader = container.get(PBLoader)
+    const projectInfo = container.get(ProjectInfo)
+    projectInfo.setPbRootPath(root)
+    projectInfo.setProjectRoot('./src')
+    const files = await pbLoader.loadByPath('example.proto')
+    const messageGenerator = container.get(MessageGenerator)
+    messageGenerator.generateDecode(files)
+    const filesManager = container.get(FilesManager)
+    const fileContent = filesManager.listAllFile().map((file) => file.toString())
+    expect(fileContent).lengthOf(2)
+    expect(fileContent[0]).deep.eq(dedent`
+      // ./example.proto
+      import { readUint32, defineMessage, readInt64, readInt32, readString, readFloat, readBool, readEnum } from 'protobuf-frontend'
+      import { decodePeople } from './people.proto'
+      export const decodePagination = defineMessage<Pagination>(
+        new Map([
+          [1, { type: 'scalar', decode: readUint32, name: 'index' }],
+          [10, { type: 'scalar', decode: readUint32, name: 'pageSize' }],
+        ])
+      )
+
+      export const decodeGetDataReq = defineMessage<GetDataReq>(
+        new Map([
+          [1, { type: 'scalar', decode: readInt64, name: 'uid' }],
+          [2, { type: 'message', decode: decodePagination, name: 'pagination' }],
+        ])
+      )
+
+      export const decodeBook = defineMessage<Book>(
+        new Map([
+          [1, { type: 'scalar', decode: readInt32, name: 'bookId' }],
+          [2, { type: 'scalar', decode: readString, name: 'bookName' }],
+          [3, { type: 'scalar', decode: readFloat, name: 'price' }],
+          [4, { type: 'scalar', decode: readBool, name: 'isFavorite' }],
+          [5, { type: 'message', decode: decodePeople, name: 'author' }],
+          [6, { type: 'scalar', decode: readEnum, name: 'status' }],
+        ])
+      )
+
+      export const decodeData = defineMessage<Data>(
+        new Map([[1, { type: 'message', isRepeat: true, decode: decodeBook, name: 'books' }]])
+      )
+
+      export const decodeGetDataRes = defineMessage<GetDataRes>(
+        new Map([
+          [1, { type: 'scalar', decode: readInt32, name: 'code' }],
+          [2, { type: 'scalar', decode: readString, name: 'message' }],
+          [3, { type: 'message', decode: decodeData, name: 'data' }],
+        ])
+      )
+      
+    `)
+    expect(fileContent[1]).deep.eq(dedent`
+      // ./people.proto
+      import { readInt32, readString, defineMessage } from 'protobuf-frontend'
+      export const decodePeople = defineMessage<People>(
+        new Map([
+          [1, { type: 'scalar', decode: readInt32, name: 'userId' }],
+          [2, { type: 'scalar', decode: readString, name: 'name' }],
+        ])
+      )
+      
+    `)
+  })
 })
