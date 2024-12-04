@@ -23,6 +23,9 @@ export class File {
     return declarations
   }
   addImport({ absolutePath, member }: { absolutePath: string; member: string }) {
+    if (this.fileAbsolutePath === absolutePath) {
+      return
+    }
     const declarations = this.#getDeclarationsByPath(absolutePath)
     declarations.add(member)
   }
