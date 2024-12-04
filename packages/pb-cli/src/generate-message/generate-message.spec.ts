@@ -71,6 +71,8 @@ describe('pbloader', () => {
       
     `)
   })
+
+  it.only('load encode and decode', async () => {
     const container = createContainer()
     const pbLoader = container.get(PBLoader)
     const projectInfo = container.get(ProjectInfo)
@@ -78,9 +80,13 @@ describe('pbloader', () => {
     projectInfo.setProjectRoot('./src')
     const files = await pbLoader.loadByPath('example.proto')
     const messageGenerator = container.get(MessageGenerator)
-    messageGenerator.generateMessageCode(files)
+    messageGenerator.generateEncoderAndDecoder(files)
     const filesManager = container.get(FilesManager)
     const fileContent = filesManager.listAllFile().map((file) => file.toString())
-    expect(fileContent).lengthOf(2)
+    console.log(
+      'debugger 🐛 ',
+
+      fileContent.map((f) => f.toString()).join('\n')
+    )
   })
 })

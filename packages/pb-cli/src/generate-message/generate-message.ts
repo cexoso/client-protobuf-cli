@@ -3,10 +3,14 @@ import { Root } from 'protobufjs'
 import { getAllMessages } from './get-all-type'
 import { group } from 'radash'
 import { InterfaceGenerater } from './generate/g-interface'
+import { EncoderGenerater } from './generate/g-encode'
 
 @injectable()
 export class MessageGenerator {
-  constructor(@inject(InterfaceGenerater) private interfaceGenerater: InterfaceGenerater) {}
+  constructor(
+    @inject(InterfaceGenerater) private interfaceGenerater: InterfaceGenerater,
+    @inject(EncoderGenerater) private encoderGenerater: EncoderGenerater
+  ) {}
   #getGroupTypesByFileName(files: Map<string, Root>) {
     const entries = files.entries()
     const data = group(
@@ -21,10 +25,11 @@ export class MessageGenerator {
       .flatMap((fileName) => data[fileName])
       .map((type) => this.interfaceGenerater.generateMessage(type))
   }
-  generateMessageCode(files: Map<string, Root>) {
+  generateEncoderAndDecoder(files: Map<string, Root>) {
     const data = this.#getGroupTypesByFileName(files)
     Object.keys(data)
       .flatMap((fileName) => data[fileName])
-      .map((type) => this.interfaceGenerater.generateMessage(type))
+      .map((type) => this.encoderGenerater.generateEncodeCode(type))
   }
+  generateMessageCode(files: Map<string, Root>) {}
 }
