@@ -1,4 +1,4 @@
-import { parse, Root, IParserResult, loadSync } from 'protobufjs'
+import { Root, loadSync } from 'protobufjs'
 import { isAbsolute, join } from 'path'
 import { existsSync, readFile } from 'fs'
 import { inject, injectable } from 'inversify'
@@ -44,7 +44,11 @@ export class PBLoader {
     path: string,
     callback: (error: Error | null, content?: string | null) => void
   ) => {
-    const readAndFill = (path: string) => {
+    const readAndFill = (path: string | null) => {
+      if (path === null) {
+        callback(new Error(`can't find ${path}`))
+        return
+      }
       this.#readFile(path).then(
         (content) => {
           callback(null, content)

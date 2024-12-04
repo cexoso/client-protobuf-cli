@@ -1,5 +1,4 @@
 import { program } from 'commander'
-import { generatePackage } from './generate-services'
 import { isAbsolute, join } from 'path'
 
 program.option('-p, --path <path>', '输入文件的相对/绝对路径')
@@ -29,9 +28,3 @@ const entryProtoFileEntryPath = getPath()
 const outputPath = getOutPath()
 
 const dryRun = options.dryRun
-generatePackage({
-  absolutePath: entryProtoFileEntryPath,
-  serviceName: options.serviceName,
-  dryRun,
-  out: outputPath,
-})
