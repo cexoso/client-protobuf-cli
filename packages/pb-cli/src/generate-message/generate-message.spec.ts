@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createContainer } from '../container'
 import { MessageGenerator } from './generate-message'
-import { join } from 'path'
+import { isAbsolute, join, relative } from 'path'
 import { PBLoader } from '../pb-loader/pb-loader'
 import { ProjectInfo } from '../project'
 import { FilesManager } from '../files-manager/files-manager'
@@ -91,9 +91,9 @@ describe('generate', () => {
     expect(fileContent).lengthOf(2)
     expect(fileContent[0]).deep.eq(dedent`
       // ./example.ts
-      import { encodeUint32ToBuffer, EncoderWithoutTag, encodeInt64ToBuffer, encodeMessageToBuffer, encodeInt32ToBuffer, encodeStringToBuffer, encodeFloatToBuffer, encodeBoolToBuffer, encodeEnumToBuffer, encodeRepeatToBuffer } from 'protobuf-frontend'
+      import { encodeUint32ToBuffer, EncoderWithoutTag, encodeInt64ToBuffer, encodeMessageToBuffer, encodeInt32ToBuffer, encodeStringToBuffer, encodeFloatToBuffer, encodeBoolToBuffer, encodeEnumToBuffer, encodeRepeatToBuffer } from '@protobuf-es/core'
       import { encodePeople } from './people'
-      const encodePagination: EncoderWithoutTag<Pagination> = ({ value, writer }) => {
+      export const encodePagination: EncoderWithoutTag<Pagination> = ({ value, writer }) => {
         encodeUint32ToBuffer({
           value: value.index,
           tag: 1,
@@ -109,7 +109,7 @@ describe('generate', () => {
         }
       }
 
-      const encodeGetDataReq: EncoderWithoutTag<GetDataReq> = ({ value, writer }) => {
+      export const encodeGetDataReq: EncoderWithoutTag<GetDataReq> = ({ value, writer }) => {
         encodeInt64ToBuffer({
           value: value.uid,
           tag: 1,
@@ -128,7 +128,7 @@ describe('generate', () => {
         }
       }
 
-      const encodeBook: EncoderWithoutTag<Book> = ({ value, writer }) => {
+      export const encodeBook: EncoderWithoutTag<Book> = ({ value, writer }) => {
         encodeInt32ToBuffer({
           value: value.bookId,
           tag: 1,
@@ -168,7 +168,7 @@ describe('generate', () => {
         })
       }
 
-      const encodeData: EncoderWithoutTag<Data> = ({ value, writer }) => {
+      export const encodeData: EncoderWithoutTag<Data> = ({ value, writer }) => {
         if (value.books !== undefined) {
           encodeRepeatToBuffer(
             value.books,
@@ -179,7 +179,7 @@ describe('generate', () => {
         }
       }
 
-      const encodeGetDataRes: EncoderWithoutTag<GetDataRes> = ({ value, writer }) => {
+      export const encodeGetDataRes: EncoderWithoutTag<GetDataRes> = ({ value, writer }) => {
         encodeInt32ToBuffer({
           value: value.code,
           tag: 1,
@@ -207,8 +207,8 @@ describe('generate', () => {
 
     expect(fileContent[1]).deep.eq(dedent`
       // ./people.ts
-      import { encodeInt32ToBuffer, encodeStringToBuffer, EncoderWithoutTag } from 'protobuf-frontend'
-      const encodePeople: EncoderWithoutTag<People> = ({ value, writer }) => {
+      import { encodeInt32ToBuffer, encodeStringToBuffer, EncoderWithoutTag } from '@protobuf-es/core'
+      export const encodePeople: EncoderWithoutTag<People> = ({ value, writer }) => {
         encodeInt32ToBuffer({
           value: value.userId,
           tag: 1,
@@ -241,7 +241,7 @@ describe('generate', () => {
     expect(fileContent).lengthOf(2)
     expect(fileContent[0]).deep.eq(dedent`
       // ./example.ts
-      import { readUint32, defineMessage, readInt64, readInt32, readString, readFloat, readBool, readEnum } from 'protobuf-frontend'
+      import { readUint32, defineMessage, readInt64, readInt32, readString, readFloat, readBool, readEnum } from '@protobuf-es/core'
       import { decodePeople } from './people'
       export const decodePagination = defineMessage<Pagination>(
         new Map([
@@ -283,7 +283,7 @@ describe('generate', () => {
     `)
     expect(fileContent[1]).deep.eq(dedent`
       // ./people.ts
-      import { readInt32, readString, defineMessage } from 'protobuf-frontend'
+      import { readInt32, readString, defineMessage } from '@protobuf-es/core'
       export const decodePeople = defineMessage<People>(
         new Map([
           [1, { type: 'scalar', decode: readInt32, name: 'userId' }],
@@ -293,7 +293,8 @@ describe('generate', () => {
       
     `)
   })
-  it.only('所有内容生成', async () => {
+
+  it('所有内容生成', async () => {
     const container = createContainer()
     const pbLoader = container.get(PBLoader)
     const projectInfo = container.get(ProjectInfo)
@@ -306,21 +307,45 @@ describe('generate', () => {
     const fileContent = filesManager.listAllFile()
     expect(fileContent).lengthOf(2)
 
+    const toProjectRelativePath = (p: string) => {
+      if (isAbsolute(p)) {
+        return relative(process.cwd(), p)
+      }
+      return p
+    }
     const fileNames = fileContent.map((file) => {
       return file.fileNameWithProject
     })
 
     const compiler = createCompilerHost({})
     const originGetSourceFile = compiler.getSourceFile
-    compiler.getSourceFile = (filename, languageVersion) => {
-      const file = filesManager.getFile(filename)
+    compiler.getSourceFile = (fileName, languageVersion) => {
+      const file = filesManager.getFile(toProjectRelativePath(fileName))
       if (file) {
-        return createSourceFile(filename, file.content, languageVersion)
+        return createSourceFile(fileName, file.body, languageVersion)
       }
-      return originGetSourceFile(filename, languageVersion)
+      return originGetSourceFile(fileName, languageVersion)
+    }
+    const fileExists = compiler.fileExists
+    compiler.fileExists = (fileName: string) => {
+      const x = toProjectRelativePath(fileName)
+      const file = filesManager.getFile(x)
+      if (file) {
+        return true
+      }
+      return fileExists(fileName)
+    }
+    const originReadFile = compiler.readFile
+    compiler.readFile = (fileName: string) => {
+      const file = filesManager.getFile(toProjectRelativePath(fileName))
+      if (file) {
+        return file.body
+      }
+      return originReadFile(fileName)
     }
     const program = createProgram(fileNames, {}, compiler)
 
     const diagnostics = getPreEmitDiagnostics(program)
+    expect(diagnostics).lengthOf(0)
   })
 })

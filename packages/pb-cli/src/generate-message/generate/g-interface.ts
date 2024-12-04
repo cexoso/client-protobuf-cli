@@ -40,7 +40,7 @@ export class InterfaceGenerater {
   #generateMessageInterfaceIfNeed(type: Type) {
     let result = this.#interfaces.get(type.name)
     if (result === undefined) {
-      const currentFile = this.filesManager.getFileByPath(type.filename)
+      const currentFile = this.filesManager.getFileByPath(type.filename!)
       result = {
         declareContent: '',
       }

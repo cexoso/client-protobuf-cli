@@ -11,7 +11,7 @@ import { File } from '../../files-manager/file'
 export class DecoderGenerater {
   constructor(@inject(FilesManager) private filesManager: FilesManager) {}
   #addImport(field: Field, modulePath: string, member: string) {
-    const file = this.filesManager.getFileByPath(field.filename)
+    const file = this.filesManager.getFileByPath(field.filename!)
     file.addImport({ absolutePath: modulePath, member })
   }
   #messageDecodeMap = new Map<
@@ -29,7 +29,7 @@ export class DecoderGenerater {
   }
   #getAndCompileDependenciesDecode(fields: Field[]) {
     return fields
-      .filter((field) => !isScalarType(field.type) && !isEnum(field.resolvedType))
+      .filter((field) => !isScalarType(field.type) && !isEnum(field.resolvedType!))
       .map((field) => {
         const decodeName = 'decode' + upperCaseFirst(field.type)
         return {
@@ -41,7 +41,7 @@ export class DecoderGenerater {
   #generateMessageDecodeCodeIfNeed(type: Type) {
     let result = this.#messageDecodeMap.get(type.name)
     if (result === undefined) {
-      const currentFile = this.filesManager.getFileByPath(type.filename)
+      const currentFile = this.filesManager.getFileByPath(type.filename!)
       result = {
         content: '',
         file: currentFile,
@@ -53,9 +53,9 @@ export class DecoderGenerater {
         const tag = field.id
         let config = ''
         const repeatedDescription = field.repeated ? 'isRepeat: true, ' : ''
-        if (isScalarType(field.type) || isEnum(field.resolvedType)) {
+        if (isScalarType(field.type) || isEnum(field.resolvedType!)) {
           const decode = this.#mapTypeToDecodeMethod(field)
-          this.#addImport(field, 'protobuf-frontend', decode)
+          this.#addImport(field, '@protobuf-es/core', decode)
           config = `{ type: 'scalar', ${repeatedDescription}decode: ${decode}, name: '${camel(
             field.name
           )}' }`
@@ -86,7 +86,7 @@ export class DecoderGenerater {
       )
       result.file.write(result.content)
       currentFile.addImport({
-        absolutePath: 'protobuf-frontend',
+        absolutePath: '@protobuf-es/core',
         member: 'defineMessage',
       })
       this.#messageDecodeMap.set(type.name, result)

@@ -11,7 +11,7 @@ export class EncoderGenerater {
   constructor(@inject(FilesManager) private filesManager: FilesManager) {}
   #messageEncodeMap = new Map<string, { content: string; file: File }>()
   #addImport(field: Field, modulePath: string, member: string) {
-    const file = this.filesManager.getFileByPath(field.filename)
+    const file = this.filesManager.getFileByPath(field.filename!)
     file.addImport({ absolutePath: modulePath, member })
   }
   #genRepeatFieldContent(field: Field) {
@@ -19,8 +19,8 @@ export class EncoderGenerater {
     if (!isScalar) {
       const encodeMethodName = 'encode' + upperCaseFirst(field.type)
       this.#generateMessageEncodeCode(field.root.lookupType(field.type))
-      this.#addImport(field, 'protobuf-frontend', 'encodeRepeatToBuffer')
-      this.#addImport(field, 'protobuf-frontend', 'encodeMessageToBuffer')
+      this.#addImport(field, '@protobuf-es/core', 'encodeRepeatToBuffer')
+      this.#addImport(field, '@protobuf-es/core', 'encodeMessageToBuffer')
       return `encodeRepeatToBuffer(
         value.${field.name},
         ({ value, tag, writer }) => encodeMessageToBuffer({ value, tag, writer }, ${encodeMethodName}),
@@ -33,7 +33,7 @@ export class EncoderGenerater {
     // 但也应该尽量把这个逻辑补上，防止接受 Proto3 的时候出问题
     const packed = field?.options?.packed ?? false
     const encodeName = packed ? 'encodePackedRepeatToBuffer' : 'encodeRepeatToBuffer'
-    this.#addImport(field, 'protobuf-frontend', encodeName)
+    this.#addImport(field, '@protobuf-es/core', encodeName)
     const result = `${encodeName}(value.${field.name}, ${method}, ${field.id}, writer)`
     return result
   }
@@ -50,9 +50,9 @@ export class EncoderGenerater {
       return this.#genRepeatFieldContent(field)
     }
 
-    if (isScalarType(field.type) || isEnum(field.resolvedType)) {
+    if (isScalarType(field.type) || isEnum(field.resolvedType!)) {
       const method = this.#mapTypeToEncodeMethod(field)
-      this.#addImport(field, 'protobuf-frontend', method)
+      this.#addImport(field, '@protobuf-es/core', method)
       return `${method}({
         value: value.${field.name},
         tag: ${field.id},
@@ -60,7 +60,7 @@ export class EncoderGenerater {
       })`
     }
     const encodeMethodName = 'encode' + upperCaseFirst(field.type)
-    this.#addImport(field, 'protobuf-frontend', 'encodeMessageToBuffer')
+    this.#addImport(field, '@protobuf-es/core', 'encodeMessageToBuffer')
     return `encodeMessageToBuffer(
       {
         value: value.${field.name},
@@ -73,7 +73,7 @@ export class EncoderGenerater {
 
   #getAndCompileDependenciesEncode(fields: Field[]) {
     return fields
-      .filter((field) => !isScalarType(field.type) && !isEnum(field.resolvedType))
+      .filter((field) => !isScalarType(field.type) && !isEnum(field.resolvedType!))
       .map((field) => {
         const encodeMethodName = 'encode' + upperCaseFirst(field.type)
         return {
@@ -88,7 +88,7 @@ export class EncoderGenerater {
     let result = this.#messageEncodeMap.get(name)
 
     if (result === undefined) {
-      const currentFile = this.filesManager.getFileByPath(type.filename)
+      const currentFile = this.filesManager.getFileByPath(type.filename!)
       result = { content: '', file: currentFile }
       this.#messageEncodeMap.set(name, result)
       const genFieldEncode = (field: Field) => {
@@ -117,7 +117,7 @@ export class EncoderGenerater {
 
       // 需要考虑嵌套请求参数
       result.content = formatTypescript(
-        `const ${name}: EncoderWithoutTag<${type.name}> = (${paramsDefined}) => {
+        `export const ${name}: EncoderWithoutTag<${type.name}> = (${paramsDefined}) => {
           ${type.fieldsArray.map((field) => genFieldEncode(field)).join('\n')}
         }`
       )
@@ -125,7 +125,7 @@ export class EncoderGenerater {
       result.file.write(result.content)
 
       currentFile.addImport({
-        absolutePath: 'protobuf-frontend',
+        absolutePath: '@protobuf-es/core',
         member: 'EncoderWithoutTag',
       })
       this.#messageEncodeMap.set(name, result)

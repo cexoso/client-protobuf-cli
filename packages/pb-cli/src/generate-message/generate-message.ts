@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify'
-import { Root } from 'protobufjs'
+import { Root, Type } from 'protobufjs'
 import { getAllMessages } from './get-all-type'
 import { group } from 'radash'
 import { InterfaceGenerater } from './generate/g-interface'
@@ -17,27 +17,26 @@ export class MessageGenerator {
     const entries = files.entries()
     const data = group(
       [...entries].flatMap(([_, root]) => getAllMessages(root)),
-      (i) => i.filename
+      (i) => i.filename!
     )
     return data
   }
-  generateType(files: Map<string, Root>) {
+  #doForType(files: Map<string, Root>, job: (_: Type) => any) {
     const data = this.#getGroupTypesByFileName(files)
     Object.keys(data)
-      .flatMap((fileName) => data[fileName])
-      .map((type) => this.interfaceGenerater.generateMessage(type))
+      .flatMap((fileName) => data[fileName]!)
+      .map((type) => {
+        job(type)
+      })
+  }
+  generateType(files: Map<string, Root>) {
+    this.#doForType(files, (type) => this.interfaceGenerater.generateMessage(type))
   }
   generateDecode(files: Map<string, Root>) {
-    const data = this.#getGroupTypesByFileName(files)
-    Object.keys(data)
-      .flatMap((fileName) => data[fileName])
-      .map((type) => this.decoderGenerater.generateDecodeCode(type))
+    this.#doForType(files, (type) => this.decoderGenerater.generateDecodeCode(type))
   }
   generateEncoder(files: Map<string, Root>) {
-    const data = this.#getGroupTypesByFileName(files)
-    Object.keys(data)
-      .flatMap((fileName) => data[fileName])
-      .map((type) => this.encoderGenerater.generateEncodeCode(type))
+    this.#doForType(files, (type) => this.encoderGenerater.generateEncodeCode(type))
   }
   generateAllCode(files: Map<string, Root>) {
     this.generateType(files)

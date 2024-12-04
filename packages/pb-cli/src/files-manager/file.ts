@@ -78,16 +78,13 @@ export class File {
     )
   }
 
-  get content() {
-    const content = this.#contents.join('\n')
-    return content
+  get body() {
+    return this.#getImportsDeclaration() + this.#contents.join('\n')
   }
 
   toString() {
     const filename = this.fileNameWithProject
     let body = `// ${filename}\n`
-    body += this.#getImportsDeclaration()
-    body += this.content
-    return body
+    return body + this.body
   }
 }
