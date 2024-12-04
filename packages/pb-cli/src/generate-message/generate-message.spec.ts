@@ -293,7 +293,7 @@ describe('generate', () => {
       
     `)
   })
-  it('所有内容生成', async () => {
+  it.only('所有内容生成', async () => {
     const container = createContainer()
     const pbLoader = container.get(PBLoader)
     const projectInfo = container.get(ProjectInfo)
@@ -306,14 +306,21 @@ describe('generate', () => {
     const fileContent = filesManager.listAllFile()
     expect(fileContent).lengthOf(2)
 
-    fileContent.map((file) => {
+    const fileNames = fileContent.map((file) => {
       return file.fileNameWithProject
     })
 
-    // const compiler = createCompilerHost({})
-    // const program = createProgram([], {}, compiler)
-    //
-    // const diagnostics = getPreEmitDiagnostics(program)
-    // console.log('debugger 🐛 diagnostics', diagnostics)
+    const compiler = createCompilerHost({})
+    const originGetSourceFile = compiler.getSourceFile
+    compiler.getSourceFile = (filename, languageVersion) => {
+      const file = filesManager.getFile(filename)
+      if (file) {
+        return createSourceFile(filename, file.content, languageVersion)
+      }
+      return originGetSourceFile(filename, languageVersion)
+    }
+    const program = createProgram(fileNames, {}, compiler)
+
+    const diagnostics = getPreEmitDiagnostics(program)
   })
 })
