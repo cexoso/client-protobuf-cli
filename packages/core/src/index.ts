@@ -1,4 +1,4 @@
-export { defineMessage } from './src/decode'
+export { defineMessage } from './decode'
 export {
   readInt32,
   createReader,
@@ -17,8 +17,8 @@ export {
   readFixed64,
   readSfixed64,
   readEnum,
-} from './src/reader'
-export type { EncoderWithoutTag } from './src/encode'
+} from './reader'
+export type { EncoderWithoutTag } from './encode'
 export {
   encodeStringToBuffer,
   encodeUint32ToBuffer,
@@ -38,6 +38,6 @@ export {
   encodePackedRepeatToBuffer,
   encodeSfixed64ToBuffer,
   encodeEnumToBuffer,
-} from './src/encode'
-export { toUint8Array, createWriter } from './src/writer'
-export type { ReaderLike } from './src/reader'
+} from './encode'
+export { toUint8Array, createWriter } from './writer'
+export type { ReaderLike } from './reader'
