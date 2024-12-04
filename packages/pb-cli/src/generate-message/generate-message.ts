@@ -25,7 +25,7 @@ export class MessageGenerator {
       .flatMap((fileName) => data[fileName])
       .map((type) => this.interfaceGenerater.generateMessage(type))
   }
-  generateEncoderAndDecoder(files: Map<string, Root>) {
+  generateEncoder(files: Map<string, Root>) {
     const data = this.#getGroupTypesByFileName(files)
     Object.keys(data)
       .flatMap((fileName) => data[fileName])
