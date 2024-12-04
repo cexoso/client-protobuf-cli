@@ -6,6 +6,12 @@ import { PBLoader } from '../pb-loader/pb-loader'
 import { ProjectInfo } from '../project'
 import { FilesManager } from '../files-manager/files-manager'
 import { dedent } from 'ts-dedent'
+import {
+  createProgram,
+  createSourceFile,
+  createCompilerHost,
+  getPreEmitDiagnostics,
+} from 'typescript'
 
 const root = join(__dirname, '../../test-protos')
 
@@ -23,8 +29,8 @@ describe('generate', () => {
     const fileContent = filesManager.listAllFile().map((file) => file.toString())
     expect(fileContent).lengthOf(2)
     expect(fileContent[0]).deep.eq(dedent`
-      // ./example.proto
-      import { People } from './people.proto'
+      // ./example.ts
+      import { People } from './people'
       export interface Pagination {
         index: number
         pageSize?: number
@@ -61,7 +67,7 @@ describe('generate', () => {
 
     `)
     expect(fileContent[1]).deep.eq(dedent`
-      // ./people.proto
+      // ./people.ts
 
       export interface People {
         userId: number
@@ -84,9 +90,9 @@ describe('generate', () => {
     const fileContent = filesManager.listAllFile().map((file) => file.toString())
     expect(fileContent).lengthOf(2)
     expect(fileContent[0]).deep.eq(dedent`
-      // ./example.proto
+      // ./example.ts
       import { encodeUint32ToBuffer, EncoderWithoutTag, encodeInt64ToBuffer, encodeMessageToBuffer, encodeInt32ToBuffer, encodeStringToBuffer, encodeFloatToBuffer, encodeBoolToBuffer, encodeEnumToBuffer, encodeRepeatToBuffer } from 'protobuf-frontend'
-      import { encodePeople } from './people.proto'
+      import { encodePeople } from './people'
       const encodePagination: EncoderWithoutTag<Pagination> = ({ value, writer }) => {
         encodeUint32ToBuffer({
           value: value.index,
@@ -200,7 +206,7 @@ describe('generate', () => {
     `)
 
     expect(fileContent[1]).deep.eq(dedent`
-      // ./people.proto
+      // ./people.ts
       import { encodeInt32ToBuffer, encodeStringToBuffer, EncoderWithoutTag } from 'protobuf-frontend'
       const encodePeople: EncoderWithoutTag<People> = ({ value, writer }) => {
         encodeInt32ToBuffer({
@@ -234,9 +240,9 @@ describe('generate', () => {
     const fileContent = filesManager.listAllFile().map((file) => file.toString())
     expect(fileContent).lengthOf(2)
     expect(fileContent[0]).deep.eq(dedent`
-      // ./example.proto
+      // ./example.ts
       import { readUint32, defineMessage, readInt64, readInt32, readString, readFloat, readBool, readEnum } from 'protobuf-frontend'
-      import { decodePeople } from './people.proto'
+      import { decodePeople } from './people'
       export const decodePagination = defineMessage<Pagination>(
         new Map([
           [1, { type: 'scalar', decode: readUint32, name: 'index' }],
@@ -276,7 +282,7 @@ describe('generate', () => {
       
     `)
     expect(fileContent[1]).deep.eq(dedent`
-      // ./people.proto
+      // ./people.ts
       import { readInt32, readString, defineMessage } from 'protobuf-frontend'
       export const decodePeople = defineMessage<People>(
         new Map([
@@ -286,5 +292,28 @@ describe('generate', () => {
       )
       
     `)
+  })
+  it('所有内容生成', async () => {
+    const container = createContainer()
+    const pbLoader = container.get(PBLoader)
+    const projectInfo = container.get(ProjectInfo)
+    projectInfo.setPbRootPath(root)
+    projectInfo.setProjectRoot('./src')
+    const files = await pbLoader.loadByPath('example.proto')
+    const messageGenerator = container.get(MessageGenerator)
+    messageGenerator.generateAllCode(files)
+    const filesManager = container.get(FilesManager)
+    const fileContent = filesManager.listAllFile()
+    expect(fileContent).lengthOf(2)
+
+    fileContent.map((file) => {
+      return file.fileNameWithProject
+    })
+
+    // const compiler = createCompilerHost({})
+    // const program = createProgram([], {}, compiler)
+    //
+    // const diagnostics = getPreEmitDiagnostics(program)
+    // console.log('debugger 🐛 diagnostics', diagnostics)
   })
 })

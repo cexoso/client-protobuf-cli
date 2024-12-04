@@ -39,5 +39,9 @@ export class MessageGenerator {
       .flatMap((fileName) => data[fileName])
       .map((type) => this.encoderGenerater.generateEncodeCode(type))
   }
-  generateMessageCode(files: Map<string, Root>) {}
+  generateAllCode(files: Map<string, Root>) {
+    this.generateType(files)
+    this.generateEncoder(files)
+    this.generateDecode(files)
+  }
 }

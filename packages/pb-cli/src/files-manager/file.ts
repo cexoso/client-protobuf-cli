@@ -1,4 +1,4 @@
-import { relative, join, isAbsolute } from 'path'
+import { relative, join, isAbsolute, extname } from 'path'
 export class File {
   #contents: string[] = []
   #imports = new Map<string, Set<string>>()
@@ -45,8 +45,16 @@ export class File {
   get absoluteFileName() {
     return join(this.opts.projectRoot, this.fileNameWithProject)
   }
+  #getRelativeTsPath(absolutePath: string, ignoreExt: boolean = false) {
+    let relativePath = this.#transformToProjectRelativePath(absolutePath)
+    const ext = extname(relativePath)
+    if (ext) {
+      relativePath = relativePath.replace(new RegExp(`${ext}$`), ignoreExt ? '' : '.ts')
+    }
+    return relativePath
+  }
   get fileNameWithProject() {
-    return this.#transformToProjectRelativePath(this.fileAbsolutePath)
+    return this.#getRelativeTsPath(this.fileAbsolutePath)
   }
 
   #getMemberDeclaration = (members: Set<string>) => {
@@ -63,7 +71,7 @@ export class File {
       allImports
         .map(([module, members]) => {
           const memberDeclarations = this.#getMemberDeclaration(members)
-          const modulePath = this.#transformToProjectRelativePath(module)
+          const modulePath = this.#getRelativeTsPath(module, true)
           return `import ${memberDeclarations}'${modulePath}'`
         })
         .join('\n') + '\n'
