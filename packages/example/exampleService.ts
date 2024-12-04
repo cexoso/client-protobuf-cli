@@ -12,7 +12,7 @@ import {
   encodeUint32ToBuffer,
   EncoderWithoutTag,
   encodeMessageToBuffer,
-} from 'protobuf-frontend'
+} from '@protobuf-es/core'
 const serviceId = 0xb601
 export interface Pagination {
   index: number

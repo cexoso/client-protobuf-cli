@@ -47,7 +47,7 @@ importers:
 
   packages/example:
     dependencies:
-      protobuf-frontend:
+      '@protobuf-es/core':
         specifier: 'workspace: *'
         version: link:../core
     devDependencies:
@@ -82,6 +82,9 @@ importers:
       '@prettier/sync':
         specifier: ^0.5.2
         version: 0.5.2(prettier@3.3.3)
+      '@protobuf-es/core':
+        specifier: 'workspace: *'
+        version: link:../core
       commander:
         specifier: ^12.1.0
         version: 12.1.0

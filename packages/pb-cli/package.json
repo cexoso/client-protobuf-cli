@@ -6,6 +6,7 @@
     "test": "vitest --reporter=dot"
   },
   "dependencies": {
+    "@protobuf-es/core": "workspace: *",
     "@prettier/sync": "^0.5.2",
     "commander": "^12.1.0",
     "dedent": "^1.5.3",
