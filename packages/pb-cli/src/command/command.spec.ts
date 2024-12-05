@@ -2,19 +2,19 @@ import { describe, it } from 'vitest'
 import { createContainer } from '../container'
 import { Command } from './command'
 import { join } from 'path'
-import { FilesManager } from '../files-manager/files-manager'
 
 const root = join(__dirname, '../../test-protos')
 const dist = join(__dirname, '../../dist')
 
-describe('Command', () => {
-  it.skip('生成', async () => {
+describe.only('Command', () => {
+  it.only('生成', async () => {
     const container = createContainer()
     const cmd = container.get(Command)
-    const filesManager = container.get(FilesManager)
     await cmd.compileProtos({
       protoDir: root,
       outDir: dist,
+      protoGlob: "google/protobuf/compiler/plugin.proto",
+      // protoGlob: 'srpc.proto',
       verbose: true,
       autoClean: true,
       withPrettier: true,

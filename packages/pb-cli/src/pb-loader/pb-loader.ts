@@ -1,72 +1,43 @@
 import { Root, loadSync } from 'protobufjs'
 import { isAbsolute, join } from 'path'
-import { existsSync, readFile } from 'fs'
+import { existsSync } from 'fs'
 import { inject, injectable } from 'inversify'
 import { globSync } from 'glob'
 import { ProjectInfo } from '../project'
 const buildInProtobufPath = join(__dirname, '../buildin-protobufs')
 
-type onFetchFunction = (
-  path: string,
-  callback: (error: Error | null, content?: string) => void
-) => void
-
 @injectable()
 export class PBLoader {
-  constructor(@inject(ProjectInfo) private projectInfo: ProjectInfo) {}
-  #pbFiles = new Map<string, Root>()
-  async #readFile(path: string) {
-    return new Promise<string>((resolve, reject) => {
-      readFile(path, (err, content) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(content.toString())
-        }
-      })
-    })
-  }
-  #getPathRelativeToRoot = (path: string) => {
-    const absolutePath = join(this.projectInfo.pbRootPath, path)
-    if (existsSync(absolutePath)) {
-      return absolutePath
-    }
-    return null
-  }
-  #getBuiltinPath = (path: string) => {
-    const absolutePath = join(buildInProtobufPath, path)
-    if (existsSync(absolutePath)) {
-      return absolutePath
-    }
-    return null
-  }
-  #onFetch: onFetchFunction = (
-    path: string,
-    callback: (error: Error | null, content?: string | null) => void
-  ) => {
-    const readAndFill = (path: string | null) => {
-      if (path === null) {
-        callback(new Error(`can't find ${path}`))
-        return
+  #root: Root
+  constructor(@inject(ProjectInfo) private projectInfo: ProjectInfo) {
+    this.#root = new Root()
+    this.#root.resolvePath = (origin, target) => {
+      if (isAbsolute(target)) {
+        return target
       }
-      this.#readFile(path).then(
-        (content) => {
-          callback(null, content)
-        },
-        () => callback(new Error(`can't find ${path}`))
-      )
-    }
+      const baseCurrentPath = join(origin, target)
 
-    if (isAbsolute(path)) {
-      return readAndFill(path)
-    }
-    const pathRelativeToRoot = this.#getPathRelativeToRoot(path)
-    if (pathRelativeToRoot) {
-      return readAndFill(pathRelativeToRoot)
-    }
+      // 这个好像是不对的，pb 并不存在基于当前文件路径的做法
+      if (existsSync(baseCurrentPath)) {
+        return baseCurrentPath
+      }
 
-    readAndFill(this.#getBuiltinPath(path))
+      const baseRoot = join(this.projectInfo.pbRootPath, target)
+      if (existsSync(baseRoot)) {
+        // 更多情况是基于 PB root 目录
+        return baseRoot
+      }
+
+      const baseBuildin = join(buildInProtobufPath, target)
+      // 兜底到内置的 PB 目录来查找像：
+      // validate.proto, google/type/phone_number.proto
+      if (existsSync(baseBuildin)) {
+        return baseBuildin
+      }
+      return target
+    }
   }
+  #pbFiles = new Map<string, Root>()
   public async loadByPath(path: string) {
     const allPBs = globSync(path, {
       cwd: this.projectInfo.pbRootPath,
@@ -74,7 +45,7 @@ export class PBLoader {
     })
     await Promise.all(
       allPBs.map(async (pbPath) => {
-        const x = loadSync(pbPath)
+        const x = loadSync(pbPath, this.#root)
         x.resolveAll()
         this.#pbFiles.set(pbPath, x)
       })
