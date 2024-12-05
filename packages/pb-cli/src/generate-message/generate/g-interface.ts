@@ -8,7 +8,7 @@ import { File } from '../../files-manager/file'
 @injectable()
 export class InterfaceGenerater {
   constructor(@inject(FilesManager) private filesManager: FilesManager) {}
-  #interfaces: Map<string, { file?: File; declareContent?: string }> = new Map()
+  #interfaces: Map<string, { file: File; declareContent: string }> = new Map()
   // 存的是 type
   #interfaceOrderList: string[] = []
 
@@ -32,7 +32,7 @@ export class InterfaceGenerater {
       .map((field) => {
         return {
           typeName: field.type,
-          file: this.#generateMessageInterfaceIfNeed(field.root.lookupTypeOrEnum(field.type)).file!,
+          file: this.#generateMessageInterfaceIfNeed(field.root.lookupTypeOrEnum(field.type)).file,
         }
       })
   }
@@ -43,10 +43,11 @@ export class InterfaceGenerater {
       const currentFile = this.filesManager.getFileByPath(type.filename!)
       result = {
         declareContent: '',
+        file: currentFile,
       }
 
       // 如果不存在声明, 也先填充一个空的，这是为了防止类型循环依赖无限生成
-      this.#interfaces.set(type.name, {})
+      this.#interfaces.set(type.name, result)
       if (isEnum(type)) {
         // 采用 const string 作为 enum 的值，目的是为了可读，以及兼容 javascript
         result.declareContent = formatTypescript(
@@ -78,7 +79,6 @@ export class InterfaceGenerater {
         file: currentFile,
         declareContent: result.declareContent,
       })
-      result.file = currentFile
     }
 
     return result
