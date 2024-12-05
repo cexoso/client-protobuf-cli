@@ -17,6 +17,7 @@ export {
   readFixed64,
   readSfixed64,
   readEnum,
+  readAsBytes
 } from './reader'
 export type { EncoderWithoutTag } from './encode'
 export {
@@ -38,6 +39,7 @@ export {
   encodePackedRepeatToBuffer,
   encodeSfixed64ToBuffer,
   encodeEnumToBuffer,
+  encodeByteToBuffer
 } from './encode'
 export { toUint8Array, createWriter } from './writer'
 export type { ReaderLike } from './reader'

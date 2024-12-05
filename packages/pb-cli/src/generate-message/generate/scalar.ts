@@ -15,6 +15,7 @@ const enum ScalarTypes {
   uint64 = 'uint64',
   sint64 = 'sint64',
   bool = 'bool',
+  bytes = 'bytes',
 }
 
 // 判断是否张量类型
@@ -32,6 +33,7 @@ export const isScalarType = (type: string): type is ScalarTypes => {
     ScalarTypes.int64,
     ScalarTypes.uint64,
     ScalarTypes.bool,
+    ScalarTypes.bytes,
   ]
   return scalarTypes.includes(type as ScalarTypes)
 }
@@ -51,6 +53,7 @@ export const scalarToTypescript = (scalarType: ScalarTypes) => {
     [ScalarTypes.int64, 'string'],
     [ScalarTypes.uint64, 'string'],
     [ScalarTypes.bool, 'boolean'],
+    [ScalarTypes.bytes, 'Uint8Array'],
   ])
   return scalarToTypescriptMap.get(scalarType)!
 }
@@ -71,6 +74,7 @@ export const mapScalarToEncodeMethod = (field: Field) => {
     [ScalarTypes.int64, 'encodeInt64ToBuffer'],
     [ScalarTypes.uint64, 'encodeUint64ToBuffer'],
     [ScalarTypes.bool, 'encodeBoolToBuffer'],
+    [ScalarTypes.bytes, 'encodeByteToBuffer'],
   ])
   const encodeType = scalarToEncodeMethodMap.get(field.type as ScalarTypes)
   if (!encodeType) {
@@ -95,6 +99,7 @@ export const mapScalarToDecodeMethod = (field: Field) => {
     [ScalarTypes.int64, 'readInt64'],
     [ScalarTypes.uint64, 'readUint64'],
     [ScalarTypes.bool, 'readBool'],
+    [ScalarTypes.bytes, 'readAsBytes'],
   ])
   const decodeMethod = scalarToEncodeMethodMap.get(field.type as ScalarTypes)
   if (!decodeMethod) {
