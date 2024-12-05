@@ -21,7 +21,7 @@
   },
   "scripts": {
     "test": "vitest --reporter=dot",
-    "build": "pkgroll",
+    "build": "pkgroll --clean-dist",
     "release": "vitest --run && npm run build",
     "prepublishOnly": "npm run release"
   },

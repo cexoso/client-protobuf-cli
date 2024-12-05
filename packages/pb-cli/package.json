@@ -1,24 +1,16 @@
 {
   "name": "@protobuf-es/cli",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "scripts": {
     "test": "vitest --reporter=dot",
-    "build": "pkgroll"
-  },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.cts",
-  "exports": {
-    "require": {
-      "types": "./dist/index.d.cts",
-      "default": "./dist/index.cjs"
-    },
-    "import": {
-      "types": "./dist/index.d.mts",
-      "default": "./dist/index.mjs"
-    }
+    "build": "pkgroll --clean-dist",
+    "release": "vitest --run && npm run build",
+    "prepublishOnly": "npm run release"
   },
   "bin": "./dist/cli.js",
+  "files": [
+    "dist/**/*"
+  ],
   "dependencies": {
     "@prettier/sync": "^0.5.2",
     "@protobuf-es/core": "workspace: *",
