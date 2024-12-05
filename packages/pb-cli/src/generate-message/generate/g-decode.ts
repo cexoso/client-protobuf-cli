@@ -6,12 +6,13 @@ import { formatTypescript } from '../../prettier'
 import { inject, injectable } from 'inversify'
 import { FilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
+import { getFilenameByType } from '../get-filename-by-type'
 
 @injectable()
 export class DecoderGenerater {
   constructor(@inject(FilesManager) private filesManager: FilesManager) {}
   #addImport(field: Field, modulePath: string, member: string) {
-    const file = this.filesManager.getFileByPath(field.filename!)
+    const file = this.filesManager.getFileByPath(getFilenameByType(field))
     file.addImport({ absolutePath: modulePath, member })
   }
   #messageDecodeMap = new Map<
@@ -41,7 +42,8 @@ export class DecoderGenerater {
   #generateMessageDecodeCodeIfNeed(type: Type) {
     let result = this.#messageDecodeMap.get(type.name)
     if (result === undefined) {
-      const currentFile = this.filesManager.getFileByPath(type.filename!)
+      const currentFile = this.filesManager.getFileByPath(getFilenameByType(type))
+
       result = {
         content: '',
         file: currentFile,

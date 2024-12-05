@@ -95,14 +95,14 @@ describe('generate', () => {
       import { encodePeople } from './people'
       export const encodePagination: EncoderWithoutTag<Pagination> = ({ value, writer }) => {
         encodeUint32ToBuffer({
-          value: value.index,
+          value: value['index'],
           tag: 1,
           writer,
         })
 
-        if (value.pageSize !== undefined) {
+        if (value['pageSize'] !== undefined) {
           encodeUint32ToBuffer({
-            value: value.pageSize,
+            value: value['pageSize'],
             tag: 10,
             writer,
           })
@@ -111,15 +111,15 @@ describe('generate', () => {
 
       export const encodeGetDataReq: EncoderWithoutTag<GetDataReq> = ({ value, writer }) => {
         encodeInt64ToBuffer({
-          value: value.uid,
+          value: value['uid'],
           tag: 1,
           writer,
         })
 
-        if (value.pagination !== undefined) {
+        if (value['pagination'] !== undefined) {
           encodeMessageToBuffer(
             {
-              value: value.pagination,
+              value: value['pagination'],
               tag: 2,
               writer,
             },
@@ -130,24 +130,24 @@ describe('generate', () => {
 
       export const encodeBook: EncoderWithoutTag<Book> = ({ value, writer }) => {
         encodeInt32ToBuffer({
-          value: value.bookId,
+          value: value['bookId'],
           tag: 1,
           writer,
         })
         encodeStringToBuffer({
-          value: value.bookName,
+          value: value['bookName'],
           tag: 2,
           writer,
         })
         encodeFloatToBuffer({
-          value: value.price,
+          value: value['price'],
           tag: 3,
           writer,
         })
 
-        if (value.isFavorite !== undefined) {
+        if (value['isFavorite'] !== undefined) {
           encodeBoolToBuffer({
-            value: value.isFavorite,
+            value: value['isFavorite'],
             tag: 4,
             writer,
           })
@@ -155,23 +155,23 @@ describe('generate', () => {
 
         encodeMessageToBuffer(
           {
-            value: value.author,
+            value: value['author'],
             tag: 5,
             writer,
           },
           encodePeople
         )
         encodeEnumToBuffer({
-          value: value.status,
+          value: value['status'],
           tag: 6,
           writer,
         })
       }
 
       export const encodeData: EncoderWithoutTag<Data> = ({ value, writer }) => {
-        if (value.books !== undefined) {
+        if (value['books'] !== undefined) {
           encodeRepeatToBuffer(
-            value.books,
+            value['books'],
             ({ value, tag, writer }) => encodeMessageToBuffer({ value, tag, writer }, encodeBook),
             1,
             writer
@@ -181,20 +181,20 @@ describe('generate', () => {
 
       export const encodeGetDataRes: EncoderWithoutTag<GetDataRes> = ({ value, writer }) => {
         encodeInt32ToBuffer({
-          value: value.code,
+          value: value['code'],
           tag: 1,
           writer,
         })
         encodeStringToBuffer({
-          value: value.message,
+          value: value['message'],
           tag: 2,
           writer,
         })
 
-        if (value.data !== undefined) {
+        if (value['data'] !== undefined) {
           encodeMessageToBuffer(
             {
-              value: value.data,
+              value: value['data'],
               tag: 3,
               writer,
             },
@@ -210,14 +210,14 @@ describe('generate', () => {
       import { encodeInt32ToBuffer, encodeStringToBuffer, EncoderWithoutTag } from '@protobuf-es/core'
       export const encodePeople: EncoderWithoutTag<People> = ({ value, writer }) => {
         encodeInt32ToBuffer({
-          value: value.userId,
+          value: value['userId'],
           tag: 1,
           writer,
         })
 
-        if (value.name !== undefined) {
+        if (value['name'] !== undefined) {
           encodeStringToBuffer({
-            value: value.name,
+            value: value['name'],
             tag: 2,
             writer,
           })

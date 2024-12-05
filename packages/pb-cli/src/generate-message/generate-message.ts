@@ -5,6 +5,7 @@ import { group } from 'radash'
 import { InterfaceGenerater } from './generate/g-interface'
 import { EncoderGenerater } from './generate/g-encode'
 import { DecoderGenerater } from './generate/g-decode'
+import { getFilenameByType } from './get-filename-by-type'
 
 @injectable()
 export class MessageGenerator {
@@ -17,7 +18,7 @@ export class MessageGenerator {
     const entries = files.entries()
     const data = group(
       [...entries].flatMap(([_, root]) => getAllMessages(root)),
-      (i) => i.filename!
+      (i) => getFilenameByType(i)
     )
     return data
   }

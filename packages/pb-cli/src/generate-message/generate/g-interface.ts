@@ -4,6 +4,7 @@ import { formatTypescript } from '../../prettier'
 import { inject, injectable } from 'inversify'
 import { FilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
+import { getFilenameByType } from '../get-filename-by-type'
 
 @injectable()
 export class InterfaceGenerater {
@@ -22,7 +23,7 @@ export class InterfaceGenerater {
   #generateFieldDescription(field: Field) {
     const optionalTag = field.optional ? '?' : ''
     let type = this.#getType(field)
-    const content = `${field.name}${optionalTag}: ${type}${field.repeated ? '[]' : ''}`
+    const content = `"${field.name}"${optionalTag}: ${type}${field.repeated ? '[]' : ''}`
     return content
   }
 
@@ -40,7 +41,7 @@ export class InterfaceGenerater {
   #generateMessageInterfaceIfNeed(type: Type) {
     let result = this.#interfaces.get(type.name)
     if (result === undefined) {
-      const currentFile = this.filesManager.getFileByPath(type.filename!)
+      const currentFile = this.filesManager.getFileByPath(getFilenameByType(type))
       result = {
         declareContent: '',
         file: currentFile,

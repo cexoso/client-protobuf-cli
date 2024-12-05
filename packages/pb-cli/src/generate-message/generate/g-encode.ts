@@ -5,13 +5,14 @@ import { formatTypescript } from '../../prettier'
 import { inject, injectable } from 'inversify'
 import { FilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
+import { getFilenameByType } from '../get-filename-by-type'
 
 @injectable()
 export class EncoderGenerater {
   constructor(@inject(FilesManager) private filesManager: FilesManager) {}
   #messageEncodeMap = new Map<string, { content: string; file: File }>()
   #addImport(field: Field, modulePath: string, member: string) {
-    const file = this.filesManager.getFileByPath(field.filename!)
+    const file = this.filesManager.getFileByPath(getFilenameByType(field))
     file.addImport({ absolutePath: modulePath, member })
   }
   #genRepeatFieldContent(field: Field) {
@@ -22,7 +23,7 @@ export class EncoderGenerater {
       this.#addImport(field, '@protobuf-es/core', 'encodeRepeatToBuffer')
       this.#addImport(field, '@protobuf-es/core', 'encodeMessageToBuffer')
       return `encodeRepeatToBuffer(
-        value.${field.name},
+        value["${field.name}"],
         ({ value, tag, writer }) => encodeMessageToBuffer({ value, tag, writer }, ${encodeMethodName}),
         ${field.id},
         writer
@@ -34,7 +35,7 @@ export class EncoderGenerater {
     const packed = field?.options?.packed ?? false
     const encodeName = packed ? 'encodePackedRepeatToBuffer' : 'encodeRepeatToBuffer'
     this.#addImport(field, '@protobuf-es/core', encodeName)
-    const result = `${encodeName}(value.${field.name}, ${method}, ${field.id}, writer)`
+    const result = `${encodeName}(value["${field.name}"], ${method}, ${field.id}, writer)`
     return result
   }
   #mapTypeToEncodeMethod(field: Field) {
@@ -54,7 +55,7 @@ export class EncoderGenerater {
       const method = this.#mapTypeToEncodeMethod(field)
       this.#addImport(field, '@protobuf-es/core', method)
       return `${method}({
-        value: value.${field.name},
+        value: value["${field.name}"],
         tag: ${field.id},
         writer,
       })`
@@ -63,7 +64,7 @@ export class EncoderGenerater {
     this.#addImport(field, '@protobuf-es/core', 'encodeMessageToBuffer')
     return `encodeMessageToBuffer(
       {
-        value: value.${field.name},
+        value: value["${field.name}"],
         tag: ${field.id},
         writer,
       },
@@ -88,14 +89,14 @@ export class EncoderGenerater {
     let result = this.#messageEncodeMap.get(name)
 
     if (result === undefined) {
-      const currentFile = this.filesManager.getFileByPath(type.filename!)
+      const currentFile = this.filesManager.getFileByPath(getFilenameByType(type))
       result = { content: '', file: currentFile }
       this.#messageEncodeMap.set(name, result)
       const genFieldEncode = (field: Field) => {
         let content = this.#genFieldContent(field)
         if (field.optional) {
           content = `
-            if (value.${field.name} !== undefined) {
+            if (value["${field.name}"] !== undefined) {
               ${content}
             }
           `

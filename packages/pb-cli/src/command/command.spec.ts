@@ -6,15 +6,13 @@ import { join } from 'path'
 const root = join(__dirname, '../../test-protos')
 const dist = join(__dirname, '../../dist')
 
-describe.only('Command', () => {
-  it.only('生成', async () => {
+describe('Command', () => {
+  it('生成所有的文件', async () => {
     const container = createContainer()
     const cmd = container.get(Command)
     await cmd.compileProtos({
       protoDir: root,
       outDir: dist,
-      protoGlob: "google/protobuf/compiler/plugin.proto",
-      // protoGlob: 'srpc.proto',
       verbose: true,
       autoClean: true,
       withPrettier: true,
