@@ -1,7 +1,7 @@
 import synchronizedPrettier from '@prettier/sync'
 const resolvePrettierConfig = () => {
   const string = synchronizedPrettier.resolveConfigFile()
-  return synchronizedPrettier.resolveConfig(string)
+  return synchronizedPrettier.resolveConfig(string!)
 }
 const prettierConfig = resolvePrettierConfig()
 

@@ -8,13 +8,14 @@ export class ProjectInfo {
   #pbRootPath: string = ''
   // 最后产物生成的项目位置
   #projectRoot: string = ''
-  #getPathSafely(path: string) {
+  #getPathSafely(path: string, ignoreNotFound: boolean = false) {
     const absolutePath = isAbsolute(path)
       ? path
       : // 从执行的路径开始查找
         join(process.cwd(), path)
-
-    this.#assertIsDirectory(absolutePath)
+    if (!ignoreNotFound) {
+      this.#assertIsDirectory(absolutePath)
+    }
     return absolutePath
   }
   setPbRootPath(path: string) {
@@ -34,7 +35,7 @@ export class ProjectInfo {
     return this.#pbRootPath
   }
   setProjectRoot(path: string) {
-    this.#projectRoot = this.#getPathSafely(path)
+    this.#projectRoot = this.#getPathSafely(path, true)
   }
   get projectRoot() {
     return this.#projectRoot

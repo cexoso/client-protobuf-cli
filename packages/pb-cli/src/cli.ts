@@ -1,19 +1,26 @@
 import { program } from 'commander'
 import { isAbsolute, join } from 'path'
+import { createContainer } from './container'
+import { Command } from './command/command'
 
-program.option('-p, --path <path>', '输入文件的相对/绝对路径')
-program.option('-s, --service-name <service_name>', '命名服务上注册的服务命名, 用于服务发现')
+program.option('-p, --proto-dir <protoDir>', '输入 proto 文件所在的目录，相对或者绝对路径')
+program.option('-g, --glob <globPath>', '用于进一步过滤 protos 文件，默认为 **/*.proto')
 program.option('--dry-run', '仅运行，不生成文件')
 program.option('-o, --out-dir <outDir>', '指定生成的目录')
+program.option('-v, --verbose', '输出更多信息')
+program.option('--auto-clean', '清空目标目录')
+program.option('--prettier', '应用当前项目的 prettier 进行格式化')
+
 program.parse()
 
 const options = program.opts()
 function getPath() {
-  const { path } = options
-  if (typeof path !== 'string' || path === '') {
-    return null
+  const { protoDir } = options
+  if (typeof protoDir !== 'string' || protoDir === '') {
+    console.log('你需要指定 proto-dir, 例如: -p protos')
+    process.exit(-1)
   }
-  return isAbsolute(path) ? path : join(process.cwd(), path)
+  return isAbsolute(protoDir) ? protoDir : join(process.cwd(), protoDir)
 }
 
 function getOutPath() {
@@ -26,5 +33,15 @@ function getOutPath() {
 
 const entryProtoFileEntryPath = getPath()
 const outputPath = getOutPath()
-
 const dryRun = options.dryRun
+
+const container = createContainer()
+const cmd = container.get(Command)
+cmd.compileProtos({
+  dryRun,
+  outDir: outputPath,
+  protoDir: entryProtoFileEntryPath,
+  protoGlob: options.globPath,
+  autoClean: options.autoClean,
+  withPrettier: options.prettier,
+})

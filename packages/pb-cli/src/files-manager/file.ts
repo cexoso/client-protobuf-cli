@@ -1,4 +1,5 @@
 import { relative, join, isAbsolute, extname } from 'path'
+import { formatTypescript } from '../prettier'
 export class File {
   #contents: string[] = []
   #imports = new Map<string, Set<string>>()
@@ -80,6 +81,14 @@ export class File {
 
   get body() {
     return this.#getImportsDeclaration() + this.#contents.join('\n')
+  }
+
+  getBody(opts: { formatWithCurrentPrettier?: boolean }) {
+    const body = this.body
+    if (opts.formatWithCurrentPrettier) {
+      return formatTypescript(body) // 现在这个 File 是耦合了 TS 的
+    }
+    return body
   }
 
   toString() {
