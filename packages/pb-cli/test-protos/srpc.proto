@@ -1,0 +1,242 @@
+syntax = "proto2";
+package srpc;
+
+option go_package = "gitlab.futunn.com/golang/srpc";
+// 服务选项与方法选项扩展定义
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.ServiceOptions {
+  optional uint32 service_option_id    = 10001;
+}
+
+extend google.protobuf.MethodOptions {
+  optional uint32 method_option_id     = 10002;
+}
+
+// frpc新增web逻辑
+message HttpRouteOptions {
+    optional string get = 1;  // get path
+    optional string post = 2; // post path
+}
+
+extend google.protobuf.MethodOptions {
+    optional HttpRouteOptions method_option_http_api = 10003;
+}
+
+// frpc新增通用错误码，详情见frpc错误码设计
+message ErrorInfo {
+    optional string source = 1;        //错误来源
+    optional int32 code = 2;           //业务自定义错误码、框架错误码
+    optional string message = 3;       //错误码说明
+    optional bool retry = 4;           //是否可重试
+    optional int64 retry_delay = 5;    //重试间隔，单位ms
+}
+
+// 标明方法是否可重试，例如调用超时或网络错误时，调用方是否可发起重试，未标识该标记的方法无法利用框架提供的重试策略，需调用法自行处理重试
+extend google.protobuf.MethodOptions {
+    optional bool method_option_retry = 10004;
+}
+
+// 鉴权信息定义
+message CSignKey
+{
+    optional uint32 type            = 1;    // 签名类型
+    optional string skey            = 2;    // 登录态的内容
+    optional string domain          = 3;    // 登录态的domain
+    optional uint32 company_id      = 4;    // esop 需要的公司id
+}
+
+// 内嵌webview上报的附加数据
+enum OsType
+{
+    OS_TYPE_WINDOWS = 10;
+    OS_TYPE_MAC     = 11;
+    OS_TYPE_IOS     = 12;
+    OS_TYPE_ANDROID = 13;
+}
+
+enum AppType
+{
+    APP_TYPE_FTNN   = 1;
+    APP_TYPE_WECHAT = 2;
+    APP_TYPE_QQ     = 3;
+    APP_TYPE_SAFARI = 4;
+    APP_TYPE_CHROME = 5;
+    APP_TYPE_OPERA  = 6;
+    APP_TYPE_IE     = 7;
+    APP_TYPE_FTMM   = 8;
+    APP_TYPE_VA     = 9;
+    APP_TYPE_QTNN   = 10;
+    APP_TYPE_QTMM   = 11;
+}
+
+enum BrokerID
+{
+    BROKER_ID_FSI_HK              = 1001;     // 富途证券国际（香港）
+    BROKER_ID_FSI_INC             = 1007;     // 富途证券国际（美分）
+    BROKER_ID_FSI_SG              = 1008;     // 富途证券国际（新加坡）
+    BROKER_ID_FSI_AU              = 1009;     // 富途证券国际（澳大利亚）
+    BROKER_ID_FSI_CRYPTO          = 1010;     // 美分数字货币
+    BROKER_ID_FSI_SG_CRYPTO       = 1011;     // 新分数字货币
+    BROKER_ID_FSI_JP              = 1012;     // 富途证券国际（日本）
+    BROKER_ID_FSI_AU_CRYPTO       = 1013;     // 澳分数字货币
+    BROKER_ID_FSI_HK_CRYPTO       = 1015;     // 香港数字货币
+    BROKER_ID_FSI_MY              = 1017;     // 富途证券国际（马来西亚）
+    BROKER_ID_FSI_CA              = 1019;     // 富途证券国际（加拿大）
+    BROKER_ID_FSI_HK_CRYPTO_TRUST = 1020;     // 香港数字货币信托
+}
+
+// 流式RPC数据帧类型
+enum FrameType
+{
+  FRAME_TYPE_UNKNOWN       = 0;
+  FRAME_TYPE_DATA          = 1;   // DATA帧可承载所有FrameFlag，可认为是通用帧
+  FRAME_TYPE_PING          = 2;   // 流级别心跳帧
+  FRAME_TYPE_GOAWAY        = 3;   // 用于连接上流的Graceful Stop
+  FRAME_TYPE_WINDOW_UPDATE = 4;   // 用于更新发送方窗口大小
+}
+
+enum FrameFlag
+{
+  FRAME_FLAG_START   = 0x1;       // 用于流的第一帧
+  FRAME_FLAG_ACK     = 0x2;       // 流级别ACK标志
+  FRAME_FLAG_CLOSE   = 0x4;       // 表示发送端流进入半关闭状态，不会再发送消息
+  FRAME_FLAG_RST     = 0x8;       // 流出现异常，断开流
+}
+
+message FrameExtendInfo {
+  optional uint32 recv_window_inc  = 1;   // 用于流控
+}
+
+message FrameMeta
+{
+  optional uint64 stream_id = 1;          // 帧所属流ID，0号保留为连接级别控制
+  optional uint32 type      = 2;          // 帧所属类型，
+  optional uint32 flag      = 3;          // 流携带的标志信息
+  optional FrameExtendInfo extend_info = 4;   // 根据流标志携带维护流状态需要的扩展信息
+}
+
+message WebView
+{
+    optional uint32 os_type           = 1;    // 实际来源的系统
+    optional uint32 app_type          = 2;    // 来源浏览器或微信等
+    optional string  version          = 3;    // 完整的版本信息
+}
+
+message Tag
+{
+    optional string name              = 1;    // 标签名
+    optional string value             = 2;    // 标签值
+    optional string source            = 3;    // 标签来源
+}
+
+// Destination 指定网关转发的目标实例信息
+message Destination {
+    // host 目标实例的IP地址
+    optional string host = 1;
+    // ports 目标实例的协议与端口，key为协议类型（SRPC/SRPCS/HTTP/HTTPS/TCP），value为端口号，网关根据请求的协议类型、Fauth配置选择对应端口
+    map<string, int32> ports = 2;
+    // tags 目标实例的标签，网关需要依赖Region标签来路由，鉴权等逻辑也可以依赖此信息，C++版本 写成 repeated StringMapEntry tags = 4;
+    map<string, string> tags = 3;
+}
+
+// 标准的通用头定义
+message CRpcHead
+{
+    optional uint64 origin_uid        = 1;    // 来源用户id信息 - 关联登录key信息 -可以是OA帐号
+    optional uint64 target_uid        = 2;    // 被操作的用户id - 默认是牛牛号 - 可选, 为空则等价源ID
+    optional string staff_name        = 3;    // 如果来源id是OA帐号, 则必须有员工名
+    optional uint64 session_id        = 4;    // 用户会话id, conn登录分配
+    optional uint32 service_id        = 5;    // 主命令字 服务id  cmdid
+    optional uint32 method_id         = 6;    // 子命令字 方法id  service type
+    optional uint64 sequence          = 7;    // 序列号, 上下文识别id
+    optional uint32 client_ipv4       = 8;    // 客户来源ip
+    optional uint32 client_port       = 9;    // 客户来源port
+    optional uint32 client_type       = 10;   // 客户类型
+    optional uint32 client_version    = 11;   // 客户版本
+    optional uint32 client_lang       = 12;   // 客户语言版本
+    optional uint32 client_seq        = 13;   // 客户端序号
+    optional int32  result            = 14;   // 返回码信息 <0系统错误 >0 业务失败
+    optional string result_msg        = 15;   // 返回字符串提示
+    optional string method_name       = 16;   // 可选支持按字符串访问rpc-默认为空 通常不需要填
+    optional CSignKey signature       = 17;   // 登录态TOKEN
+    optional string device_id         = 18;   // 设备ID
+    optional uint32 prot_ver          = 19;   // 客户端协议版本号
+
+    // 2017/04/17 添加
+    optional uint32 server_ip         = 20;   // 调用服务者的IP地址
+    optional bytes customized_data    = 21;   // 自定义数据部分
+
+    // 2017/04/21 添加
+    optional WebView user_agent       = 22;   // web用保存user_agent信息
+
+    // 2018/4/25
+    optional uint32 gray_flag         = 23;   // 自定义开启灰度发布/预发布 0关闭 1开启：路由到灰度cmlb
+
+    // 2018/5/12 add for trace
+    optional bytes trace_id           = 24;
+    optional bytes parent_id          = 25;
+    optional bytes span_id            = 26;
+    optional bool sampled             = 27;
+    optional bool debug               = 28;
+
+    // 2018/10/19 add for async trace
+    optional uint64 request_timestamp = 29;
+    optional uint32 broker_id         = 30;   // 券商 ID 用于路由
+
+    // 2021/10/11 add for conn
+    optional uint32 client_plugin_type = 31;   // 客户端插件类型
+    optional uint32 client_plugin_ver  = 32;   // 客户端插件版本号
+    optional uint32 conn_attribution   = 33;   // 接入层机器的归属地
+
+    // 2022/05/06 compatible with x_futu_client_staffid in web.proto
+    optional uint64 staff_id = 34;
+
+    // 2023/02/20 add for webconn, compatible with x-futu-client-user-attribution in http header
+    optional uint32 user_attribution = 35;  // 用户归属地
+    // 2023/02/20 add for apigw, compatible with x-futu-client-target-location in http header
+    optional uint32 target_location = 36;   // 目标地区
+
+    // 2023/04/26 add for webconn nearby forwarding
+    optional uint32 web_conn_region = 37;
+
+    // 2020/11/12 add error_info for frpc
+    optional ErrorInfo err_info = 100;
+
+    // 2021/5/17 add customized_header for frpc customized headers
+    map<string, string> customized_header = 101;
+
+    // 2021/7/19 add frame_meta for frpc streaming rpc
+    optional FrameMeta frame_meta = 102;
+
+    // 2021/9/28 add caller and callee name for naming service
+    optional string caller_name = 103;
+    optional string callee_name = 104;
+
+    // 2021/10/26 add naming_service_tags for naming service
+    repeated Tag naming_service_tags = 105;
+    optional  bytes  fgateway_data = 106;
+
+    // 2023/01/03 add caller_tags for fgateway permission validation
+    repeated Tag caller_tags = 107;
+
+    // 2023/07/07 add for naming service filled by fgateway/frame
+    optional string caller_ip = 108;
+    optional string callee_ip = 109;
+
+    // 2023/12/25 add for FGW/FNS, 发送给网关的请求才需要填写此字段
+    optional Destination destination = 110;
+
+    extensions 1000 to 1999;                // 保留扩展
+};
+
+extend google.protobuf.MessageOptions {
+  optional bool is_json_array = 10005;
+}
+
+extend google.protobuf.FieldOptions {
+  optional bool emit_default = 10006;
+}
+extend google.protobuf.FileOptions {
+    optional bool use_gogo   = 10001;
+}

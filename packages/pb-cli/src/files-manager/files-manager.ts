@@ -3,7 +3,6 @@ import { ProjectInfo } from '../project'
 import { File } from './file'
 import { join, isAbsolute, extname, dirname } from 'path'
 import { mkdirSync, writeFileSync, lstatSync, existsSync, rmSync } from 'fs'
-import { formatTypescript } from '../prettier'
 
 @injectable()
 export class FilesManager {

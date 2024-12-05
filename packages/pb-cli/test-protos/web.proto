@@ -1,0 +1,61 @@
+package web;
+
+//服务选项与方法选项扩展定义
+import "google/protobuf/descriptor.proto";
+
+enum HttpPathArgsPattern {
+    // 默认为0,即 scores=100&amp;scores=98
+    HTTP_PATH_ARGS_NORMAL = 0;
+    // 1. 为scores[]=100&amp;scores[]=98
+    HTTP_PATH_ARGS_RICH = 1;
+}
+
+extend google.protobuf.ServiceOptions {
+    optional string cmlb              = 20001;      //HTTP服务后端CMLB id
+    optional string host              = 20002;      //HTTP服务的host地址
+    optional string schema            = 20003;      //HTTP or HTTPS
+    optional string service_name      = 20004;      //ftrace的service
+
+    optional int32 app_id = 20005; // 提供给api test平台的appId（在server.oss.com申请）
+    optional string app_key = 20006; // 提供给api test平台的appKey（在server.oss.com申请）
+    optional bool auth_head = 20007; // true表示在x-futu-client-authentication头部字段设置server.oss.com的签名
+    optional int32 sort_type = 20008; // 计算server.oss.com签名的参数排序，0升序，1降序
+}
+
+extend google.protobuf.MethodOptions {
+    optional string http_method                         = 20101;      //HTTP请求方式 POST/GET/PUT/DELETE等
+    optional string http_url                            = 20102;      //HTTP的URL地址 例如http://www.futu5.com/account/cashin只需要填写account/cashin即可
+    optional string http_header                         = 20103;      //HTTP请求头 使用哪个message 例如填写CRpcHttpHead
+    optional string content_type                        = 20104;      //HTTP请求数据格式, 不设置默认取值 'application/json', 具体可设值为 'application/x-www-form-urlencoded', 'multipart/form-data'
+    optional string csrf_token_url                      = 20105;      //获取 csrf token url地址, 例如http://www.futu5.com/index 只需要填写index即可
+    optional string csrf_token_name                     = 20106;      //csrf token 变量名字, 默认变量名为csrf
+    optional HttpPathArgsPattern http_path_args_pattern = 20107;      //PATH参数传输方案
+    optional double sampled_rate = 20108;      //采样率
+}
+
+//HTTP统一接口层标准的通用头定义 注意在实际使用中，由于HTTP原因，下述字段中的下划线要替换成-
+//例如x_futu_client_serviceid实际上是x-futu-client-serviceid
+//下述注释中 英文为对标统一接口层的字段说明
+message CRpcHttpHead
+{
+    optional string x_futu_client_serviceid = 1;        //服务ID service_id
+    optional string x_futu_client_methodid = 2;         //方法ID method_id
+    optional string x_futu_client_nnid = 3;             //当前票据的牛牛号  origin_uid
+    optional string x_futu_client_grayflag = 4;         //是否走灰度机器 gray_flag
+    optional string x_futu_client_targetid = 5;         //当前请求操作人 target_uid
+    optional string x_futu_client_staffid = 6;          //当前员工ID origin_uid
+    optional string x_futu_client_staffname = 7;        //当前员工名 staff_name
+    optional string x_futu_client_sig = 8;              //票据  signature.skey
+    optional string x_futu_client_sigtype = 9;          //票据类型 signature.type
+    optional string x_futu_client_domain = 10;          //票据所属域名 signature.domain
+    optional string x_futu_client_companyid = 11;       //esop专用公司ID signature.company_id
+    optional string x_futu_client_ip = 12;              //客户真实IP client_ipv4
+    optional string x_futu_client_lang = 13;            //客户选择的语言 client_lang
+    optional bytes x_futu_client_useragent = 14;         //客户浏览器的UA
+    optional int32 x_futu_result = 15;                  //统一接口层错误码 result
+    optional bytes x_futu_resultmsg = 16;                //统一接口层错误文案 result_msg
+
+    optional int32 x_futu_client_appid = 17;             // server.oss.com的appId
+    optional string x_futu_client_authentication = 18;   // server.oss.com的签名（通过参数、时间戳、appkey计算得到）
+    optional int32 x_futu_client_time = 19;              // 用于server.oss.com，请求时间戳
+}
