@@ -5,6 +5,7 @@ import { inject, injectable } from 'inversify'
 import { FilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
 import { getFilenameByType } from '../get-filename-by-type'
+import { getTypeName } from '../get-type-name'
 
 @injectable()
 export class InterfaceGenerater {
@@ -32,7 +33,7 @@ export class InterfaceGenerater {
       .filter((field) => !isScalarType(field.type))
       .map((field) => {
         return {
-          typeName: field.type,
+          typeName: getTypeName(field),
           file: this.#generateMessageInterfaceIfNeed(field.root.lookupTypeOrEnum(field.type)).file,
         }
       })

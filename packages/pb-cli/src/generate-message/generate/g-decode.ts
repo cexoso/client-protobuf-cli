@@ -7,6 +7,7 @@ import { inject, injectable } from 'inversify'
 import { FilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
 import { getFilenameByType } from '../get-filename-by-type'
+import { getTypeName } from '../get-type-name'
 
 @injectable()
 export class DecoderGenerater {
@@ -32,7 +33,7 @@ export class DecoderGenerater {
     return fields
       .filter((field) => !isScalarType(field.type) && !isEnum(field.resolvedType!))
       .map((field) => {
-        const decodeName = 'decode' + upperCaseFirst(field.type)
+        const decodeName = 'decode' + upperCaseFirst(getTypeName(field))
         return {
           typeName: decodeName,
           file: this.#generateMessageDecodeCodeIfNeed(field.root.lookupType(field.type)).file!,
