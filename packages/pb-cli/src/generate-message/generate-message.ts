@@ -5,6 +5,10 @@ import { InterfaceGenerater } from './generate/g-interface'
 import { EncoderGenerater } from './generate/g-encode'
 import { DecoderGenerater } from './generate/g-decode'
 
+interface Opts {
+  typeFullnameRegExp?: RegExp | string
+}
+
 @injectable()
 export class MessageGenerator {
   constructor(
@@ -24,24 +28,27 @@ export class MessageGenerator {
       return true
     })
   }
-  #doForType(files: Map<string, Root>, job: (_: Type) => any) {
+  #doForType(files: Map<string, Root>, job: (_: Type) => any, opts?: Opts) {
     const data = this.getAllTypes(files)
     data.map((type) => {
+      if (opts?.typeFullnameRegExp && !type.fullName.match(opts.typeFullnameRegExp)) {
+        return
+      }
       job(type)
     })
   }
-  generateType(files: Map<string, Root>) {
-    this.#doForType(files, (type) => this.interfaceGenerater.generateMessage(type))
+  generateType(files: Map<string, Root>, opts?: Opts) {
+    this.#doForType(files, (type) => this.interfaceGenerater.generateMessage(type), opts)
   }
-  generateDecode(files: Map<string, Root>) {
-    this.#doForType(files, (type) => this.decoderGenerater.generateDecodeCode(type))
+  generateDecode(files: Map<string, Root>, opts?: Opts) {
+    this.#doForType(files, (type) => this.decoderGenerater.generateDecodeCode(type), opts)
   }
-  generateEncoder(files: Map<string, Root>) {
-    this.#doForType(files, (type) => this.encoderGenerater.generateEncodeCode(type))
+  generateEncoder(files: Map<string, Root>, opts?: Opts) {
+    this.#doForType(files, (type) => this.encoderGenerater.generateEncodeCode(type), opts)
   }
-  generateAllCode(files: Map<string, Root>) {
-    this.generateType(files)
-    this.generateEncoder(files)
-    this.generateDecode(files)
+  generateAllCode(files: Map<string, Root>, opts?: Opts) {
+    this.generateType(files, opts)
+    this.generateEncoder(files, opts)
+    this.generateDecode(files, opts)
   }
 }

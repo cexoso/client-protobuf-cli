@@ -22,12 +22,15 @@ export class Command {
     // 清空目标目录再输出
     autoClean?: boolean
     withPrettier?: boolean
+    typeFullnameRegExp?: RegExp | string
   }) {
     this.projectInfo.setPbRootPath(opts.protoDir)
     this.projectInfo.setProjectRoot(opts.outDir)
     const glob = opts.protoGlob ?? '**/*.proto'
     const files = await this.loader.loadByPath(glob)
-    this.messageGenerator.generateAllCode(files)
+    this.messageGenerator.generateAllCode(files, {
+      typeFullnameRegExp: opts.typeFullnameRegExp,
+    })
 
     this.filesManager.renderAllFileToDir({
       verbose: opts.verbose,
