@@ -61,7 +61,7 @@ describe('encode', () => {
       }
 
       // ./google/type/color.ts
-      import { FloatValue } from './google/protobuf'
+      import { FloatValue } from '../protobuf'
       export interface Color {
         red?: number
         green?: number

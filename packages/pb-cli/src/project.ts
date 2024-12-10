@@ -16,7 +16,7 @@ export class ProjectInfo {
     if (!ignoreNotFound) {
       this.#assertIsDirectory(absolutePath)
     }
-    return absolutePath
+    return absolutePath.endsWith('/') ? absolutePath : absolutePath + '/'
   }
   setPbRootPath(path: string) {
     this.#pbRootPath = this.#getPathSafely(path)

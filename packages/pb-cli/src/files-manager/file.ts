@@ -1,4 +1,4 @@
-import { relative, join, isAbsolute, extname } from 'path'
+import { relative, join, isAbsolute, extname, dirname } from 'path'
 import { formatTypescript } from '../prettier'
 export class File {
   #contents: string[] = []
@@ -31,9 +31,9 @@ export class File {
     declarations.add(member)
   }
 
-  #transformToProjectRelativePath(absolutePath: string) {
+  #transformToRelativePath(baseAbsolutePath: string, absolutePath: string) {
     if (isAbsolute(absolutePath)) {
-      let x = relative(this.opts.pbRootPath, absolutePath)
+      let x = relative(baseAbsolutePath, absolutePath)
       if (!x.startsWith('.')) {
         x = `./${x}`
       }
@@ -46,16 +46,22 @@ export class File {
   get absoluteFileName() {
     return join(this.opts.projectRoot, this.fileNameWithProject)
   }
-  #getRelativeTsPath(absolutePath: string, ignoreExt: boolean = false) {
-    let relativePath = this.#transformToProjectRelativePath(absolutePath)
-    const ext = extname(relativePath)
+  #getRelativeTsPath(baseAbsolutePath: string, absolutePath: string, ignoreExt: boolean = false) {
+    const directoryName = baseAbsolutePath.endsWith('/')
+      ? baseAbsolutePath
+      : dirname(baseAbsolutePath)
+    const relativePath = this.#transformToRelativePath(directoryName, absolutePath)
+    return this.#changeExtName(relativePath, ignoreExt ? '' : '.ts')
+  }
+  #changeExtName(path: string, extName: string) {
+    const ext = extname(path)
     if (ext) {
-      relativePath = relativePath.replace(new RegExp(`${ext}$`), ignoreExt ? '' : '.ts')
+      return path.replace(new RegExp(`${ext}$`), extName)
     }
-    return relativePath
+    return path
   }
   get fileNameWithProject() {
-    return this.#getRelativeTsPath(this.fileAbsolutePath)
+    return this.#getRelativeTsPath(this.opts.pbRootPath, this.fileAbsolutePath)
   }
 
   #getMemberDeclaration = (members: Set<string>) => {
@@ -66,13 +72,13 @@ export class File {
     let memberDeclarations = [...members].map((m) => m).join(', ')
     return `{ ${memberDeclarations} } from `
   }
-  #getImportsDeclaration() {
+  getImportsDeclaration() {
     const allImports = [...this.#imports.entries()]
     return (
       allImports
         .map(([module, members]) => {
           const memberDeclarations = this.#getMemberDeclaration(members)
-          const modulePath = this.#getRelativeTsPath(module, true)
+          const modulePath = this.#getRelativeTsPath(this.fileAbsolutePath, module, true)
           return `import ${memberDeclarations}'${modulePath}'`
         })
         .join('\n') + '\n'
@@ -80,7 +86,7 @@ export class File {
   }
 
   get body() {
-    return this.#getImportsDeclaration() + this.#contents.join('\n')
+    return this.getImportsDeclaration() + this.#contents.join('\n')
   }
 
   getBody(opts: { formatWithCurrentPrettier?: boolean }) {
