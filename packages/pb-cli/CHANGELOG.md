@@ -1,5 +1,13 @@
 # @protobuf-es/cli
 
+## 0.0.5
+
+### Patch Changes
+
+- 修复 tag 大于15时写入值错误的问题
+- Updated dependencies
+  - @protobuf-es/core@0.0.3
+
 ## 0.0.4
 
 ### Patch Changes

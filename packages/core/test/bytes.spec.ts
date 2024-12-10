@@ -4,8 +4,8 @@ import { encodeByteToBuffer } from '../src/encode'
 import { createWriter, toHexString } from '../src/writer'
 import { Uint8ArrayToHexString, hexstringToReader } from './hexstring-to-reader.helper'
 import { readAsBytes, readTag } from '../src/reader'
-
-const message = new Type('XMessage').add(new Field('x', 1, 'bytes'))
+const tag = 16
+const message = new Type('XMessage').add(new Field('x', tag, 'bytes'))
 
 describe('bytes', async () => {
   it('一段文本', async () => {
@@ -20,7 +20,7 @@ describe('bytes', async () => {
     expect(message.verify(obj)).eq(null, '通过校验')
 
     // 直接传递 uint8array
-    encodeByteToBuffer({ value: expectedValue, tag: 1, writer })
+    encodeByteToBuffer({ value: expectedValue, tag, writer })
 
     const buffer = toHexString(writer)
 
@@ -47,7 +47,7 @@ describe('bytes', async () => {
     const obj = message.fromObject({
       x: expectedValue,
     })
-    encodeByteToBuffer({ value: base64Value, tag: 1, writer })
+    encodeByteToBuffer({ value: base64Value, tag, writer })
     const expectedBuffer = message.encode(obj).finish()
 
     const buffer = toHexString(writer)
@@ -60,7 +60,7 @@ describe('bytes', async () => {
     const obj = message.fromObject({
       x: arrayBuffer,
     })
-    encodeByteToBuffer({ value: arrayBuffer, tag: 1, writer })
+    encodeByteToBuffer({ value: arrayBuffer, tag, writer })
     const expectedBuffer = message.encode(obj).finish()
 
     const buffer = toHexString(writer)

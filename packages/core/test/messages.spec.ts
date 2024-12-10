@@ -22,6 +22,7 @@ import {
 import { Uint8ArrayToHexString } from './hexstring-to-reader.helper'
 
 const root = new Root()
+const messageTag = 16
 const message = new Type('ComplexMessage')
 message.add(new Field('i64', 1, 'int64'))
 message.add(new Field('i32', 2, 'int32'))
@@ -31,7 +32,7 @@ message.add(new Field('str', 5, 'string'))
 
 const nestMessage = new Type('NestMessage')
 nestMessage.add(new Field('i64', 1, 'int64'))
-nestMessage.add(new Field('message', 2, 'ComplexMessage'))
+nestMessage.add(new Field('message', messageTag, 'ComplexMessage'))
 root.add(message)
 root.add(nestMessage)
 
@@ -92,7 +93,7 @@ describe('message encode', async () => {
     encodeMessageToBuffer(
       {
         value: values.message,
-        tag: 2,
+        tag: messageTag,
         writer,
       },
       encodeMessage
@@ -127,7 +128,7 @@ describe('message encode', async () => {
     const decodeNestMessage = defineMessage(
       new Map([
         [1, { type: 'scalar', decode: readInt64, name: 'i64' }],
-        [2, { type: 'message', decode: decodeComplexMessage, name: 'message' }],
+        [messageTag, { type: 'message', decode: decodeComplexMessage, name: 'message' }],
       ])
     )
     const reader = arrayBufferToReader(buffer)

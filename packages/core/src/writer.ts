@@ -28,7 +28,7 @@ const raw = (writer: Writer, bytes: Byte[] | Byte) => {
 const getCurrenctBytes = (writer: Writer) => writer.stackBytes[writer.stackBytes.length - 1]
 
 export const writeTag = (writer: Writer, tag: number, wireType: WireType) => {
-  raw(writer, ((tag << 3) | wireType) >>> 0)
+  writeUint32(writer, ((tag << 3) | wireType) >>> 0)
 }
 
 export const toUint8Array = (writer: Writer) => {

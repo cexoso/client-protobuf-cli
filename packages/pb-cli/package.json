@@ -1,6 +1,6 @@
 {
   "name": "@protobuf-es/cli",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "scripts": {
     "test": "vitest --reporter=dot",
     "build": "pkgroll --clean-dist",
