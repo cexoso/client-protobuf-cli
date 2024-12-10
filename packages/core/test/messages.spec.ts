@@ -135,4 +135,39 @@ describe('message encode', async () => {
     const result = decodeNestMessage(reader)
     expect(result).deep.eq(value)
   })
+
+  it('嵌套长 string', async () => {
+    const value = {
+      i64: '9',
+      message: {
+        i64: '3',
+        i32: 2,
+        u32: 3,
+        b: true,
+        str: '1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678',
+      },
+    }
+
+    const buffer = nestMessage.encode(value).finish()
+
+    expect(encodeWithNested(value)).eq(Uint8ArrayToHexString(buffer))
+    const decodeComplexMessage = defineMessage(
+      new Map([
+        [1, { type: 'scalar', decode: readInt64, name: 'i64' }],
+        [2, { type: 'scalar', decode: readInt32, name: 'i32' }],
+        [3, { type: 'scalar', decode: readUint32, name: 'u32' }],
+        [4, { type: 'scalar', decode: readBool, name: 'b' }],
+        [5, { type: 'scalar', decode: readString, name: 'str' }],
+      ])
+    )
+    const decodeNestMessage = defineMessage(
+      new Map([
+        [1, { type: 'scalar', decode: readInt64, name: 'i64' }],
+        [messageTag, { type: 'message', decode: decodeComplexMessage, name: 'message' }],
+      ])
+    )
+    const reader = arrayBufferToReader(buffer)
+    const result = decodeNestMessage(reader)
+    expect(result).deep.eq(value)
+  })
 })

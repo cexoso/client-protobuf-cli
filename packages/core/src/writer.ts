@@ -193,7 +193,6 @@ export const forkWriter = (writer: Writer) => {
 export const joinWriter = (writer: Writer) => {
   let prev = writer.stackBytes.pop()
   if (!prev) throw new Error('invalid state, fork stack empty')
-
-  raw(writer, prev.length)
+  writeUint32(writer, prev.length)
   raw(writer, prev)
 }

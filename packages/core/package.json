@@ -1,6 +1,6 @@
 {
   "name": "@protobuf-es/core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
