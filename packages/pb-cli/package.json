@@ -1,12 +1,15 @@
 {
   "name": "@protobuf-es/cli",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "test": "vitest --reporter=dot",
     "build": "pkgroll --clean-dist",
     "release": "vitest --run && npm run build",
     "prepublishOnly": "npm run release"
   },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
   "exports": {
     "require": {
       "types": "./dist/index.d.cts",

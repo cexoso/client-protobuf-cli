@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.4
+
+### Patch Changes
+
+- 添加类型支持
+
 ## 0.0.3
 
 ### Patch Changes
