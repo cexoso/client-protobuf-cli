@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.3
+
+### Patch Changes
+
+- e316be9: 添加 api 调用方式
+
 ## 0.0.2
 
 ### Patch Changes
