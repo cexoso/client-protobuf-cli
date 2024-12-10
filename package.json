@@ -9,6 +9,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "@changesets/cli": "^2.27.10"
+  }
 }
