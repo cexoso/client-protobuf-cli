@@ -6,6 +6,7 @@ import { getFilenameByType } from '../generate-message/get-filename-by-type'
 const testProtos = join(__dirname, '../../test-protos')
 const people = loadSync(join(__dirname, '../../test-protos/people.proto'))
 const srpc = loadSync(join(__dirname, '../../test-protos/srpc.proto'))
+const web = loadSync(join(__dirname, '../../test-protos/web.proto'))
 const any = loadSync(join(__dirname, '../../test-protos/google/protobuf/any.proto'))
 const root = join(__dirname, '../../test-protos')
 
@@ -20,5 +21,10 @@ describe('get-filename-by-type', async () => {
 
     expect(getFilenameByType(fileDescriptor)).eq(join(root, 'google/protobuf/descriptor.proto'))
     expect(getFilenameByType(anyType)).eq('google/protobuf.proto')
+  })
+  it('奇怪的 package，我还没想好', () => {
+    const x = web.lookupType('google.protobuf.ServiceOptions')
+    const sortType = x.fields['.web.sortType']
+    expect(getFilenameByType(sortType)).eq('web.proto')
   })
 })
