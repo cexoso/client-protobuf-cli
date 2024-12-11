@@ -1,5 +1,11 @@
 # @protobuf-es/core
 
+## 0.0.6
+
+### Patch Changes
+
+- export wrapEncode wrapDecode
+
 ## 0.0.5
 
 ### Patch Changes

@@ -17,7 +17,7 @@ export {
   readFixed64,
   readSfixed64,
   readEnum,
-  readAsBytes
+  readAsBytes,
 } from './reader'
 export type { EncoderWithoutTag } from './encode'
 export {
@@ -39,7 +39,9 @@ export {
   encodePackedRepeatToBuffer,
   encodeSfixed64ToBuffer,
   encodeEnumToBuffer,
-  encodeByteToBuffer
+  encodeByteToBuffer,
 } from './encode'
 export { toUint8Array, createWriter } from './writer'
 export type { ReaderLike } from './reader'
+export { wrapDecode } from './helper/wrap-decode'
+export { wrapEncode } from './helper/wrap-encode'
