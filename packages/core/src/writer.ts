@@ -77,7 +77,13 @@ export const writeFloat = (writer: Writer, value: number) => {
   writeDataView(writer, dataView)
 }
 
-export const toHexString = (writer: Writer) => Buffer.from(getCurrenctBytes(writer)).toString('hex')
+export const toHexString = (writerOrBuffer: Writer | Uint8Array) => {
+  if (writerOrBuffer instanceof Uint8Array) {
+    const buffer = writerOrBuffer
+    return Buffer.from(buffer).toString('hex')
+  }
+  return Buffer.from(getCurrenctBytes(writerOrBuffer)).toString('hex')
+}
 
 export const writeInt32 = (writer: Writer, value: number) => {
   assertInt32(value)

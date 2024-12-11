@@ -1,5 +1,11 @@
 # @protobuf-es/core
 
+## 0.0.5
+
+### Patch Changes
+
+- b332f5c: 提供 wrapEncode wrapDecode 帮助函数
+
 ## 0.0.4
 
 ### Patch Changes

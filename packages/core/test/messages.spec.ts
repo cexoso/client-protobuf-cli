@@ -11,15 +11,10 @@ import {
 } from '../src/encode'
 import { createWriter, toHexString } from '../src/writer'
 import { defineMessage } from '../src/decode'
-import {
-  arrayBufferToReader,
-  readBool,
-  readInt32,
-  readInt64,
-  readString,
-  readUint32,
-} from '../src/reader'
+import { readBool, readInt32, readInt64, readString, readUint32 } from '../src/reader'
 import { Uint8ArrayToHexString } from './hexstring-to-reader.helper'
+import { wrapEncode } from '../src/helper/wrap-encode'
+import { wrapDecode } from '../src/helper/wrap-decode'
 
 const root = new Root()
 const messageTag = 16
@@ -83,23 +78,43 @@ describe('message encode', async () => {
     expect(encodeWithFN(value)).eq(Uint8ArrayToHexString(buffer))
   })
 
-  function encodeWithNested(values: Record<string, any>) {
-    const writer = createWriter()
+  const encodeNestMessage: EncoderWithoutTag<any> = ({ value, writer }) => {
     encodeInt64ToBuffer({
-      value: values.i64,
+      value: value.i64,
       tag: 1,
       writer,
     })
     encodeMessageToBuffer(
       {
-        value: values.message,
+        value: value.message,
         tag: messageTag,
         writer,
       },
       encodeMessage
     )
-    return toHexString(writer)
   }
+  const nestMessageEncode = wrapEncode(encodeNestMessage)
+  function encodeWithNested(values: Record<string, any>) {
+    const buffer = nestMessageEncode(values)
+    return toHexString(buffer)
+  }
+
+  const decodeComplexMessage = defineMessage(
+    new Map([
+      [1, { type: 'scalar', decode: readInt64, name: 'i64' }],
+      [2, { type: 'scalar', decode: readInt32, name: 'i32' }],
+      [3, { type: 'scalar', decode: readUint32, name: 'u32' }],
+      [4, { type: 'scalar', decode: readBool, name: 'b' }],
+      [5, { type: 'scalar', decode: readString, name: 'str' }],
+    ])
+  )
+  const decodeNestMessage = defineMessage(
+    new Map([
+      [1, { type: 'scalar', decode: readInt64, name: 'i64' }],
+      [messageTag, { type: 'message', decode: decodeComplexMessage, name: 'message' }],
+    ])
+  )
+  const nestMessageDecode = wrapDecode(decodeNestMessage)
 
   it('嵌套的情况', async () => {
     const value = {
@@ -114,25 +129,8 @@ describe('message encode', async () => {
     }
 
     const buffer = nestMessage.encode(value).finish()
-
     expect(encodeWithNested(value)).eq(Uint8ArrayToHexString(buffer))
-    const decodeComplexMessage = defineMessage(
-      new Map([
-        [1, { type: 'scalar', decode: readInt64, name: 'i64' }],
-        [2, { type: 'scalar', decode: readInt32, name: 'i32' }],
-        [3, { type: 'scalar', decode: readUint32, name: 'u32' }],
-        [4, { type: 'scalar', decode: readBool, name: 'b' }],
-        [5, { type: 'scalar', decode: readString, name: 'str' }],
-      ])
-    )
-    const decodeNestMessage = defineMessage(
-      new Map([
-        [1, { type: 'scalar', decode: readInt64, name: 'i64' }],
-        [messageTag, { type: 'message', decode: decodeComplexMessage, name: 'message' }],
-      ])
-    )
-    const reader = arrayBufferToReader(buffer)
-    const result = decodeNestMessage(reader)
+    const result = nestMessageDecode(buffer)
     expect(result).deep.eq(value)
   })
 
@@ -151,23 +149,7 @@ describe('message encode', async () => {
     const buffer = nestMessage.encode(value).finish()
 
     expect(encodeWithNested(value)).eq(Uint8ArrayToHexString(buffer))
-    const decodeComplexMessage = defineMessage(
-      new Map([
-        [1, { type: 'scalar', decode: readInt64, name: 'i64' }],
-        [2, { type: 'scalar', decode: readInt32, name: 'i32' }],
-        [3, { type: 'scalar', decode: readUint32, name: 'u32' }],
-        [4, { type: 'scalar', decode: readBool, name: 'b' }],
-        [5, { type: 'scalar', decode: readString, name: 'str' }],
-      ])
-    )
-    const decodeNestMessage = defineMessage(
-      new Map([
-        [1, { type: 'scalar', decode: readInt64, name: 'i64' }],
-        [messageTag, { type: 'message', decode: decodeComplexMessage, name: 'message' }],
-      ])
-    )
-    const reader = arrayBufferToReader(buffer)
-    const result = decodeNestMessage(reader)
+    const result = nestMessageDecode(buffer)
     expect(result).deep.eq(value)
   })
 })
