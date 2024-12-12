@@ -1,4 +1,4 @@
-export { defineMessage } from './decode'
+export { defineMessage, defineMap } from './decode'
 export {
   readInt32,
   createReader,
@@ -33,6 +33,7 @@ export {
   encodeFloatToBuffer,
   encodeSint32ToBuffer,
   encodeSint64ToBuffer,
+  encodeMapToBuffer,
   encodeFixed32ToBuffer,
   encodeSfixed32ToBuffer,
   encodeFixed64ToBuffer,
