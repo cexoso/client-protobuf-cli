@@ -1,4 +1,4 @@
-import { Field, Type } from 'protobufjs'
+import { Field, Type, MapField } from 'protobufjs'
 import { isScalarType, scalarToTypescript, isEnum } from './scalar'
 import { formatTypescript } from '../../prettier'
 import { inject, injectable } from 'inversify'
@@ -13,13 +13,17 @@ export class InterfaceGenerater {
   #interfaces: Map<string, { file: File; declareContent: string }> = new Map()
   // 存的是 type
   #interfaceOrderList: string[] = []
-
   #getType(field: Field) {
-    if (isScalarType(field.type)) {
-      return scalarToTypescript(field.type)
+    if (field instanceof MapField) {
+      return `Record<${this.#pbTypeToTsType(field.keyType)}, ${this.#pbTypeToTsType(field.type)}>`
     }
-    this.#generateMessageInterfaceIfNeed(field.root.lookupTypeOrEnum(field.type))
-    return field.type
+    return this.#pbTypeToTsType(field.type)
+  }
+  #pbTypeToTsType(type: string) {
+    if (isScalarType(type)) {
+      return scalarToTypescript(type)
+    }
+    return type
   }
   #generateFieldDescription(field: Field) {
     const optionalTag = field.optional ? '?' : ''
@@ -29,14 +33,23 @@ export class InterfaceGenerater {
   }
 
   #getAndCompileDependenciesType(fields: Field[]) {
-    return fields
-      .filter((field) => !isScalarType(field.type))
-      .map((field) => {
-        return {
-          typeName: getTypeName(field),
-          file: this.#generateMessageInterfaceIfNeed(field.root.lookupTypeOrEnum(field.type)).file,
-        }
-      })
+    if (fields.length === 0) {
+      return []
+    }
+    const root = fields[0].root
+    return (
+      fields
+        //这里不需要考虑 mapField 的 keyType 因为 keyType 不存在复杂类型需要从另一个文件 import
+        .map((field) => field.type)
+        .filter((type) => !isScalarType(type))
+        .map((typeString) => {
+          const typeOrEnum = root.lookupTypeOrEnum(typeString)
+          return {
+            typeName: getTypeName(typeOrEnum),
+            file: this.#generateMessageInterfaceIfNeed(typeOrEnum).file,
+          }
+        })
+    )
   }
 
   #generateMessageInterfaceIfNeed(type: Type) {

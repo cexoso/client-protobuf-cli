@@ -72,4 +72,66 @@ describe('encode', () => {
     `)
     expect(fileContent.length).eq(2)
   })
+
+  it('map interface', async () => {
+    const container = createContainer()
+    const pbLoader = container.get(PBLoader)
+    const projectInfo = container.get(ProjectInfo)
+    projectInfo.setPbRootPath(root)
+    projectInfo.setProjectRoot('./src')
+    const files = await pbLoader.loadByPath('map.proto')
+    const messageGenerator = container.get(MessageGenerator)
+    messageGenerator.generateType(files, {
+      typeFullnameRegExp: 'CRpcHead',
+    })
+    const filesManager = container.get(FilesManager)
+    expect(filesManager.listAllFile().at(0)?.getBody({ formatWithCurrentPrettier: true }))
+      .eq(dedent`
+        export interface Book {
+          id?: number
+        }
+
+        export interface Destination {
+          ports?: Record<string, number>
+          tags?: Record<string, string>
+          books?: Record<string, Book>
+        }
+
+        export interface CRpcHead {
+          destination?: Destination
+        }
+        
+      `)
+  })
+
+  it('map encode ', async () => {
+    const container = createContainer()
+    const pbLoader = container.get(PBLoader)
+    const projectInfo = container.get(ProjectInfo)
+    projectInfo.setPbRootPath(root)
+    projectInfo.setProjectRoot('./src')
+    const files = await pbLoader.loadByPath('map.proto')
+    const messageGenerator = container.get(MessageGenerator)
+    messageGenerator.generateType(files, {
+      typeFullnameRegExp: 'CRpcHead',
+    })
+    const filesManager = container.get(FilesManager)
+    expect(filesManager.listAllFile().at(0)?.getBody({ formatWithCurrentPrettier: true }))
+      .eq(dedent`
+        export interface Book {
+          id?: number
+        }
+
+        export interface Destination {
+          ports?: Record<string, number>
+          tags?: Record<string, string>
+          books?: Record<string, Book>
+        }
+
+        export interface CRpcHead {
+          destination?: Destination
+        }
+        
+      `)
+  })
 })
