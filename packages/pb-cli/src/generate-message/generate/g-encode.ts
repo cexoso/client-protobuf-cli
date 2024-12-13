@@ -1,4 +1,4 @@
-import { Field, Type } from 'protobufjs'
+import { Field, MapField, Root, Type } from 'protobufjs'
 import { isEnum, isScalarType, mapScalarToEncodeMethod } from './scalar'
 import { upperCaseFirst } from '../../prettier/string-format'
 import { formatTypescript } from '../../prettier'
@@ -7,6 +7,7 @@ import { FilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
 import { getFilenameByType } from '../get-filename-by-type'
 import { getTypeName } from '../get-type-name'
+import dedent from 'ts-dedent'
 
 @injectable()
 export class EncoderGenerater {
@@ -30,7 +31,7 @@ export class EncoderGenerater {
         writer
       )`
     }
-    const method = mapScalarToEncodeMethod(field)
+    const method = mapScalarToEncodeMethod(field.type)
     // TODO: proto3 默认使用 packed 了, 我们目前仍使用 proto2
     // 但也应该尽量把这个逻辑补上，防止接受 Proto3 的时候出问题
     const packed = field?.options?.packed ?? false
@@ -39,28 +40,55 @@ export class EncoderGenerater {
     const result = `${encodeName}(value["${field.name}"], ${method}, ${field.id}, writer)`
     return result
   }
-  #mapTypeToEncodeMethod(field: Field) {
-    if (isScalarType(field.type)) {
-      return mapScalarToEncodeMethod(field)
+  #mapTypeToEncodeMethod(root: Root, type: string) {
+    if (isScalarType(type)) {
+      return {
+        typeName: mapScalarToEncodeMethod(type),
+        file: '@protobuf-es/core',
+      }
     }
-
-    // enum
-    return 'encodeEnumToBuffer'
+    if (isEnum(root.lookupTypeOrEnum(type))) {
+      // enum
+      return {
+        typeName: 'encodeEnumToBuffer',
+        file: '@protobuf-es/core',
+      }
+    }
+    const name = 'encode' + upperCaseFirst(type)
+    return {
+      typeName: name,
+      file: this.#generateMessageEncodeCode(root.lookupType(type)).file.fileAbsolutePath,
+    }
   }
+
   #genFieldContent(field: Field) {
+    const root = field.root
     if (field.repeated) {
       return this.#genRepeatFieldContent(field)
     }
 
+    if (field instanceof MapField) {
+      this.#addImport(field, '@protobuf-es/core', 'encodeMapToBuffer')
+
+      const keyType = field.keyType !== 'string' ? '\nisKeyNumber: true,' : ''
+      return dedent`
+        encodeMapToBuffer(value["${field.name}"], {
+          tag: ${field.id},
+          writer,${keyType}
+          keyEncoderWithTag: ${this.#mapTypeToEncodeMethod(root, field.keyType).typeName},
+          valueEncoderWithTag: ${this.#mapTypeToEncodeMethod(root, field.type).typeName},
+        })
+      `
+    }
     if (isScalarType(field.type) || isEnum(field.resolvedType!)) {
-      const method = this.#mapTypeToEncodeMethod(field)
-      this.#addImport(field, '@protobuf-es/core', method)
+      const { typeName: method } = this.#mapTypeToEncodeMethod(root, field.type)
       return `${method}({
         value: value["${field.name}"],
         tag: ${field.id},
         writer,
       })`
     }
+
     const encodeMethodName = 'encode' + upperCaseFirst(field.type)
     this.#addImport(field, '@protobuf-es/core', 'encodeMessageToBuffer')
     return `encodeMessageToBuffer(
@@ -74,15 +102,19 @@ export class EncoderGenerater {
   }
 
   #getAndCompileDependenciesEncode(fields: Field[]) {
-    return fields
-      .filter((field) => !isScalarType(field.type) && !isEnum(field.resolvedType!))
-      .map((field) => {
-        const encodeMethodName = 'encode' + upperCaseFirst(getTypeName(field))
-        return {
-          typeName: encodeMethodName,
-          file: this.#generateMessageEncodeCode(field.root.lookupType(field.type)).file!,
-        }
-      })
+    if (fields.length === 0) {
+      return []
+    }
+    const root = fields[0].root
+    return (
+      fields
+        .map((field) => field.type)
+        // .filter((field) => !isScalarType(field.type) && !isEnum(field.resolvedType!))
+        // 这里似乎不需要算是 MapField, 因为 MapField 的 keyType 不可能是一个 message
+        .map((type) => {
+          return this.#mapTypeToEncodeMethod(root, type)
+        })
+    )
   }
 
   #generateMessageEncodeCode(type: Type) {
@@ -109,10 +141,9 @@ export class EncoderGenerater {
       const paramsDefined = isEmpty ? `{ value: _value, writer: _writer }` : `{ value, writer }`
 
       const files = this.#getAndCompileDependenciesEncode(type.fieldsArray)
-
       files.map(({ file, typeName }) => {
         currentFile.addImport({
-          absolutePath: file.fileAbsolutePath,
+          absolutePath: file,
           member: typeName,
         })
       })

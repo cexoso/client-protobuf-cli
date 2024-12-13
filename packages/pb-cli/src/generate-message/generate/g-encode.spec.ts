@@ -92,7 +92,7 @@ describe('encode', () => {
         }
 
         export interface Destination {
-          ports?: Record<string, number>
+          ports?: Record<number, number>
           tags?: Record<string, string>
           books?: Record<string, Book>
         }
@@ -104,7 +104,7 @@ describe('encode', () => {
       `)
   })
 
-  it('map encode ', async () => {
+  it('map encode', async () => {
     const container = createContainer()
     const pbLoader = container.get(PBLoader)
     const projectInfo = container.get(ProjectInfo)
@@ -112,26 +112,81 @@ describe('encode', () => {
     projectInfo.setProjectRoot('./src')
     const files = await pbLoader.loadByPath('map.proto')
     const messageGenerator = container.get(MessageGenerator)
-    messageGenerator.generateType(files, {
+    messageGenerator.generateEncoder(files, {
       typeFullnameRegExp: 'CRpcHead',
     })
     const filesManager = container.get(FilesManager)
-    expect(filesManager.listAllFile().at(0)?.getBody({ formatWithCurrentPrettier: true }))
-      .eq(dedent`
-        export interface Book {
-          id?: number
+    expect(filesManager.listAllFile().at(0)?.toString()).eq(dedent`
+      // ./map.ts
+      import { encodeInt32ToBuffer, EncoderWithoutTag, encodeStringToBuffer, encodeMapToBuffer, encodeMessageToBuffer } from '@protobuf-es/core'
+      export const encodeBook: EncoderWithoutTag<Book> = ({ value, writer }) => {
+        if (value['id'] !== undefined) {
+          encodeInt32ToBuffer({
+            value: value['id'],
+            tag: 1,
+            writer,
+          })
+        }
+      }
+
+      export const encodeDestination: EncoderWithoutTag<Destination> = ({ value, writer }) => {
+        if (value['ports'] !== undefined) {
+          encodeMapToBuffer(value['ports'], {
+            tag: 1,
+            writer,
+            isKeyNumber: true,
+            keyEncoderWithTag: encodeInt32ToBuffer,
+            valueEncoderWithTag: encodeInt32ToBuffer,
+          })
         }
 
-        export interface Destination {
-          ports?: Record<string, number>
-          tags?: Record<string, string>
-          books?: Record<string, Book>
+        if (value['tags'] !== undefined) {
+          encodeMapToBuffer(value['tags'], {
+            tag: 2,
+            writer,
+            keyEncoderWithTag: encodeStringToBuffer,
+            valueEncoderWithTag: encodeStringToBuffer,
+          })
         }
 
-        export interface CRpcHead {
-          destination?: Destination
+        if (value['books'] !== undefined) {
+          encodeMapToBuffer(value['books'], {
+            tag: 3,
+            writer,
+            keyEncoderWithTag: encodeStringToBuffer,
+            valueEncoderWithTag: encodeBook,
+          })
         }
-        
-      `)
+      }
+
+      export const encodeCRpcHead: EncoderWithoutTag<CRpcHead> = ({ value, writer }) => {
+        if (value['destination'] !== undefined) {
+          encodeMessageToBuffer(
+            {
+              value: value['destination'],
+              tag: 1,
+              writer,
+            },
+            encodeDestination
+          )
+        }
+      }
+      
+    `)
+  })
+
+  it('map decode', async () => {
+    const container = createContainer()
+    const pbLoader = container.get(PBLoader)
+    const projectInfo = container.get(ProjectInfo)
+    projectInfo.setPbRootPath(root)
+    projectInfo.setProjectRoot('./src')
+    const files = await pbLoader.loadByPath('map.proto')
+    const messageGenerator = container.get(MessageGenerator)
+    messageGenerator.generateDecode(files, {
+      typeFullnameRegExp: 'CRpcHead',
+    })
+    const filesManager = container.get(FilesManager)
+    filesManager.catAllFile()
   })
 })

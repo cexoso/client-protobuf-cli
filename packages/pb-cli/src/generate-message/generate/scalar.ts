@@ -61,7 +61,7 @@ export const scalarToTypescript = (scalarType: ScalarTypes) => {
   return scalarToTypescriptMap.get(scalarType)!
 }
 
-export const mapScalarToEncodeMethod = (field: Field) => {
+export const mapScalarToEncodeMethod = (type: string) => {
   const scalarToEncodeMethodMap = new Map<ScalarTypes, string>([
     [ScalarTypes.string, 'encodeStringToBuffer'],
     [ScalarTypes.double, 'encodeDoubleToBuffer'],
@@ -79,9 +79,9 @@ export const mapScalarToEncodeMethod = (field: Field) => {
     [ScalarTypes.bool, 'encodeBoolToBuffer'],
     [ScalarTypes.bytes, 'encodeByteToBuffer'],
   ])
-  const encodeType = scalarToEncodeMethodMap.get(field.type as ScalarTypes)
+  const encodeType = scalarToEncodeMethodMap.get(type as ScalarTypes)
   if (!encodeType) {
-    throw new Error(`目前不支持的 ${field.type} 类型`)
+    throw new Error(`目前不支持的 ${type} 类型`)
   }
   return encodeType
 }
