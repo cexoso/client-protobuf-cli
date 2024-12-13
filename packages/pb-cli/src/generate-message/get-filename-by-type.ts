@@ -1,6 +1,6 @@
-import { Field, Type } from 'protobufjs'
+import { Field, MapField, Type } from 'protobufjs'
 
-export function getFilenameByType(type: Type | Field) {
+export function getFilenameByType(type: Type | Field | MapField) {
   if (type.filename) {
     return type.filename
   }

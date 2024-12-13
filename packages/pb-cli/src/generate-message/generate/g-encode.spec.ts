@@ -189,7 +189,7 @@ describe('encode', () => {
     const filesManager = container.get(FilesManager)
     expect(filesManager.listAllFile().at(0)?.toString()).eq(dedent`
       // ./map.ts
-      import { readInt32, defineMessage } from '@protobuf-es/core'
+      import { defineMap, readInt32, defineMessage } from '@protobuf-es/core'
       export const decodeBook = defineMessage<Book>(
         new Map([[1, { type: 'scalar', decode: readInt32, name: 'id' }]])
       )

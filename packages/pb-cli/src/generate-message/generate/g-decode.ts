@@ -11,6 +11,10 @@ import { getFilenameByType } from '../get-filename-by-type'
 @injectable()
 export class DecoderGenerater {
   constructor(@inject(FilesManager) private filesManager: FilesManager) {}
+  #addImport(field: Field | MapField, modulePath: string, member: string) {
+    const file = this.filesManager.getFileByPath(getFilenameByType(field))
+    file.addImport({ absolutePath: modulePath, member })
+  }
   #messageDecodeMap = new Map<
     string,
     {
@@ -57,6 +61,7 @@ export class DecoderGenerater {
     const valueReader = this.#mapTypeToDecodeMethod(field.root, field.type).typeName
     const valueType = isScalarType(field.type) ? 'scalar' : 'message'
 
+    this.#addImport(field, '@protobuf-es/core', 'defineMap')
     const context = `const ${decodeName} = defineMap({
       keyReader: ${keyReader},
       valueReader: ${valueReader},
