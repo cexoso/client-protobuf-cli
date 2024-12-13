@@ -1,5 +1,12 @@
 # @protobuf-es/core
 
+## 0.0.7
+
+### Patch Changes
+
+- 修复 map 的编解码问题，以及脚架添加对 map 编解码的支持
+- 202a29e: 将 map 相关的方法导出
+
 ## 0.0.6
 
 ### Patch Changes

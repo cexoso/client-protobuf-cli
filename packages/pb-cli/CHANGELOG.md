@@ -1,5 +1,14 @@
 # @protobuf-es/cli
 
+## 0.0.6
+
+### Patch Changes
+
+- 修复 map 的编解码问题，以及脚架添加对 map 编解码的支持
+- Updated dependencies
+- Updated dependencies [202a29e]
+  - @protobuf-es/core@0.0.7
+
 ## 0.0.5
 
 ### Patch Changes
