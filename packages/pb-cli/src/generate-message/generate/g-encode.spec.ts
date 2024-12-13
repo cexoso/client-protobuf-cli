@@ -187,6 +187,41 @@ describe('encode', () => {
       typeFullnameRegExp: 'CRpcHead',
     })
     const filesManager = container.get(FilesManager)
-    filesManager.catAllFile()
+    expect(filesManager.listAllFile().at(0)?.toString()).eq(dedent`
+      // ./map.ts
+      import { readInt32, defineMessage } from '@protobuf-es/core'
+      export const decodeBook = defineMessage<Book>(
+        new Map([[1, { type: 'scalar', decode: readInt32, name: 'id' }]])
+      )
+
+      const decodePorts = defineMap({
+        keyReader: readInt32,
+        valueReader: readInt32,
+        valueType: 'scalar',
+      })
+      const decodeTags = defineMap({
+        keyReader: readString,
+        valueReader: readString,
+        valueType: 'scalar',
+      })
+      const decodeBooks = defineMap({
+        keyReader: readString,
+        valueReader: decodeBook,
+        valueType: 'message',
+      })
+
+      export const decodeDestination = defineMessage<Destination>(
+        new Map([
+          [1, { type: 'message', decode: decodePorts, name: 'ports', isMap: true }],
+          [2, { type: 'message', decode: decodeTags, name: 'tags', isMap: true }],
+          [3, { type: 'message', decode: decodeBooks, name: 'books', isMap: true }],
+        ])
+      )
+
+      export const decodeCRpcHead = defineMessage<CRpcHead>(
+        new Map([[1, { type: 'message', decode: decodeDestination, name: 'destination' }]])
+      )
+      
+    `)
   })
 })

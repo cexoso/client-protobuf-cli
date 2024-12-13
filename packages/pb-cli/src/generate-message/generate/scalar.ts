@@ -86,7 +86,7 @@ export const mapScalarToEncodeMethod = (type: string) => {
   return encodeType
 }
 
-export const mapScalarToDecodeMethod = (field: Field) => {
+export const mapScalarToDecodeMethod = (type: string) => {
   const scalarToEncodeMethodMap = new Map<ScalarTypes, string>([
     [ScalarTypes.string, 'readString'],
     [ScalarTypes.double, 'readDouble'],
@@ -104,7 +104,7 @@ export const mapScalarToDecodeMethod = (field: Field) => {
     [ScalarTypes.bool, 'readBool'],
     [ScalarTypes.bytes, 'readAsBytes'],
   ])
-  const decodeMethod = scalarToEncodeMethodMap.get(field.type as ScalarTypes)
+  const decodeMethod = scalarToEncodeMethodMap.get(type as ScalarTypes)
   if (!decodeMethod) {
     throw new Error(`目前不支持 ${decodeMethod} 类型`)
   }

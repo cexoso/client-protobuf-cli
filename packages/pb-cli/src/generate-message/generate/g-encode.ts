@@ -6,7 +6,6 @@ import { inject, injectable } from 'inversify'
 import { FilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
 import { getFilenameByType } from '../get-filename-by-type'
-import { getTypeName } from '../get-type-name'
 import dedent from 'ts-dedent'
 
 @injectable()

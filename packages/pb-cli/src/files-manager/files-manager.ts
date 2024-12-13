@@ -38,6 +38,14 @@ export class FilesManager {
     return this.#files.get(key)
   }
 
+  catAllFile() {
+    console.log(
+      this.listAllFile()
+        .map((file) => file.toString())
+        .join('\n\n')
+    )
+  }
+
   listAllFile() {
     return [...this.#files].map(([_, file]) => file)
   }
