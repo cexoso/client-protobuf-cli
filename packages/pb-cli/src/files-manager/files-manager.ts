@@ -58,23 +58,6 @@ export class TSFilesManager {
   listAllFile() {
     return [...this.#files].map(([_, file]) => file)
   }
-  // 下面这部分的代码明显没有思考充分, 我现在只是想让项目跑起来
-  hasFileByFileName(fileName: string) {
-    const key = join(this.projectInfo.projectRoot, fileName)
-    return this.#files.has(key)
-  }
-  getOrCreateFile(fileName: string) {
-    const key = join(this.projectInfo.projectRoot, fileName)
-    let file = this.#files.get(key)
-    if (file === undefined) {
-      file = new File(key, {
-        projectRoot: this.projectInfo.projectRoot,
-        pbRootPath: this.projectInfo.pbRootPath,
-      })
-      this.#files.set(key, file)
-    }
-    return file
-  }
 
   #cleanAndMakeOutDir() {
     if (existsSync(this.projectInfo.projectRoot)) {
