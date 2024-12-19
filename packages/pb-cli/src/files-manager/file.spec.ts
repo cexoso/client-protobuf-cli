@@ -56,7 +56,7 @@ describe('files', async () => {
     const x = filesManager.getTSFileByProtoPath('./dir1/x.proto')
     const y = filesManager.getTSFileByProtoPath('./dir2/y.proto')
     x.addImport({
-      absolutePath: y.finalTsAbsolutePath,
+      absolutePath: y,
       member: 'get',
     })
     const imports = x.getImportsDeclaration().trim()

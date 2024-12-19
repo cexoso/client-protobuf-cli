@@ -26,7 +26,17 @@ export class File {
     }
     return declarations
   }
-  addImport({ absolutePath, member }: { absolutePath: string; member: string }) {
+  addImport({
+    absolutePath: maybeAbsolutePath,
+    member,
+  }: {
+    absolutePath: string | File
+    member: string
+  }) {
+    const absolutePath =
+      typeof maybeAbsolutePath === 'string'
+        ? maybeAbsolutePath
+        : maybeAbsolutePath.finalTsAbsolutePath
     if (this.finalTsAbsolutePath === absolutePath) {
       return
     }

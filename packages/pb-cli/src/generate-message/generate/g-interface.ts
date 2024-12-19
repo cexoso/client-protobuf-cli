@@ -76,7 +76,7 @@ export class InterfaceGenerater {
         const files = this.#getAndCompileDependenciesType(type.fieldsArray)
         files.map(({ file, typeName }) => {
           currentFile.addImport({
-            absolutePath: file.finalTsAbsolutePath,
+            absolutePath: file,
             member: typeName,
           })
         })
