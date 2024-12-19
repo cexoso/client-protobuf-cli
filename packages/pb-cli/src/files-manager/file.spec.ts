@@ -5,9 +5,13 @@ import { dedent } from 'ts-dedent'
 import { ProjectInfo } from '../project'
 import { join } from 'path'
 
+const root = join(__dirname, '../../test-protos')
 describe('files', async () => {
   it('normal', async () => {
     const container = createContainer()
+    const projectInfo = container.get(ProjectInfo)
+    projectInfo.setPbRootPath(root)
+    projectInfo.setProjectRoot('./src')
     const filesManager = container.get(TSFilesManager)
     const x = filesManager.getTSFileByProtoPath('./x.proto')
     x.addImport({
@@ -35,7 +39,7 @@ describe('files', async () => {
 
     expect(x.toString()).deep.eq(
       dedent`
-        // x.ts
+        // ./x.ts
         import { get, map, map as xMap, default as _ } from 'radash'
         import { add } from './a'
         const a = get({ a: 1 }, 'a')
@@ -52,7 +56,7 @@ describe('files', async () => {
     const x = filesManager.getTSFileByProtoPath('./dir1/x.proto')
     const y = filesManager.getTSFileByProtoPath('./dir2/y.proto')
     x.addImport({
-      absolutePath: y.fileAbsolutePath,
+      absolutePath: y.finalTsAbsolutePath,
       member: 'get',
     })
     const imports = x.getImportsDeclaration().trim()

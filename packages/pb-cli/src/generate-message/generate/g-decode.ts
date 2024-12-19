@@ -39,7 +39,7 @@ export class DecoderGenerater {
     const resolvedType = root.lookupType(type)
     return {
       typeName: decodeName,
-      file: this.#generateMessageDecodeCodeIfNeed(resolvedType).file.fileAbsolutePath,
+      file: this.#generateMessageDecodeCodeIfNeed(resolvedType).file.finalTsAbsolutePath,
     }
   }
   #getAndCompileDependenciesDecode(fields: Field[]) {

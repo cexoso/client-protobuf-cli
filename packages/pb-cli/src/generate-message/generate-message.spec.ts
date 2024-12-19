@@ -320,7 +320,7 @@ describe('generate', () => {
     const compiler = createCompilerHost({})
     const originGetSourceFile = compiler.getSourceFile
     compiler.getSourceFile = (fileName, languageVersion) => {
-      const file = filesManager.getFile(toProjectRelativePath(fileName))
+      const file = filesManager.getFileByTs(toProjectRelativePath(fileName))
       if (file) {
         return createSourceFile(fileName, file.body, languageVersion)
       }
@@ -329,7 +329,7 @@ describe('generate', () => {
     const fileExists = compiler.fileExists
     compiler.fileExists = (fileName: string) => {
       const x = toProjectRelativePath(fileName)
-      const file = filesManager.getFile(x)
+      const file = filesManager.getFileByTs(x)
       if (file) {
         return true
       }
@@ -337,7 +337,7 @@ describe('generate', () => {
     }
     const originReadFile = compiler.readFile
     compiler.readFile = (fileName: string) => {
-      const file = filesManager.getFile(toProjectRelativePath(fileName))
+      const file = filesManager.getFileByTs(toProjectRelativePath(fileName))
       if (file) {
         return file.body
       }

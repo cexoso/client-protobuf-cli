@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify'
 import { ProjectInfo } from '../project'
 import { File } from './file'
-import { join, isAbsolute, extname, dirname } from 'path'
+import { join, isAbsolute, extname, dirname, relative } from 'path'
 import { mkdirSync, writeFileSync, lstatSync, existsSync, rmSync } from 'fs'
 
 @injectable()
@@ -12,19 +12,27 @@ export class TSFilesManager {
     const absolutePath = isAbsolute(path) ? path : join(this.projectInfo.pbRootPath, path)
     return absolutePath
   }
-  #ignoreExt(absolutePath: string) {
+  #transformExtToTs(absolutePath: string) {
     const ext = extname(absolutePath)
     if (ext) {
-      absolutePath = absolutePath.replace(new RegExp(`${ext}$`), '')
+      absolutePath = absolutePath.replace(new RegExp(`${ext}$`), '.ts')
     }
     return absolutePath
   }
-  getTSFileByProtoPath(path: string) {
+  // 转换成最终 ts 的绝对路径
+  #transformToFinalTSAbsolutePath(path: string) {
     const absolutePath = this.#pathToKey(path)
-    const key = this.#ignoreExt(absolutePath)
+    let x = relative(this.projectInfo.pbRootPath, absolutePath)
+    const result = join(this.projectInfo.projectRoot, x)
+    return this.#transformExtToTs(result)
+  }
+  getTSFileByProtoPath(path: string) {
+    const finalTSAbsolutePath = this.#transformToFinalTSAbsolutePath(path)
+    const key = finalTSAbsolutePath
+
     let file = this.#files.get(key)
     if (!file) {
-      file = new File(absolutePath, {
+      file = new File(finalTSAbsolutePath, {
         projectRoot: this.projectInfo.projectRoot,
         pbRootPath: this.projectInfo.pbRootPath,
       })
@@ -32,9 +40,10 @@ export class TSFilesManager {
     }
     return file
   }
-  getFile(path: string): File | undefined {
-    const absolutePath = this.#pathToKey(path)
-    const key = this.#ignoreExt(absolutePath)
+  getFileByTs(path: string): File | undefined {
+    const absolutePath = isAbsolute(path) ? path : join(this.projectInfo.projectRoot, path)
+    const key = this.#transformExtToTs(absolutePath)
+
     return this.#files.get(key)
   }
 

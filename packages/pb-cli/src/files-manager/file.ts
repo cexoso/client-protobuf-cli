@@ -4,13 +4,16 @@ export class File {
   #contents: string[] = []
   #imports = new Map<string, Set<string>>()
   constructor(
-    // (PBRoot) 下的绝对路径
-    public fileAbsolutePath: string,
+    public finalTsAbsolutePath: string,
     private opts: {
       projectRoot: string
       pbRootPath: string
     }
-  ) {}
+  ) {
+    if (!isAbsolute(finalTsAbsolutePath)) {
+      throw new Error('只允许传递最终生成 ts 的绝对路径')
+    }
+  }
   write(content: string) {
     this.#contents.push(content)
   }
@@ -24,7 +27,7 @@ export class File {
     return declarations
   }
   addImport({ absolutePath, member }: { absolutePath: string; member: string }) {
-    if (this.fileAbsolutePath === absolutePath) {
+    if (this.finalTsAbsolutePath === absolutePath) {
       return
     }
     const declarations = this.#getDeclarationsByPath(absolutePath)
@@ -61,7 +64,7 @@ export class File {
     return path
   }
   get fileNameWithProject() {
-    return this.#getRelativeTsPath(this.opts.pbRootPath, this.fileAbsolutePath)
+    return this.#getRelativeTsPath(this.opts.projectRoot, this.finalTsAbsolutePath)
   }
 
   #getMemberDeclaration = (members: Set<string>) => {
@@ -78,7 +81,7 @@ export class File {
       allImports
         .map(([module, members]) => {
           const memberDeclarations = this.#getMemberDeclaration(members)
-          const modulePath = this.#getRelativeTsPath(this.fileAbsolutePath, module, true)
+          const modulePath = this.#getRelativeTsPath(this.finalTsAbsolutePath, module, true)
           return `import ${memberDeclarations}'${modulePath}'`
         })
         .join('\n') + '\n'

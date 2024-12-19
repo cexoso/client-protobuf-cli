@@ -56,7 +56,7 @@ export class EncoderGenerater {
     const name = 'encode' + upperCaseFirst(type)
     return {
       typeName: name,
-      file: this.#generateMessageEncodeCode(root.lookupType(type)).file.fileAbsolutePath,
+      file: this.#generateMessageEncodeCode(root.lookupType(type)).file.finalTsAbsolutePath,
     }
   }
 
