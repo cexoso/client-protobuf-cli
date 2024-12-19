@@ -9,7 +9,7 @@ describe('files', async () => {
   it('normal', async () => {
     const container = createContainer()
     const filesManager = container.get(TSFilesManager)
-    const x = filesManager.getFileByPath('./x.ts')
+    const x = filesManager.getTSFileByProtoPath('./x.proto')
     x.addImport({
       absolutePath: 'radash',
       member: 'get',
@@ -49,8 +49,8 @@ describe('files', async () => {
     const projectInfo = container.get(ProjectInfo)
     projectInfo.setProjectRoot('./src')
     projectInfo.setPbRootPath(join(__dirname, '../../test-protos'))
-    const x = filesManager.getFileByPath('./dir1/x.ts')
-    const y = filesManager.getFileByPath('./dir2/y.ts')
+    const x = filesManager.getTSFileByProtoPath('./dir1/x.proto')
+    const y = filesManager.getTSFileByProtoPath('./dir2/y.proto')
     x.addImport({
       absolutePath: y.fileAbsolutePath,
       member: 'get',

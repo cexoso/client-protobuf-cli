@@ -12,7 +12,7 @@ import { getFilenameByType } from '../get-filename-by-type'
 export class DecoderGenerater {
   constructor(@inject(TSFilesManager) private filesManager: TSFilesManager) {}
   #addImport(field: Field | MapField, modulePath: string, member: string) {
-    const file = this.filesManager.getFileByPath(getFilenameByType(field))
+    const file = this.filesManager.getTSFileByProtoPath(getFilenameByType(field))
     file.addImport({ absolutePath: modulePath, member })
   }
   #messageDecodeMap = new Map<
@@ -74,7 +74,7 @@ export class DecoderGenerater {
   #generateMessageDecodeCodeIfNeed(type: Type) {
     let result = this.#messageDecodeMap.get(type.name)
     if (result === undefined) {
-      const currentFile = this.filesManager.getFileByPath(getFilenameByType(type))
+      const currentFile = this.filesManager.getTSFileByProtoPath(getFilenameByType(type))
       let preContext = ''
       result = {
         content: '',

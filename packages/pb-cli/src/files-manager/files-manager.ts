@@ -19,7 +19,7 @@ export class TSFilesManager {
     }
     return absolutePath
   }
-  getFileByPath(path: string) {
+  getTSFileByProtoPath(path: string) {
     const absolutePath = this.#pathToKey(path)
     const key = this.#ignoreExt(absolutePath)
     let file = this.#files.get(key)
