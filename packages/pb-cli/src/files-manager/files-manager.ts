@@ -99,7 +99,7 @@ export class TSFilesManager {
       }
     }
     const renderFile = (file: File) => {
-      const path = file.absoluteFileName
+      const path = file.finalTsAbsolutePath
       log(path)
       if (opts.dryRun) {
         return

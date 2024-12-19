@@ -1,9 +1,10 @@
-import { relative, join, isAbsolute, extname, dirname } from 'path'
+import { relative, isAbsolute, extname, dirname } from 'path'
 import { formatTypescript } from '../prettier'
 export class File {
   #contents: string[] = []
   #imports = new Map<string, Set<string>>()
   constructor(
+    // 最终生成到项目目录下的绝对路径
     public finalTsAbsolutePath: string,
     private opts: {
       projectRoot: string
@@ -14,6 +15,7 @@ export class File {
       throw new Error('只允许传递最终生成 ts 的绝对路径')
     }
   }
+
   write(content: string) {
     this.#contents.push(content)
   }
@@ -55,21 +57,17 @@ export class File {
     return absolutePath
   }
 
-  // 最终生成到项目目录下的绝对路径
-  get absoluteFileName() {
-    return join(this.opts.projectRoot, this.fileNameWithProject)
-  }
   #getRelativeTsPath(baseAbsolutePath: string, absolutePath: string, ignoreExt: boolean = false) {
     const directoryName = baseAbsolutePath.endsWith('/')
       ? baseAbsolutePath
       : dirname(baseAbsolutePath)
     const relativePath = this.#transformToRelativePath(directoryName, absolutePath)
-    return this.#changeExtName(relativePath, ignoreExt ? '' : '.ts')
+    return ignoreExt ? this.#ignoreExt(relativePath) : relativePath
   }
-  #changeExtName(path: string, extName: string) {
+  #ignoreExt(path: string) {
     const ext = extname(path)
     if (ext) {
-      return path.replace(new RegExp(`${ext}$`), extName)
+      return path.replace(new RegExp(`${ext}$`), '')
     }
     return path
   }
