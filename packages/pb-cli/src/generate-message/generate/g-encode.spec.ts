@@ -4,7 +4,7 @@ import { createContainer } from '../../container'
 import { PBLoader } from '../../pb-loader/pb-loader'
 import { ProjectInfo } from '../../project'
 import { MessageGenerator } from '../generate-message'
-import { FilesManager } from '../../files-manager/files-manager'
+import { TSFilesManager } from '../../files-manager/files-manager'
 import dedent from 'ts-dedent'
 
 const root = join(__dirname, '../../../test-protos')
@@ -19,7 +19,7 @@ describe('encode', () => {
     const files = await pbLoader.loadByPath('**/color.proto')
     const messageGenerator = container.get(MessageGenerator)
     messageGenerator.generateType(files)
-    const filesManager = container.get(FilesManager)
+    const filesManager = container.get(TSFilesManager)
     const fileContent = filesManager.listAllFile().map((file) => file.toString())
     expect(fileContent.map((file) => file.toString()).join('\n')).deep.eq(dedent`
       // ./google/protobuf.ts
@@ -84,7 +84,7 @@ describe('encode', () => {
     messageGenerator.generateType(files, {
       typeFullnameRegExp: 'CRpcHead',
     })
-    const filesManager = container.get(FilesManager)
+    const filesManager = container.get(TSFilesManager)
     expect(filesManager.listAllFile().at(0)?.getBody({ formatWithCurrentPrettier: true }))
       .eq(dedent`
         export interface Book {
@@ -115,7 +115,7 @@ describe('encode', () => {
     messageGenerator.generateEncoder(files, {
       typeFullnameRegExp: 'CRpcHead',
     })
-    const filesManager = container.get(FilesManager)
+    const filesManager = container.get(TSFilesManager)
     expect(filesManager.listAllFile().at(0)?.toString()).eq(dedent`
       // ./map.ts
       import { encodeInt32ToBuffer, EncoderWithoutTag, encodeStringToBuffer, encodeMapToBuffer, encodeMessageToBuffer } from '@protobuf-es/core'
@@ -186,7 +186,7 @@ describe('encode', () => {
     messageGenerator.generateDecode(files, {
       typeFullnameRegExp: 'CRpcHead',
     })
-    const filesManager = container.get(FilesManager)
+    const filesManager = container.get(TSFilesManager)
     expect(filesManager.listAllFile().at(0)?.toString()).eq(dedent`
       // ./map.ts
       import { defineMap, readInt32, defineMessage } from '@protobuf-es/core'

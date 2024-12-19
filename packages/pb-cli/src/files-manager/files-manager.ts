@@ -5,7 +5,7 @@ import { join, isAbsolute, extname, dirname } from 'path'
 import { mkdirSync, writeFileSync, lstatSync, existsSync, rmSync } from 'fs'
 
 @injectable()
-export class FilesManager {
+export class TSFilesManager {
   #files = new Map<string, File>()
   constructor(@inject(ProjectInfo) private projectInfo: ProjectInfo) {}
   #pathToKey(path: string) {

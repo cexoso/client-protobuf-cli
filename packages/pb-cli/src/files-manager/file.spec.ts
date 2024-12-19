@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createContainer } from '../container'
-import { FilesManager } from './files-manager'
+import { TSFilesManager } from './files-manager'
 import { dedent } from 'ts-dedent'
 import { ProjectInfo } from '../project'
 import { join } from 'path'
@@ -8,7 +8,7 @@ import { join } from 'path'
 describe('files', async () => {
   it('normal', async () => {
     const container = createContainer()
-    const filesManager = container.get(FilesManager)
+    const filesManager = container.get(TSFilesManager)
     const x = filesManager.getFileByPath('./x.ts')
     x.addImport({
       absolutePath: 'radash',
@@ -45,7 +45,7 @@ describe('files', async () => {
   })
   it('相对地址', async () => {
     const container = createContainer()
-    const filesManager = container.get(FilesManager)
+    const filesManager = container.get(TSFilesManager)
     const projectInfo = container.get(ProjectInfo)
     projectInfo.setProjectRoot('./src')
     projectInfo.setPbRootPath(join(__dirname, '../../test-protos'))

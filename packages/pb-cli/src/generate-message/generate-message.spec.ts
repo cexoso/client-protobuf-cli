@@ -4,7 +4,7 @@ import { MessageGenerator } from './generate-message'
 import { isAbsolute, join, relative } from 'path'
 import { PBLoader } from '../pb-loader/pb-loader'
 import { ProjectInfo } from '../project'
-import { FilesManager } from '../files-manager/files-manager'
+import { TSFilesManager } from '../files-manager/files-manager'
 import { dedent } from 'ts-dedent'
 import {
   createProgram,
@@ -25,7 +25,7 @@ describe('generate', () => {
     const files = await pbLoader.loadByPath('example.proto')
     const messageGenerator = container.get(MessageGenerator)
     messageGenerator.generateType(files)
-    const filesManager = container.get(FilesManager)
+    const filesManager = container.get(TSFilesManager)
     const fileContent = filesManager.listAllFile().map((file) => file.toString())
     expect(fileContent).lengthOf(2)
     expect(fileContent[0]).deep.eq(dedent`
@@ -86,7 +86,7 @@ describe('generate', () => {
     const files = await pbLoader.loadByPath('example.proto')
     const messageGenerator = container.get(MessageGenerator)
     messageGenerator.generateEncoder(files)
-    const filesManager = container.get(FilesManager)
+    const filesManager = container.get(TSFilesManager)
     const fileContent = filesManager.listAllFile().map((file) => file.toString())
     expect(fileContent).lengthOf(2)
     expect(fileContent[0]).deep.eq(dedent`
@@ -236,7 +236,7 @@ describe('generate', () => {
     const files = await pbLoader.loadByPath('example.proto')
     const messageGenerator = container.get(MessageGenerator)
     messageGenerator.generateDecode(files)
-    const filesManager = container.get(FilesManager)
+    const filesManager = container.get(TSFilesManager)
     const fileContent = filesManager.listAllFile().map((file) => file.toString())
     expect(fileContent).lengthOf(2)
     expect(fileContent[0]).deep.eq(dedent`
@@ -303,7 +303,7 @@ describe('generate', () => {
     const files = await pbLoader.loadByPath('example.proto')
     const messageGenerator = container.get(MessageGenerator)
     messageGenerator.generateAllCode(files)
-    const filesManager = container.get(FilesManager)
+    const filesManager = container.get(TSFilesManager)
     const fileContent = filesManager.listAllFile()
     expect(fileContent).lengthOf(2)
 

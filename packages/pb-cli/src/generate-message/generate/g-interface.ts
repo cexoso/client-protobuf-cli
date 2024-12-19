@@ -2,14 +2,14 @@ import { Field, Type, MapField } from 'protobufjs'
 import { isScalarType, scalarToTypescript, isEnum } from './scalar'
 import { formatTypescript } from '../../prettier'
 import { inject, injectable } from 'inversify'
-import { FilesManager } from '../../files-manager/files-manager'
+import { TSFilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
 import { getFilenameByType } from '../get-filename-by-type'
 import { getTypeName } from '../get-type-name'
 
 @injectable()
 export class InterfaceGenerater {
-  constructor(@inject(FilesManager) private filesManager: FilesManager) {}
+  constructor(@inject(TSFilesManager) private filesManager: TSFilesManager) {}
   #interfaces: Map<string, { file: File; declareContent: string }> = new Map()
   // 存的是 type
   #interfaceOrderList: string[] = []

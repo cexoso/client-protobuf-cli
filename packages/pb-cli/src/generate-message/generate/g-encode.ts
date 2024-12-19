@@ -3,14 +3,14 @@ import { isEnum, isScalarType, mapScalarToEncodeMethod } from './scalar'
 import { upperCaseFirst } from '../../prettier/string-format'
 import { formatTypescript } from '../../prettier'
 import { inject, injectable } from 'inversify'
-import { FilesManager } from '../../files-manager/files-manager'
+import { TSFilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
 import { getFilenameByType } from '../get-filename-by-type'
 import dedent from 'dedent'
 
 @injectable()
 export class EncoderGenerater {
-  constructor(@inject(FilesManager) private filesManager: FilesManager) {}
+  constructor(@inject(TSFilesManager) private filesManager: TSFilesManager) {}
   #messageEncodeMap = new Map<string, { content: string; file: File }>()
   #addImport(field: Field, modulePath: string, member: string) {
     const file = this.filesManager.getFileByPath(getFilenameByType(field))

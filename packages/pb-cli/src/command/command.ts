@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify'
 import { ProjectInfo } from '../project'
 import { PBLoader } from '../pb-loader/pb-loader'
 import { MessageGenerator } from '../generate-message/generate-message'
-import { FilesManager } from '../files-manager/files-manager'
+import { TSFilesManager } from '../files-manager/files-manager'
 
 @injectable()
 export class Command {
@@ -10,7 +10,7 @@ export class Command {
     @inject(ProjectInfo) private projectInfo: ProjectInfo,
     @inject(PBLoader) private loader: PBLoader,
     @inject(MessageGenerator) private messageGenerator: MessageGenerator,
-    @inject(FilesManager) private filesManager: FilesManager
+    @inject(TSFilesManager) private filesManager: TSFilesManager
   ) {}
   async compileProtos(opts: {
     protoDir: string
