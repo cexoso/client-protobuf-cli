@@ -3,9 +3,19 @@ import { ProjectInfo } from '../project'
 import { PBLoader } from '../pb-loader/pb-loader'
 import { MessageGenerator } from '../generate-message/generate-message'
 import { TSFilesManager } from '../files-manager/files-manager'
+import { Root } from 'protobufjs'
+
+export interface Context {
+  files: Map<string, Root>
+}
+export interface Plugin {
+  afterGenerate?: (context: Context) => void
+}
 
 @injectable()
 export class Command {
+  #plugins: Plugin[] = []
+  files?: Map<string, Root>
   constructor(
     @inject(ProjectInfo) private projectInfo: ProjectInfo,
     @inject(PBLoader) private loader: PBLoader,
@@ -27,16 +37,27 @@ export class Command {
     this.projectInfo.setPbRootPath(opts.protoDir)
     this.projectInfo.setProjectRoot(opts.outDir)
     const glob = opts.protoGlob ?? '**/*.proto'
-    const files = await this.loader.loadByPath(glob)
-    this.messageGenerator.generateAllCode(files, {
+    this.files = await this.loader.loadByPath(glob)
+    this.messageGenerator.generateAllCode(this.files, {
       typeFullnameRegExp: opts.typeFullnameRegExp,
     })
-
+    this.#callPlugin('afterGenerate')
     this.filesManager.renderAllFileToDir({
       verbose: opts.verbose,
       dryRun: opts.dryRun,
       autoClean: opts.autoClean,
       withPrettier: opts.withPrettier,
     })
+  }
+  #callPlugin(phase: keyof Plugin) {
+    const context = {
+      files: this.files!,
+    }
+    this.#plugins.forEach((plugin) => {
+      plugin[phase]?.(context)
+    })
+  }
+  addPlugin(plugin: Plugin) {
+    this.#plugins.push(plugin)
   }
 }
