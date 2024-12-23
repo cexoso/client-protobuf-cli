@@ -1,5 +1,12 @@
 # @protobuf-es/cli
 
+## 0.0.7
+
+### Patch Changes
+
+- 完成了生成请求类
+- fad9476: 应该使用 dedent 而非 ts dedent
+
 ## 0.0.6
 
 ### Patch Changes
