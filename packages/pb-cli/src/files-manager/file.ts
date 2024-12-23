@@ -1,4 +1,4 @@
-import { relative, isAbsolute, extname, dirname } from 'path'
+import { relative, isAbsolute, extname, dirname, basename } from 'path'
 import { formatTypescript } from '../prettier'
 export class File {
   #contents: string[] = []
@@ -73,6 +73,13 @@ export class File {
   }
   get fileNameWithProject() {
     return this.#getRelativeTsPath(this.opts.projectRoot, this.finalTsAbsolutePath)
+  }
+
+  getFileName(withoutSuffix: boolean = false) {
+    return basename(
+      this.finalTsAbsolutePath,
+      withoutSuffix ? extname(this.finalTsAbsolutePath) : ''
+    )
   }
 
   #getMemberDeclaration = (members: Set<string>) => {
