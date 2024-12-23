@@ -4,7 +4,6 @@ import { getAllMessages } from './get-all-type'
 import { InterfaceGenerater } from './generate/g-interface'
 import { EncoderGenerater } from './generate/g-encode'
 import { DecoderGenerater } from './generate/g-decode'
-import { getFilenameByType } from './get-filename-by-type'
 
 interface Opts {
   typeFullnameRegExp?: RegExp | string
@@ -36,16 +35,7 @@ export class MessageGenerator {
       return true
     })
   }
-  getOwnTypes(path: string, root: Root) {
-    console.log('debugger 🐛 path', path)
-    const allType = this.getAllTypes(root)
-    allType.filter((i) => {
-      console.log('debugger 🐛 ', getFilenameByType(i))
-      return true
-    })
-    // getFilenameByType
-    return allType
-  }
+
   doForType(files: Map<string, Root>, job: (_: Type) => any, opts?: Opts) {
     const data = this.getAllTypes(files)
     data.map((type) => {
