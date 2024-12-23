@@ -31,19 +31,21 @@ export class TSFilesManager {
     if (isAbsolute(relativePath)) {
       throw new Error(`only support relative path, by get ${relativePath}`)
     }
-    return join(file.finalTsAbsolutePath, '..', relativePath)
+    const finalTSAbsolutePath = join(file.finalTsAbsolutePath, '..', relativePath)
+    return this.#getOrCreateFile(finalTSAbsolutePath)
   }
   getTSFileByProtoPath(path: string) {
     const finalTSAbsolutePath = this.#transformToFinalTSAbsolutePath(path)
-    const key = finalTSAbsolutePath
-
-    let file = this.#files.get(key)
+    return this.#getOrCreateFile(finalTSAbsolutePath)
+  }
+  #getOrCreateFile(finalTSAbsolutePath: string) {
+    let file = this.#files.get(finalTSAbsolutePath)
     if (!file) {
       file = new File(finalTSAbsolutePath, {
         projectRoot: this.projectInfo.projectRoot,
         pbRootPath: this.projectInfo.pbRootPath,
       })
-      this.#files.set(key, file)
+      this.#files.set(finalTSAbsolutePath, file)
     }
     return file
   }

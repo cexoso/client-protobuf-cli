@@ -4,9 +4,13 @@ import { PBLoader } from '../pb-loader/pb-loader'
 import { MessageGenerator } from '../generate-message/generate-message'
 import { TSFilesManager } from '../files-manager/files-manager'
 import { Root } from 'protobufjs'
+import { InterfaceGenerater } from '../generate-message/generate/g-interface'
 
 export interface Context {
+  files: Map<string, Root>
   filesManager: TSFilesManager
+  interfaceGenerater: InterfaceGenerater
+  messageGenerator: MessageGenerator
 }
 export interface Plugin {
   afterGenerate?: (context: Context) => void
@@ -20,7 +24,8 @@ export class Command {
     @inject(ProjectInfo) private projectInfo: ProjectInfo,
     @inject(PBLoader) private loader: PBLoader,
     @inject(MessageGenerator) private messageGenerator: MessageGenerator,
-    @inject(TSFilesManager) private filesManager: TSFilesManager
+    @inject(TSFilesManager) private filesManager: TSFilesManager,
+    @inject(InterfaceGenerater) private interfaceGenerater: InterfaceGenerater
   ) {}
   async compileProtos(opts: {
     protoDir: string
@@ -52,6 +57,9 @@ export class Command {
   #callPlugin(phase: keyof Plugin) {
     const context: Context = {
       filesManager: this.filesManager,
+      files: this.files!,
+      interfaceGenerater: this.interfaceGenerater,
+      messageGenerator: this.messageGenerator,
     }
     this.#plugins.forEach((plugin) => {
       plugin[phase]?.(context)
