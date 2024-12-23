@@ -2,6 +2,7 @@ import { describe, it } from 'vitest'
 import { createContainer } from '../container'
 import { join } from 'path'
 import { Command } from '../command/command'
+import { easyRequestPlugin } from './easy-request-plugin'
 
 const root = join(__dirname, '../../test-protos')
 const dist = join(__dirname, '../../dist')
@@ -11,11 +12,7 @@ describe('插件', () => {
     // 现在全量生成还有部分问题没有解决
     const container = createContainer()
     const cmd = container.get(Command)
-    cmd.addPlugin({
-      afterGenerate(ctx) {
-        console.log('debugger 🐛 ctx', ctx)
-      },
-    })
+    cmd.addPlugin(easyRequestPlugin)
     await cmd.compileProtos({
       protoDir: root,
       outDir: dist,

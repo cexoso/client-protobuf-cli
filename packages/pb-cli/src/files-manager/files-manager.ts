@@ -26,6 +26,13 @@ export class TSFilesManager {
     const result = join(this.projectInfo.projectRoot, x)
     return this.#transformExtToTs(result)
   }
+  // 获取或创建一个相对当前文件的新文件
+  getNewFileByRelativePathWithCurrentFile(file: File, relativePath: string) {
+    if (isAbsolute(relativePath)) {
+      throw new Error(`only support relative path, by get ${relativePath}`)
+    }
+    return join(file.finalTsAbsolutePath, '..', relativePath)
+  }
   getTSFileByProtoPath(path: string) {
     const finalTSAbsolutePath = this.#transformToFinalTSAbsolutePath(path)
     const key = finalTSAbsolutePath

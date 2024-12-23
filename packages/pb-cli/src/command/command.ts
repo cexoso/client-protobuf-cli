@@ -6,7 +6,7 @@ import { TSFilesManager } from '../files-manager/files-manager'
 import { Root } from 'protobufjs'
 
 export interface Context {
-  files: Map<string, Root>
+  filesManager: TSFilesManager
 }
 export interface Plugin {
   afterGenerate?: (context: Context) => void
@@ -50,8 +50,8 @@ export class Command {
     })
   }
   #callPlugin(phase: keyof Plugin) {
-    const context = {
-      files: this.files!,
+    const context: Context = {
+      filesManager: this.filesManager,
     }
     this.#plugins.forEach((plugin) => {
       plugin[phase]?.(context)
