@@ -99,6 +99,12 @@ export class InterfaceGenerater {
     return result
   }
 
+  getInterfaceByType(type: Type) {
+    return {
+      memberName: type.name,
+      ...this.#interfaces.get(type.name),
+    }
+  }
   generateMessage(type: Type) {
     return this.#generateMessageInterfaceIfNeed(type)
   }

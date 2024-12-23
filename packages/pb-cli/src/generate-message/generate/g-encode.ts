@@ -117,7 +117,7 @@ export class EncoderGenerater {
   }
 
   #generateMessageEncodeCode(type: Type) {
-    const name = 'encode' + upperCaseFirst(type.name)
+    const name = this.#getEncoderName(type)
     let result = this.#messageEncodeMap.get(name)
 
     if (result === undefined) {
@@ -167,5 +167,15 @@ export class EncoderGenerater {
 
   generateEncodeCode(type: Type) {
     return this.#generateMessageEncodeCode(type)
+  }
+  #getEncoderName(type: Type) {
+    return 'encode' + upperCaseFirst(type.name)
+  }
+  getEncoderByType(type: Type) {
+    const name = this.#getEncoderName(type)
+    return {
+      memberName: name,
+      ...this.#messageEncodeMap.get(name)!,
+    }
   }
 }

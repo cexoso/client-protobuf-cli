@@ -81,8 +81,9 @@ export class DecoderGenerater {
         file: currentFile,
       }
       this.#messageDecodeMap.set(type.name, result)
-      const typeName = upperCaseFirst(type.name)
-      const name = 'decode' + typeName
+
+      const typeName = this.#getTypeName(type)
+      const name = this.#getDecoderName(type)
       const genFieldDecode = (field: Field) => {
         const tag = field.id
         let config = ''
@@ -131,7 +132,21 @@ export class DecoderGenerater {
     return result
   }
 
+  #getTypeName(type: Type) {
+    return upperCaseFirst(type.name)
+  }
+  #getDecoderName(type: Type) {
+    const typeName = this.#getTypeName(type)
+    const name = 'decode' + typeName
+    return name
+  }
   generateDecodeCode(type: Type) {
     this.#generateMessageDecodeCodeIfNeed(type)
+  }
+  getDecoderByType(type: Type) {
+    return {
+      memberName: this.#getDecoderName(type),
+      ...this.#messageDecodeMap.get(type.name)!,
+    }
   }
 }

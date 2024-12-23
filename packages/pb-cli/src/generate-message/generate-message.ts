@@ -4,6 +4,7 @@ import { getAllMessages } from './get-all-type'
 import { InterfaceGenerater } from './generate/g-interface'
 import { EncoderGenerater } from './generate/g-encode'
 import { DecoderGenerater } from './generate/g-decode'
+import { getFilenameByType } from './get-filename-by-type'
 
 interface Opts {
   typeFullnameRegExp?: RegExp | string
@@ -35,7 +36,17 @@ export class MessageGenerator {
       return true
     })
   }
-  #doForType(files: Map<string, Root>, job: (_: Type) => any, opts?: Opts) {
+  getOwnTypes(path: string, root: Root) {
+    console.log('debugger 🐛 path', path)
+    const allType = this.getAllTypes(root)
+    allType.filter((i) => {
+      console.log('debugger 🐛 ', getFilenameByType(i))
+      return true
+    })
+    // getFilenameByType
+    return allType
+  }
+  doForType(files: Map<string, Root>, job: (_: Type) => any, opts?: Opts) {
     const data = this.getAllTypes(files)
     data.map((type) => {
       if (opts?.typeFullnameRegExp && !type.fullName.match(opts.typeFullnameRegExp)) {
@@ -45,17 +56,25 @@ export class MessageGenerator {
     })
   }
   generateType(files: Map<string, Root>, opts?: Opts) {
-    this.#doForType(files, (type) => this.interfaceGenerater.generateMessage(type), opts)
+    this.doForType(files, (type) => this.interfaceGenerater.generateMessage(type), opts)
   }
   generateDecode(files: Map<string, Root>, opts?: Opts) {
-    this.#doForType(files, (type) => this.decoderGenerater.generateDecodeCode(type), opts)
+    this.doForType(files, (type) => this.decoderGenerater.generateDecodeCode(type), opts)
   }
   generateEncoder(files: Map<string, Root>, opts?: Opts) {
-    this.#doForType(files, (type) => this.encoderGenerater.generateEncodeCode(type), opts)
+    this.doForType(files, (type) => this.encoderGenerater.generateEncodeCode(type), opts)
   }
   generateAllCode(files: Map<string, Root>, opts?: Opts) {
     this.generateType(files, opts)
     this.generateEncoder(files, opts)
     this.generateDecode(files, opts)
+  }
+
+  getAllMemberByType(type: Type) {
+    return {
+      tsInterface: this.interfaceGenerater.getInterfaceByType(type),
+      encoder: this.encoderGenerater.getEncoderByType(type),
+      decoder: this.decoderGenerater.getDecoderByType(type),
+    }
   }
 }
