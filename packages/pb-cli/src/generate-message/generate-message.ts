@@ -9,6 +9,13 @@ interface Opts {
   typeFullnameRegExp?: RegExp | string
 }
 
+function getRoots(files: Map<string, Root> | Root) {
+  if (files instanceof Map) {
+    return [...files.values()]
+  }
+  return [files]
+}
+
 @injectable()
 export class MessageGenerator {
   constructor(
@@ -16,10 +23,10 @@ export class MessageGenerator {
     @inject(EncoderGenerater) private encoderGenerater: EncoderGenerater,
     @inject(DecoderGenerater) private decoderGenerater: DecoderGenerater
   ) {}
-  getAllTypes(files: Map<string, Root>) {
-    const entries = files.entries()
+  getAllTypes(files: Map<string, Root> | Root) {
     const dedupeMap = new Set<string>()
-    const data = [...entries].flatMap(([_, root]) => getAllMessages(root))
+    const roots = getRoots(files)
+    const data = roots.flatMap((root) => getAllMessages(root))
     return data.filter((type) => {
       if (dedupeMap.has(type.fullName)) {
         return false
