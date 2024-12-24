@@ -1,7 +1,7 @@
 import { Plugin, Context } from '../command/command'
 import dedent from 'ts-dedent'
 import { Method, Type } from 'protobufjs'
-import { getAllService } from 'src/generate-message/get-all-type'
+import { getAllService } from '../../src/generate-message/get-all-type'
 
 interface Option {
   service: string
