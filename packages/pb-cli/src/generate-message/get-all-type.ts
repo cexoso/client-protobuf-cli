@@ -16,7 +16,7 @@ export function getAllMessages(namespace: Namespace) {
   return messages
 }
 
-// 函数用于递归获取所有 message 定义
+// 函数用于递归获取所有 service 定义
 export function getAllService(namespace: Namespace) {
   let messages: Service[] = []
 
