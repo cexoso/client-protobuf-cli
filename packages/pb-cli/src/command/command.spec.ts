@@ -29,7 +29,7 @@ describe('Command', () => {
       outDir: dist,
       verbose: false,
       protoGlob: 'srpc.proto',
-      typeFullnameRegExp: /.srpc.CRpcHead/,
+      typeFullnameRegExp: /.xrpc.CRpcHead/,
       autoClean: true,
       withPrettier: true,
       // 把这个改成 false, 会真实的在 dist 目录输出文件
