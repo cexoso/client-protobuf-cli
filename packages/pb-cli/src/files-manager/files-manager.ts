@@ -76,7 +76,7 @@ export class TSFilesManager {
         force: true,
       })
     }
-    mkdirSync(this.projectInfo.projectRoot)
+    mkdirSync(this.projectInfo.projectRoot, { recursive: true })
   }
 
   #makeSureDirExists(dirName: string) {
