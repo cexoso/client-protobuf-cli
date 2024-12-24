@@ -53,6 +53,7 @@ export class Command {
       autoClean: opts.autoClean,
       withPrettier: opts.withPrettier,
     })
+    return this.filesManager.listAllFile()
   }
   #callPlugin(phase: keyof Plugin) {
     const context: Context = {
