@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "pnpm run --filter=protobuf-frontend test"
+    "test": "CI=true pnpm run -r test --allowOnly"
   },
   "keywords": [],
   "author": "",
