@@ -23,7 +23,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "cli": "workspace: *",
+    "@cexoso/ts-pkg-build": "workspace: *",
     "bignumber.js": "^9.1.2",
     "protobufjs": "^7.3.2",
     "typescript": "^5.5.4",

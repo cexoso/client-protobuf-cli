@@ -31,8 +31,8 @@
   },
   "devDependencies": {
     "@protobuf-es/core": "workspace: *",
+    "@cexoso/ts-pkg-build": "workspace: *",
     "@types/node": "^22.0.0",
-    "cli": "workspace: *",
     "typescript": "^5.5.4",
     "vitest": "^2.0.4"
   }
