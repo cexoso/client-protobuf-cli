@@ -1,30 +1,18 @@
 import { Plugin, Context } from '../command/command'
 import dedent from 'ts-dedent'
-import { camel } from 'radash'
-import { Method, Service, Type } from 'protobufjs'
+import { Method, Type } from 'protobufjs'
+import { getAllService } from 'src/generate-message/get-all-type'
+
 interface Option {
   service: string
 }
-export const easyRequestPlugin: (opts: Option) => Plugin = (opts) => {
+export const easyRequestPlugin: (opts?: Option) => Plugin = () => {
   function getHelperFileByType(ctx: Context, type: Type) {
     const file = ctx.filesManager.getTSFileByProtoPath(type.filename!)
     return ctx.filesManager.getNewFileByRelativePathWithCurrentFile(
       file,
       `${file.getFileName(true)}Helper.ts`
     )
-  }
-
-  function getService(ctx: Context) {
-    const type = [...ctx.files.values()]
-      .flatMap((file) => (file.nested ? Object.entries(file.nested) : []))
-      .find(([name]) => camel(name) === camel(opts.service))
-    if (type === undefined) {
-      throw new Error('找不到服务入口')
-    }
-
-    // @ts-ignore
-    const result = type[1][opts.service]
-    return result as Service
   }
 
   const memberMap = new WeakMap<
@@ -86,26 +74,31 @@ export const easyRequestPlugin: (opts: Option) => Plugin = (opts) => {
         })
       })
 
-      const service = getService(ctx)
+      for (let [_, root] of files) {
+        const services = getAllService(root)
+        const service = services[0]
+        if (service === undefined) {
+          continue
+        }
 
-      const index = filesManager.getTSFileByProtoPath('index.ts')
-      index.addImport({ absolutePath: '@futu/rpc-request', member: 'request' })
-      const hexServiceId = '0x' + service.getOption('(srpc.service_option_id)').toString(16)
-      // 更好的是直接从 fns 依赖，但是我不想去依赖 fns 库
-      index.write(`type FnsCallee = Parameters<typeof request>[0]['fnsCallee'];`)
-      index.write(`const serviceId = ${hexServiceId}`)
+        const index = filesManager.getTSFileByProtoPath('index.ts')
+        index.addImport({ absolutePath: '@futu/rpc-request', member: 'request' })
+        const hexServiceId = '0x' + service.getOption('(srpc.service_option_id)').toString(16)
+        // 更好的是直接从 fns 依赖，但是我不想去依赖 fns 库
+        index.write(`type FnsCallee = Parameters<typeof request>[0]['fnsCallee'];`)
+        index.write(`const serviceId = ${hexServiceId}`)
 
-      service.methodsArray.forEach((method) => {
-        const hexMethodId = '0x' + method.getOption('(srpc.method_option_id)').toString(16)
-        const { requestMembers, responseMember, responseFile, requestFile } = getMembersByMethod(
-          ctx,
-          method
-        )
+        service.methodsArray.forEach((method) => {
+          const hexMethodId = '0x' + method.getOption('(srpc.method_option_id)').toString(16)
+          const { requestMembers, responseMember, responseFile, requestFile } = getMembersByMethod(
+            ctx,
+            method
+          )
 
-        index.addImport({ absolutePath: responseFile, member: requestMembers.decoderName })
-        index.addImport({ absolutePath: requestFile, member: responseMember.encoderName })
+          index.addImport({ absolutePath: responseFile, member: requestMembers.decoderName })
+          index.addImport({ absolutePath: requestFile, member: responseMember.encoderName })
 
-        const methodBody = dedent`
+          const methodBody = dedent`
           export const ${method.name}= async (opts: { fnsCallee: FnsCallee; input: ${requestMembers.interface}}) => {
             const { header, body } = await request({
               input: opts.input,
@@ -123,8 +116,9 @@ export const easyRequestPlugin: (opts: Option) => Plugin = (opts) => {
             };
           };
         `
-        index.write(methodBody)
-      })
+          index.write(methodBody)
+        })
+      }
     },
   }
 }

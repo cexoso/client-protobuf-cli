@@ -16,9 +16,7 @@ describe('插件', () => {
     const cmd = container.get(Command)
     const tSFilesManager = container.get(TSFilesManager)
     cmd.addPlugin(
-      easyRequestPlugin({
-        service: 'ExampleService',
-      })
+      easyRequestPlugin()
     )
     await cmd.compileProtos({
       protoDir: root,
