@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.13
+
+### Patch Changes
+
+- f5535d1: 解决生成的 map 没有添加依赖的问题
+
 ## 0.0.12
 
 ### Patch Changes
