@@ -1,0 +1,14 @@
+{
+  "name": "cli",
+  "private": true,
+  "version": "0.0.5",
+  "type": "module",
+  "license": "MIT",
+  "bin": "index.mjs",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "glob": "^11.0.0",
+    "tsup": "^8.3.5",
+    "zx": "^8.2.4"
+  }
+}
