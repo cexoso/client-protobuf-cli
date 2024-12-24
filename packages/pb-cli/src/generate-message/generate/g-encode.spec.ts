@@ -66,7 +66,7 @@ describe('encode', () => {
         red?: number
         green?: number
         blue?: number
-        alpha?: google.protobuf.FloatValue
+        alpha?: FloatValue
       }
       
     `)
@@ -223,5 +223,31 @@ describe('encode', () => {
       )
       
     `)
+  })
+
+  it('嵌套且名字重复的消息', async () => {
+    const container = createContainer()
+    const pbLoader = container.get(PBLoader)
+    const projectInfo = container.get(ProjectInfo)
+    projectInfo.setPbRootPath(root)
+    projectInfo.setProjectRoot('./src')
+    const files = await pbLoader.loadByPath('nestle-duplicate-message.proto')
+    const [_, pbRoot] = [...files.entries()][0]!
+    const messageGenerator = container.get(MessageGenerator)
+    messageGenerator.generateType(files)
+    messageGenerator.generateEncoder(files)
+    messageGenerator.generateDecode(files)
+    const reqType = pbRoot.lookupType('nestle_service.GetDataReq.Reponse')
+    const resType = pbRoot.lookupType('nestle_service.GetDataRes.Reponse')
+    const reqTypeMember = messageGenerator.getAllMemberByType(reqType)
+    const resTypeMember = messageGenerator.getAllMemberByType(resType)
+    expect(reqTypeMember.tsInterface.memberName).eq('Reponse')
+    expect(resTypeMember.tsInterface.memberName).eq('NestleServiceGetDataResReponse')
+
+    expect(reqTypeMember.encoder.memberName).eq('encodeReponse')
+    expect(resTypeMember.encoder.memberName).eq('encodeNestleServiceGetDataResReponse')
+
+    expect(reqTypeMember.decoder.memberName).eq('decodeReponse')
+    expect(resTypeMember.decoder.memberName).eq('decodeNestleServiceGetDataResReponse')
   })
 })

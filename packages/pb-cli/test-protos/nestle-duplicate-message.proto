@@ -1,0 +1,16 @@
+syntax = "proto2";
+package nestle_service;
+
+message GetDataReq {
+  message Reponse {
+    optional int64 a = 1;
+  }
+  map<string, Reponse> a = 1;
+}
+
+message GetDataRes {
+  message Reponse {
+    optional int64 a = 1;
+  }
+  map<string, Reponse> a = 1;
+}

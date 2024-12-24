@@ -7,9 +7,11 @@ import { TSFilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
 import { getFilenameByType } from '../get-filename-by-type'
 import dedent from 'ts-dedent'
+import { NameManager } from './name-conflict-manager'
 
 @injectable()
 export class EncoderGenerater {
+  #nameManager = new NameManager()
   constructor(@inject(TSFilesManager) private filesManager: TSFilesManager) {}
   #messageEncodeMap = new Map<string, { content: string; file: File }>()
   #addImport(field: Field, modulePath: string, member: string) {
@@ -169,7 +171,7 @@ export class EncoderGenerater {
     return this.#generateMessageEncodeCode(type)
   }
   #getEncoderName(type: Type) {
-    return 'encode' + upperCaseFirst(type.name)
+    return 'encode' + upperCaseFirst(this.#nameManager.getUniqueName(type))
   }
   getEncoderByType(type: Type) {
     const name = this.#getEncoderName(type)

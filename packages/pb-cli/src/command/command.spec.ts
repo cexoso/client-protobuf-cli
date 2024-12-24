@@ -33,7 +33,7 @@ describe('Command', () => {
       autoClean: true,
       withPrettier: true,
       // 把这个改成 false, 会真实的在 dist 目录输出文件
-      dryRun: false,
+      dryRun: true,
     })
   })
 })

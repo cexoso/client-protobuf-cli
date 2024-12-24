@@ -7,9 +7,11 @@ import { inject, injectable } from 'inversify'
 import { TSFilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
 import { getFilenameByType } from '../get-filename-by-type'
+import { NameManager } from './name-conflict-manager'
 
 @injectable()
 export class DecoderGenerater {
+  #nameManager = new NameManager()
   constructor(@inject(TSFilesManager) private filesManager: TSFilesManager) {}
   #addImport(field: Field | MapField, modulePath: string, member: string) {
     const file = this.filesManager.getTSFileByProtoPath(getFilenameByType(field))
@@ -136,7 +138,7 @@ export class DecoderGenerater {
   }
 
   #getTypeName(type: Type) {
-    return upperCaseFirst(type.name)
+    return upperCaseFirst(this.#nameManager.getUniqueName(type))
   }
   #getDecoderName(type: Type) {
     const typeName = this.#getTypeName(type)
