@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.12
+
+### Patch Changes
+
+- 0bd596a: 为了测试，返回所有的文件
+
 ## 0.0.11
 
 ### Patch Changes
