@@ -1,5 +1,13 @@
 # @protobuf-es/core
 
+## 0.0.8
+
+### Patch Changes
+
+- 929deff: pb-cli 递归创建输出目录
+- 切换为 tsup 打包, 只支持 cjs 格式，mjs 格式坑巨多
+  接入严格的 ts 检查
+
 ## 0.0.7
 
 ### Patch Changes
