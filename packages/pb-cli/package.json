@@ -3,44 +3,29 @@
   "version": "0.0.7",
   "scripts": {
     "test": "vitest --reporter=dot",
-    "build": "pkgroll --clean-dist",
+    "build": "cli build",
     "release": "vitest --run && npm run build",
     "prepublishOnly": "npm run release"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.cts",
-  "exports": {
-    "require": {
-      "types": "./dist/index.d.cts",
-      "default": "./dist/index.cjs"
-    },
-    "import": {
-      "types": "./dist/index.d.mts",
-      "default": "./dist/index.mjs"
-    }
-  },
-  "bin": "./dist/cli.js",
+  "main": "index.js",
   "files": [
     "dist/**/*"
   ],
   "dependencies": {
     "@prettier/sync": "^0.5.2",
-    "@protobuf-es/core": "workspace: *",
     "commander": "^12.1.0",
-    "dedent": "^1.5.3",
     "glob": "^11.0.0",
     "inversify": "^6.1.5",
     "protobufjs": "^7.3.2",
     "radash": "^12.1.0",
     "reflect-metadata": "^0.2.2",
     "ts-dedent": "^2.2.0",
-    "tslib": "^2.6.3"
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
+    "@protobuf-es/core": "workspace: *",
     "@types/node": "^22.0.0",
-    "pkgroll": "^2.5.1",
-    "ts-node": "^10.9.2",
+    "cli": "workspace: *",
     "typescript": "^5.5.4",
     "vitest": "^2.0.4"
   }

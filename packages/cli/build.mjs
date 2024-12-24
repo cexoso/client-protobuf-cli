@@ -4,7 +4,7 @@ import { build as tsBuild } from 'tsup'
 
 export const build = async () => {
   const files = globSync(['**/*.ts'], {
-    ignore: ['**/*.spec.ts', '**/*.d.ts'],
+    ignore: ['**/*.spec.ts', '**/*.d.ts', 'dist/**/*'],
   })
 
   await tsBuild({

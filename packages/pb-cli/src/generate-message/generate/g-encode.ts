@@ -6,7 +6,7 @@ import { inject, injectable } from 'inversify'
 import { TSFilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
 import { getFilenameByType } from '../get-filename-by-type'
-import dedent from 'dedent'
+import dedent from 'ts-dedent'
 
 @injectable()
 export class EncoderGenerater {
