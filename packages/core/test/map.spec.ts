@@ -24,8 +24,8 @@ describe('map', async () => {
     const message = root.lookupType('A')
     function encodeMap(value: Record<string, Record<string, number>>) {
       const writer = createWriter()
-      if (value.a) {
-        encodeMapToBuffer(value.a, {
+      if (value['a']) {
+        encodeMapToBuffer(value['a'], {
           tag: 1,
           writer,
           isKeyNumber: true,
@@ -117,8 +117,8 @@ describe('map', async () => {
 
     function encodeMap(value: Record<string, Record<string, any>>) {
       const writer = createWriter()
-      if (value.a) {
-        encodeMapToBuffer(value.a, {
+      if (value['a']) {
+        encodeMapToBuffer(value['a'], {
           tag: 1,
           writer,
           keyEncoderWithTag: encodeStringToBuffer,

@@ -38,7 +38,7 @@ export const encode = (buffer: Uint8Array, start: number, end: number): string =
     j = 0 // goto index
   let t: any // temporary
   while (start < end) {
-    var b = buffer[start++]
+    var b = buffer[start++]!
     switch (j) {
       case 0:
         chunk[i++] = b64[b >> 2]

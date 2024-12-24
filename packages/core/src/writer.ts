@@ -19,13 +19,13 @@ export const createWriter = (): Writer => {
 const raw = (writer: Writer, bytes: Byte[] | Byte) => {
   const byteList = Array.isArray(bytes) ? bytes : [bytes]
 
-  const currenctBytes = writer.stackBytes[writer.stackBytes.length - 1]
+  const currenctBytes = writer.stackBytes[writer.stackBytes.length - 1]!
   for (let i = 0; i < byteList.length; i++) {
-    currenctBytes.push(byteList[i])
+    currenctBytes.push(byteList[i]!)
   }
 }
 
-const getCurrenctBytes = (writer: Writer) => writer.stackBytes[writer.stackBytes.length - 1]
+const getCurrenctBytes = (writer: Writer) => writer.stackBytes[writer.stackBytes.length - 1]!
 
 export const writeTag = (writer: Writer, tag: number, wireType: WireType) => {
   writeUint32(writer, ((tag << 3) | wireType) >>> 0)
@@ -106,7 +106,7 @@ export const writeBytes = (writer: Writer, value: Uint8Array | string) => {
   // 结果需要在 node 上使用，又得重新考虑 uint8Array
   // 需要再思考一下要怎么处理这两者的矛盾
   for (let index = 0; index < uint8Array.length; index++) {
-    const byte = uint8Array[index]
+    const byte = uint8Array[index]!
     raw(writer, byte)
   }
 }
@@ -187,7 +187,7 @@ export const writeString = (writer: Writer, value: string) => {
   writeUint32(writer, result.length)
 
   for (let i = 0; i < result.length; i++) {
-    const byte = result[i]
+    const byte = result[i]!
     raw(writer, byte)
   }
 }

@@ -2,41 +2,29 @@
   "name": "@protobuf-es/core",
   "version": "0.0.7",
   "description": "",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.cts",
+  "publishConfig": {
+    "directory": "dist",
+    "linkDirectory": false
+  },
   "files": [
     "dist/**/*"
   ],
   "main": "src/index.ts",
   "repository": "https://github.com/cexoso/client-protobuf-cli",
-  "exports": {
-    "require": {
-      "types": "./dist/index.d.cts",
-      "default": "./dist/index.cjs"
-    },
-    "import": {
-      "types": "./dist/index.d.mts",
-      "default": "./dist/index.mjs"
-    }
-  },
   "scripts": {
     "test": "vitest --reporter=dot",
     "build": "cli build",
-    "release": "vitest --run && npm run build",
+    "ts-lint": "tsc --noEmit",
+    "release": "npm run ts-lint && vitest --run && npm run build",
     "prepublishOnly": "npm run release"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.0.0",
     "cli": "workspace: *",
     "bignumber.js": "^9.1.2",
-    "pkgroll": "^2.5.1",
     "protobufjs": "^7.3.2",
     "typescript": "^5.5.4",
     "vite": "^5.3.5",

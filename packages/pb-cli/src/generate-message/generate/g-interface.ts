@@ -36,7 +36,7 @@ export class InterfaceGenerater {
     if (fields.length === 0) {
       return []
     }
-    const root = fields[0].root
+    const root = fields[0]!.root
     return (
       fields
         //这里不需要考虑 mapField 的 keyType 因为 keyType 不存在复杂类型需要从另一个文件 import

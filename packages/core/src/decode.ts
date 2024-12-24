@@ -1,4 +1,4 @@
-import { forkReader, ReaderLike, readInt32, readTag, readUint32, skip } from './reader'
+import { forkReader, ReaderLike, readTag, readUint32, skip } from './reader'
 import { WireType } from './wire-type'
 
 interface TagHandler {

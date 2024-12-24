@@ -1,4 +1,4 @@
-import { Field, Type, Enum } from 'protobufjs'
+import { Type, Enum } from 'protobufjs'
 
 const enum ScalarTypes {
   string = 'string',

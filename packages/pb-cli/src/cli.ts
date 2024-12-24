@@ -33,7 +33,7 @@ function getOutPath() {
 
 const entryProtoFileEntryPath = getPath()
 const outputPath = getOutPath()
-const dryRun = options.dryRun
+const dryRun = options['dryRun']
 
 const container = createContainer()
 const cmd = container.get(Command)
@@ -41,7 +41,7 @@ cmd.compileProtos({
   dryRun,
   outDir: outputPath,
   protoDir: entryProtoFileEntryPath,
-  protoGlob: options.globPath,
-  autoClean: options.autoClean,
-  withPrettier: options.prettier,
+  protoGlob: options['globPath'],
+  autoClean: options['autoClean'],
+  withPrettier: options['prettier'],
 })

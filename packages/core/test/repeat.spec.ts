@@ -105,16 +105,16 @@ describe('repeat encode', async () => {
 
     it('repeat message', () => {
       const encodeMessage: EncoderWithoutTag<Record<string, any>> = ({ value, writer }) => {
-        if (value.i64) {
+        if (value['i64']) {
           encodeInt64ToBuffer({
-            value: value.i64,
+            value: value['i64'],
             tag: 1,
             writer,
           })
         }
-        if (value.i32) {
+        if (value['i32']) {
           encodeInt32ToBuffer({
-            value: value.i32,
+            value: value['i32'],
             tag: 2,
             writer,
           })
@@ -202,16 +202,16 @@ describe('repeat encode', async () => {
     })
     it('支持向前兼容，不认识的 tag 会跳过', () => {
       const encodeMessage: EncoderWithoutTag<Record<string, any>> = ({ value, writer }) => {
-        if (value.i64) {
+        if (value['i64']) {
           encodeInt64ToBuffer({
-            value: value.i64,
+            value: value['i64'],
             tag: 1,
             writer,
           })
         }
-        if (value.i32) {
+        if (value['i32']) {
           encodeInt32ToBuffer({
-            value: value.i32,
+            value: value['i32'],
             tag: 2,
             writer,
           })

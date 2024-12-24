@@ -33,7 +33,7 @@ export class EncoderGenerater {
     const method = mapScalarToEncodeMethod(field.type)
     // TODO: proto3 默认使用 packed 了, 我们目前仍使用 proto2
     // 但也应该尽量把这个逻辑补上，防止接受 Proto3 的时候出问题
-    const packed = field?.options?.packed ?? false
+    const packed = field?.options?.['packed'] ?? false
     const encodeName = packed ? 'encodePackedRepeatToBuffer' : 'encodeRepeatToBuffer'
     this.#addImport(field, '@protobuf-es/core', encodeName)
     const result = `${encodeName}(value["${field.name}"], ${method}, ${field.id}, writer)`
@@ -104,7 +104,7 @@ export class EncoderGenerater {
     if (fields.length === 0) {
       return []
     }
-    const root = fields[0].root
+    const root = fields[0]!.root
     return (
       fields
         .map((field) => field.type)

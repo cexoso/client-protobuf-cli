@@ -142,12 +142,13 @@ export const skip = (
   let start = reader.pos
   switch (wireType) {
     case WireType.Varint:
-      while (reader.buf[reader.pos++] & 0x80) {
+      while (reader.buf[reader.pos++]! & 0x80) {
         // ignore
       }
       break
     case WireType.Bit64:
-      reader.pos += 4 // 这人是不是有病，为什么不 += 8 然后 break
+      reader.pos += 8
+      break
     case WireType.Bit32:
       reader.pos += 4
       break

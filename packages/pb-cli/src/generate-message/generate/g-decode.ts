@@ -46,7 +46,7 @@ export class DecoderGenerater {
     if (fields.length === 0) {
       return []
     }
-    const root = fields[0].root
+    const root = fields[0]!.root
     return fields
       .filter((field) => !Boolean(field instanceof MapField))
       .map((field) => {

@@ -24,7 +24,7 @@ describe('get-filename-by-type', async () => {
   })
   it('奇怪的 package，我还没想好', () => {
     const x = web.lookupType('google.protobuf.ServiceOptions')
-    const sortType = x.fields['.web.sortType']
+    const sortType = x.fields['.web.sortType']!
     expect(getFilenameByType(sortType)).eq('web.proto')
   })
 })
