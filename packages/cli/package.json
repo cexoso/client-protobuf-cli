@@ -6,9 +6,11 @@
   "license": "MIT",
   "bin": "index.mjs",
   "dependencies": {
+    "@types/gulp": "^4.0.17",
     "commander": "^12.1.0",
-    "glob": "^11.0.0",
-    "tsup": "^8.3.5",
+    "del": "^8.0.0",
+    "gulp": "^5.0.0",
+    "gulp-typescript": "6.0.0-alpha.1",
     "zx": "^8.2.4"
   }
 }
