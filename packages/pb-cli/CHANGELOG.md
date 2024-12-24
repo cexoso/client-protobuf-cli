@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.11
+
+### Patch Changes
+
+- 添加 prettier 为依赖，修复在某些情况下 prettier/sync 的包不对的问题
+
 ## 0.0.10
 
 ### Patch Changes
