@@ -1,5 +1,11 @@
 # @protobuf-es/core
 
+## 0.0.9
+
+### Patch Changes
+
+- 99122b4: 替换成 gulp 打包
+
 ## 0.0.8
 
 ### Patch Changes

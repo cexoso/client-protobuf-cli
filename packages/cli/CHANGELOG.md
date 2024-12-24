@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.7
+
+### Patch Changes
+
+- 99122b4: 替换成 gulp 打包
+
 ## 0.0.6
 
 ### Patch Changes
