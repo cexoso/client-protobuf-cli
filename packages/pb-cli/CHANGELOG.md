@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.10
+
+### Patch Changes
+
+- fad350b: 导出内部成员，提供获取服务方法
+
 ## 0.0.9
 
 ### Patch Changes
