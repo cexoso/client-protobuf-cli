@@ -57,14 +57,17 @@ export class DecoderGenerater {
   #transformMapType(field: MapField, writeToContent: (content: string) => void) {
     const decodeName = 'decode' + upperCaseFirst(field.name)
 
-    const keyReader = this.#mapTypeToDecodeMethod(field.root, field.keyType).typeName
-    const valueReader = this.#mapTypeToDecodeMethod(field.root, field.type).typeName
+    const keyReader = this.#mapTypeToDecodeMethod(field.root, field.keyType)
+    const valueReader = this.#mapTypeToDecodeMethod(field.root, field.type)
     const valueType = isScalarType(field.type) ? 'scalar' : 'message'
 
     this.#addImport(field, '@protobuf-es/core', 'defineMap')
+
+    this.#addImport(field, keyReader.file, keyReader.typeName)
+    this.#addImport(field, valueReader.file, valueReader.typeName)
     const context = `const ${decodeName} = defineMap({
-      keyReader: ${keyReader},
-      valueReader: ${valueReader},
+      keyReader: ${keyReader.typeName},
+      valueReader: ${valueReader.typeName},
       valueType: '${valueType}',
     })\n`
     writeToContent(context)
