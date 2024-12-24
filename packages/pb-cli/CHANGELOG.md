@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.14
+
+### Patch Changes
+
+- 383cf6a: 解决嵌套消息重名的问题
+
 ## 0.0.13
 
 ### Patch Changes

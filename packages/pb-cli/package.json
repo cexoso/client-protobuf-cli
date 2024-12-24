@@ -1,6 +1,6 @@
 {
   "name": "@protobuf-es/cli",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "publishConfig": {
     "directory": "dist",
     "linkDirectory": false,
