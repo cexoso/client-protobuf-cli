@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.2
+
+### Patch Changes
+
+- 54de9fb: ts-pkg-build 首发
+
 ## 0.0.7
 
 ### Patch Changes
