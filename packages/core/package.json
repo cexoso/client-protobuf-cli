@@ -13,7 +13,7 @@
   "repository": "https://github.com/cexoso/client-protobuf-cli",
   "scripts": {
     "test": "vitest --reporter=dot",
-    "build": "cli build",
+    "build": "ts-pkg-build build",
     "ts-lint": "tsc --noEmit",
     "release": "npm run ts-lint && vitest --run && npm run build",
     "prepublishOnly": "npm run release"

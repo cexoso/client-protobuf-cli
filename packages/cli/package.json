@@ -1,10 +1,11 @@
 {
-  "name": "cli",
-  "private": true,
-  "version": "0.0.7",
+  "name": "@cexoso/ts-pkg-build",
+  "version": "0.0.1",
   "type": "module",
   "license": "MIT",
-  "bin": "index.mjs",
+  "bin": {
+    "ts-pkg-build": "index.mjs"
+  },
   "dependencies": {
     "@types/gulp": "^4.0.17",
     "commander": "^12.1.0",
