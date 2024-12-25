@@ -51,13 +51,8 @@ export const easyRequestPlugin: (opts?: Option) => Plugin = () => {
         const toInnerName = (name: string) => `${name} as _${name}`
 
         wrapFile.addImport({ absolutePath: file, member: toInnerName(decoderMember) })
-
         wrapFile.addImport({ absolutePath: file, member: toInnerName(encoderMember) })
-
-        wrapFile.addImport({
-          absolutePath: file,
-          member: toInnerName(interfaceMember),
-        })
+        wrapFile.addImport({ absolutePath: file, member: toInnerName(interfaceMember) })
 
         wrapFile.write(
           dedent`
@@ -95,8 +90,9 @@ export const easyRequestPlugin: (opts?: Option) => Plugin = () => {
             method
           )
 
-          index.addImport({ absolutePath: responseFile, member: requestMembers.decoderName })
-          index.addImport({ absolutePath: requestFile, member: responseMember.encoderName })
+          index.addImport({ absolutePath: responseFile, member: responseMember.decoderName })
+          index.addImport({ absolutePath: requestFile, member: requestMembers.encoderName })
+          index.addImport({ absolutePath: requestFile, member: requestMembers.interface })
 
           const methodBody = dedent`
           export const ${method.name}= async (opts: { fnsCallee: FnsCallee; input: ${requestMembers.interface}}) => {
