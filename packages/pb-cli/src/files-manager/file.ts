@@ -118,6 +118,6 @@ export class File {
   toString() {
     const filename = this.fileNameWithProject
     let body = `// ${filename}\n`
-    return body + this.body
+    return body + this.getBody({ formatWithCurrentPrettier: true })
   }
 }

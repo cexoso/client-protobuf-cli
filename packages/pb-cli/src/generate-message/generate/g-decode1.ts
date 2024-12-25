@@ -5,7 +5,6 @@ import { upperCaseFirst } from '../../prettier/string-format'
 import { formatTypescript } from '../../prettier'
 import { inject, injectable } from 'inversify'
 import { TSFilesManager } from '../../files-manager/files-manager'
-import { getFilenameByType } from '../get-filename-by-type'
 import { NameManager } from './name-conflict-manager'
 import { Generator } from './type'
 
@@ -17,10 +16,6 @@ export class DecoderGenerater implements Generator {
   ) {}
   generateEnumContent(_enumType: Enum): string {
     throw new Error('Method not implemented.')
-  }
-  #addImport(field: Field | MapField, modulePath: string, member: string) {
-    const file = this.filesManager.getTSFileByProtoPath(getFilenameByType(field))
-    file.addImport({ absolutePath: modulePath, member })
   }
   #mapUnionTypeToDecodeMethod(type: string, unionType: Type | Enum | null) {
     if (isScalarType(type)) {
@@ -46,15 +41,17 @@ export class DecoderGenerater implements Generator {
     return name
   }
 
-  #transformMapType(field: MapField) {
+  #transformMapType(type: Type, field: MapField) {
+    const originFile = this.filesManager.getTSFileByUnionType(type)
     const keyReader = this.#mapUnionTypeToDecodeMethod(field.keyType, field.resolvedKeyType as any)
     const valueReader = this.#mapUnionTypeToDecodeMethod(field.type, field.resolvedType)
     const valueType = isScalarType(field.type) ? 'scalar' : 'message'
 
-    this.#addImport(field, '@protobuf-es/core', 'defineMap')
+    originFile.addImport({ absolutePath: '@protobuf-es/core', member: 'defineMap' })
 
-    this.#addImport(field, keyReader.file, keyReader.typeName)
-    this.#addImport(field, valueReader.file, valueReader.typeName)
+    originFile.addImport({ absolutePath: keyReader.file, member: keyReader.typeName })
+
+    originFile.addImport({ absolutePath: valueReader.file, member: valueReader.typeName })
     const inlineDecoder = `defineMap({
       keyReader: ${keyReader.typeName},
       valueReader: ${valueReader.typeName},
@@ -63,26 +60,26 @@ export class DecoderGenerater implements Generator {
     return inlineDecoder
   }
 
-  #genFieldDecode(field: Field) {
+  #genFieldDecode(type: Type, field: Field) {
     const tag = field.id
+    const originFile = this.filesManager.getTSFileByUnionType(type)
     let config = ''
     const repeatedDescription = field.repeated ? 'isRepeat: true, ' : ''
     const name = camel(field.name)
     if (field instanceof MapField) {
-      const inLineDecoder = this.#transformMapType(field)
+      const inLineDecoder = this.#transformMapType(type, field)
       config = `{ type: 'message', \ndecode: ${inLineDecoder}, \nname: '${name}', \nisMap: true }`
     } else if (isScalarType(field.type) || isEnum(field.resolvedType!)) {
       const method = this.#mapUnionTypeToDecodeMethod(field.type, field.resolvedType)
       const { typeName, file } = method
-      this.#addImport(field, file, typeName)
+      originFile.addImport({ absolutePath: file, member: typeName })
       config = `{ type: 'scalar', ${repeatedDescription}decode: ${typeName}, name: '${name}' }`
     } else {
       const decodeName = this.#getDecoderName(field.resolvedType!)
-      this.#addImport(
-        field,
-        this.filesManager.getTSFileByUnionType(field.resolvedType!).finalTsAbsolutePath,
-        decodeName
-      )
+      originFile.addImport({
+        absolutePath: this.filesManager.getTSFileByUnionType(field.resolvedType!),
+        member: decodeName,
+      })
       config = `{ type: 'message', ${repeatedDescription}decode: ${decodeName}, name: '${name}' }`
     }
     return `[${tag}, ${config}],`
@@ -92,7 +89,7 @@ export class DecoderGenerater implements Generator {
     const name = this.#getDecoderName(type)
     const body = `export const ${name} = defineMessage<${typeName}>(
       new Map([
-        ${type.fieldsArray.map((field) => this.#genFieldDecode(field)).join('\n')}
+        ${type.fieldsArray.map((field) => this.#genFieldDecode(type, field)).join('\n')}
       ])
     )`
 
@@ -102,6 +99,7 @@ export class DecoderGenerater implements Generator {
     })
     return formatTypescript(body)
   }
+
   getMemberNameByType(type: Type): string {
     return this.#getDecoderName(type)
   }

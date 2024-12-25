@@ -4,7 +4,7 @@ import { File } from './file'
 import { join, isAbsolute, extname, dirname, relative } from 'path'
 import { mkdirSync, writeFileSync, lstatSync, existsSync, rmSync } from 'fs'
 import { Enum, Field, MapField, Type } from 'protobufjs'
-import { getFilenameByType } from 'src/generate-message/get-filename-by-type'
+import { getFilenameByType } from '../generate-message/get-filename-by-type'
 
 @injectable()
 export class TSFilesManager {
