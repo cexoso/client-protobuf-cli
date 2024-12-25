@@ -262,14 +262,14 @@ describe('encode', () => {
     const resType = pbRoot.lookupType('nestle_service.GetDataRes.Reponse')
     const reqTypeMember = messageGenerator.getAllMemberByType(reqType)
     const resTypeMember = messageGenerator.getAllMemberByType(resType)
-    expect(reqTypeMember.tsInterface.memberName).eq('Reponse')
-    expect(resTypeMember.tsInterface.memberName).eq('NestleServiceGetDataResReponse')
+    expect(reqTypeMember.interfaceMember).eq('Reponse')
+    expect(resTypeMember.interfaceMember).eq('NestleServiceGetDataResReponse')
 
-    expect(reqTypeMember.encoder.memberName).eq('encodeReponse')
-    expect(resTypeMember.encoder.memberName).eq('encodeNestleServiceGetDataResReponse')
+    expect(reqTypeMember.encoderMember).eq('encodeReponse')
+    expect(resTypeMember.encoderMember).eq('encodeNestleServiceGetDataResReponse')
 
-    expect(reqTypeMember.decoder.memberName).eq('decodeReponse')
-    expect(resTypeMember.decoder.memberName).eq('decodeNestleServiceGetDataResReponse')
+    expect(reqTypeMember.decoderMember).eq('decodeReponse')
+    expect(resTypeMember.decoderMember).eq('decodeNestleServiceGetDataResReponse')
     const allFiles = filesManager.listAllFile()
     expect(allFiles.map((file) => file.toString()).join('\n')).eq(dedent`
       // ./nestle-duplicate-message.ts

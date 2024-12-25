@@ -140,11 +140,8 @@ export class EncoderGenerater implements Generator {
   #getEncoderName(type: Type) {
     return 'encode' + upperCaseFirst(this.#nameManager.getUniqueName(type))
   }
-  getEncoderByType(type: Type) {
-    const name = this.#getEncoderName(type)
-    return {
-      memberName: name,
-      ...this.#messageEncodeMap.get(name)!,
-    }
+
+  getMemberNameByType(type: Type): string {
+    return this.#getEncoderName(type)
   }
 }

@@ -81,4 +81,7 @@ export class InterfaceGenerater implements Generator {
     }`
     return formatTypescript(content)
   }
+  getMemberNameByType(type: Type): string {
+    return this.nameManager.getUniqueName(type)
+  }
 }

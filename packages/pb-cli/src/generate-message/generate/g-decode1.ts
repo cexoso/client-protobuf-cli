@@ -102,4 +102,7 @@ export class DecoderGenerater implements Generator {
     })
     return formatTypescript(body)
   }
+  getMemberNameByType(type: Type): string {
+    return this.#getDecoderName(type)
+  }
 }

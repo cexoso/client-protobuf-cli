@@ -41,7 +41,7 @@ export const easyRequestPlugin: (opts?: Option) => Plugin = () => {
       messageGenerator.doForType(files, (t) => {
         const result = messageGenerator.getAllMemberByType(t)
 
-        const { decoder, encoder, tsInterface } = result
+        const { decoderMember, encoderMember, interfaceMember, file } = result
 
         const wrapFile = getHelperFileByType(ctx, t)
 
@@ -50,27 +50,27 @@ export const easyRequestPlugin: (opts?: Option) => Plugin = () => {
 
         const toInnerName = (name: string) => `${name} as _${name}`
 
-        wrapFile.addImport({ absolutePath: decoder.file, member: toInnerName(decoder.memberName) })
+        wrapFile.addImport({ absolutePath: file, member: toInnerName(decoderMember) })
 
-        wrapFile.addImport({ absolutePath: encoder.file, member: toInnerName(encoder.memberName) })
+        wrapFile.addImport({ absolutePath: file, member: toInnerName(encoderMember) })
 
         wrapFile.addImport({
-          absolutePath: decoder.file,
-          member: toInnerName(tsInterface.memberName),
+          absolutePath: file,
+          member: toInnerName(interfaceMember),
         })
 
         wrapFile.write(
           dedent`
-            export const ${encoder.memberName} = wrapEncode(_${encoder.memberName});
-            export const ${decoder.memberName} = wrapDecode(_${decoder.memberName});
-            export type ${tsInterface.memberName} = _${tsInterface.memberName};
+            export const ${encoderMember} = wrapEncode(_${encoderMember});
+            export const ${decoderMember} = wrapDecode(_${decoderMember});
+            export type ${interfaceMember} = _${interfaceMember};
           `
         )
 
         memberMap.set(t, {
-          interface: tsInterface.memberName,
-          decoderName: decoder.memberName,
-          encoderName: encoder.memberName,
+          interface: interfaceMember,
+          decoderName: decoderMember,
+          encoderName: encoderMember,
         })
       })
 

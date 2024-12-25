@@ -57,20 +57,10 @@ export class MessageGenerator {
     this.doForType(files, (type) => this.encoderGenerater.generateEncodeCode(type), opts)
   }
   generateAllCode(files: Map<string, Root>, opts?: Opts) {
-    this.generateType(files, opts)
-    this.generateEncoder(files, opts)
-    this.generateDecode(files, opts)
-  }
-
-  generateAllCode1(files: Map<string, Root>, opts?: Opts) {
     this.doForType(files, (type) => this.traversal.generate(type), opts)
   }
 
   getAllMemberByType(type: Type) {
-    return {
-      tsInterface: this.interfaceGenerater.getInterfaceByType(type),
-      encoder: this.encoderGenerater.getEncoderByType(type),
-      decoder: this.decoderGenerater.getDecoderByType(type),
-    }
+    return this.traversal.getAllMemberByType(type)
   }
 }

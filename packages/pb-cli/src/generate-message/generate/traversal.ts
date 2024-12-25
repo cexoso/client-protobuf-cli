@@ -98,4 +98,22 @@ export class Traversal {
       ...this.#messageMap.get(name)!,
     }
   }
+
+  getAllMemberByType(type: Type): {
+    interfaceMember: string
+    encoderMember: string
+    decoderMember: string
+    file: File
+  } {
+    const interfaceMember = this.interfaceGenerater.getMemberNameByType(type)
+    const encoderMember = this.encoderGenerater.getMemberNameByType(type)
+    const decoderMember = this.decoderGenerater.getMemberNameByType(type)
+    const file = this.filesManager.getTSFileByUnionType(type)
+    return {
+      interfaceMember,
+      encoderMember,
+      decoderMember,
+      file,
+    }
+  }
 }
