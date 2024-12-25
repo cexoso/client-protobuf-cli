@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.15
+
+### Patch Changes
+
+- c2d88c4: 重构了生成逻辑，修复了嵌套重名问题
+
 ## 0.0.14
 
 ### Patch Changes
