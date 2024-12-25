@@ -6,12 +6,17 @@ import { TSFilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
 import { NameManager } from './name-conflict-manager'
 import { InterfaceGenerater } from './g-interface1'
+import { DecoderGenerater } from './g-decode1'
+import { Generator } from './type'
 
 @injectable()
 export class Traversal {
   #nameManager = new NameManager()
-  interfaceGenerater = new InterfaceGenerater()
-  constructor(@inject(TSFilesManager) private filesManager: TSFilesManager) {}
+  constructor(
+    @inject(TSFilesManager) private filesManager: TSFilesManager,
+    @inject(DecoderGenerater) private decoderGenerater: Generator,
+    @inject(InterfaceGenerater) private interfaceGenerater: Generator
+  ) {}
   #messageMap = new Map<string, { file: File }>()
   // 处理 张量 类型 枚举
   #handleUnionType(type: string, resolvedType: Type | Enum | null) {
@@ -40,7 +45,8 @@ export class Traversal {
 
   #generateTypeContent(type: Type) {
     const interfaceContent = this.interfaceGenerater.generateTypeContent(type)
-    return interfaceContent
+    const decodeContent = this.decoderGenerater.generateTypeContent(type)
+    return `${interfaceContent}\n${decodeContent}`
   }
 
   #generateContentIfNeed(

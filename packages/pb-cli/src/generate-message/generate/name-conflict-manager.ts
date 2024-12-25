@@ -1,7 +1,10 @@
+import { injectable } from 'inversify'
 import { Field, Type, Enum } from 'protobufjs'
 import { camel } from 'radash'
 type ShortName = string
 type FullName = string
+
+@injectable()
 export class NameManager {
   #nameMap = new Map<ShortName, FullName>()
   #formatFullName(name: string) {
