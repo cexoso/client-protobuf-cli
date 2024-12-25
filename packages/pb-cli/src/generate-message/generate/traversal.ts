@@ -79,9 +79,9 @@ export class Traversal {
 
   #handleType(type: Type) {
     this.#generateContentIfNeed(type, (file) => {
+      this.#getAndCompileDependenciesEncode(type.fieldsArray) // 先处理依赖项
       const content = this.#generateTypeContent(type)
       file.write(content)
-      this.#getAndCompileDependenciesEncode(type.fieldsArray)
     })
   }
 

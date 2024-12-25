@@ -85,6 +85,7 @@ export class EncoderGenerater implements Generator {
     }
     if (isScalarType(field.type) || isEnum(field.resolvedType!)) {
       const { typeName: method } = this.#mapTypeToEncodeMethod(root, field.type)
+      this.#addImport(field, '@protobuf-es/core', method)
       return `${method}({
         value: value["${field.name}"],
         tag: ${field.id},
@@ -93,6 +94,12 @@ export class EncoderGenerater implements Generator {
     }
 
     const encodeMethodName = 'encode' + upperCaseFirst(field.type)
+
+    this.#addImport(
+      field,
+      this.filesManager.getTSFileByUnionType(field.resolvedType!).finalTsAbsolutePath,
+      encodeMethodName
+    )
     this.#addImport(field, '@protobuf-es/core', 'encodeMessageToBuffer')
     return `encodeMessageToBuffer(
       {
@@ -113,10 +120,10 @@ export class EncoderGenerater implements Generator {
       let content = this.#genFieldContent(field)
       if (field.optional) {
         content = `
-            if (value["${field.name}"] !== undefined) {
-              ${content}
-            }
-          `
+          if (value["${field.name}"] !== undefined) {
+            ${content}
+          }
+        `
       }
       return content
     }

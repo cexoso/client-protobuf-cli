@@ -4,39 +4,64 @@ import { formatTypescript } from '../../prettier'
 import { NameManager } from './name-conflict-manager'
 import { Generator } from './type'
 import { inject, injectable } from 'inversify'
+import { TSFilesManager } from '../../files-manager/files-manager'
 
 @injectable()
 export class InterfaceGenerater implements Generator {
-  constructor(@inject(NameManager) private nameManager: NameManager) {}
-  #getType(field: Field) {
+  constructor(
+    @inject(NameManager) private nameManager: NameManager,
+    @inject(TSFilesManager) private tsFilesManager: TSFilesManager
+  ) {}
+  #generateType(field: Field) {
     if (field instanceof MapField) {
-      return `Record<${this.#getMapKeyType(field)}, ${this.#getMapValueType(field)}>`
+      return `Record<${this.#generateMapKeyType(field)}, ${this.#generateMapValueType(field)}>`
     }
-    return this.#pbTypeToTsType(field)
+    return this.#genrateType(field)
   }
-  #getMapValueType(field: MapField) {
+  #generateMapValueType(field: MapField) {
     if (isScalarType(field.type)) {
       return scalarToTypescript(field.type)
     }
-    return this.nameManager.getUniqueName(field.resolvedType as Type)
+
+    const resolvedType = field.resolvedType!
+
+    const type = this.nameManager.getUniqueName(resolvedType)
+    this.tsFilesManager.getTSFileByUnionType(field).addImport({
+      absolutePath: this.tsFilesManager.getTSFileByUnionType(field.resolvedType!),
+      member: type,
+    })
+    return type
   }
-  #getMapKeyType(field: MapField) {
+  #generateMapKeyType(field: MapField) {
     if (isScalarType(field.keyType)) {
       return scalarToTypescript(field.keyType)
     }
-    return this.nameManager.getUniqueName(field.resolvedKeyType as Type)
+    const resolvedKeyType = field.resolvedKeyType!
+    const type = this.nameManager.getUniqueName(resolvedKeyType as Type)
+    this.tsFilesManager.getTSFileByUnionType(field).addImport({
+      absolutePath: this.tsFilesManager.getTSFileByUnionType(resolvedKeyType as any),
+      member: type,
+    })
+    return type
   }
-  #pbTypeToTsType(field: Field) {
+  #genrateType(field: Field) {
     const typeShortName = field.type
 
     if (isScalarType(typeShortName)) {
       return scalarToTypescript(typeShortName)
     }
-    return this.nameManager.getUniqueName(field.resolvedType as Type)
+
+    const resolvedType = field.resolvedType!
+    const type = this.nameManager.getUniqueName(resolvedType)
+    this.tsFilesManager.getTSFileByUnionType(field).addImport({
+      absolutePath: this.tsFilesManager.getTSFileByUnionType(field.resolvedType!),
+      member: type,
+    })
+    return type
   }
   #generateFieldDescription(field: Field) {
     const optionalTag = field.optional ? '?' : ''
-    const type = this.#getType(field)
+    const type = this.#generateType(field)
     const content = `"${field.name}"${optionalTag}: ${type}${field.repeated ? '[]' : ''}`
     return content
   }

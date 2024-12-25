@@ -72,10 +72,17 @@ export class DecoderGenerater implements Generator {
       const inLineDecoder = this.#transformMapType(field)
       config = `{ type: 'message', \ndecode: ${inLineDecoder}, \nname: '${name}', \nisMap: true }`
     } else if (isScalarType(field.type) || isEnum(field.resolvedType!)) {
-      const decode = this.#mapUnionTypeToDecodeMethod(field.type, field.resolvedType).typeName
-      config = `{ type: 'scalar', ${repeatedDescription}decode: ${decode}, name: '${name}' }`
+      const method = this.#mapUnionTypeToDecodeMethod(field.type, field.resolvedType)
+      const { typeName, file } = method
+      this.#addImport(field, file, typeName)
+      config = `{ type: 'scalar', ${repeatedDescription}decode: ${typeName}, name: '${name}' }`
     } else {
       const decodeName = this.#getDecoderName(field.resolvedType!)
+      this.#addImport(
+        field,
+        this.filesManager.getTSFileByUnionType(field.resolvedType!).finalTsAbsolutePath,
+        decodeName
+      )
       config = `{ type: 'message', ${repeatedDescription}decode: ${decodeName}, name: '${name}' }`
     }
     return `[${tag}, ${config}],`
