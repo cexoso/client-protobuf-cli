@@ -4,7 +4,6 @@ import { upperCaseFirst } from '../../prettier/string-format'
 import { inject, injectable } from 'inversify'
 import { TSFilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
-import { getFilenameByType } from '../get-filename-by-type'
 import { NameManager } from './name-conflict-manager'
 import { InterfaceGenerater } from './g-interface1'
 
@@ -15,7 +14,7 @@ export class Traversal {
     @inject(TSFilesManager) private filesManager: TSFilesManager,
     @inject(InterfaceGenerater) private interfaceGenerater: InterfaceGenerater
   ) {}
-  #messageMap = new Map<string, { content: string; file: File }>()
+  #messageMap = new Map<string, { file: File }>()
   // 处理 张量 类型 枚举
   #handleUnionType(type: string, resolvedType: Type | Enum | null) {
     if (isScalarType(type)) {
@@ -34,6 +33,9 @@ export class Traversal {
         this.#handleUnionType(field.type, field.resolvedType)
         // 处理 key, 我不确定 resolvedKeyType ReflectionObject 类型是否兼容，先 any
         this.#handleUnionType(field.keyType, field.resolvedKeyType as any)
+      } else {
+        // 正常的 field 类型
+        this.#handleUnionType(field.type, field.resolvedType)
       }
     }
   }
@@ -43,25 +45,38 @@ export class Traversal {
     return interfaceContent
   }
 
+  #generateContentIfNeed(
+    unionType: Type | Field | MapField | Enum,
+    callback: (file: File) => void
+  ) {
+    if (!this.#messageMap.has(unionType.fullName)) {
+      const currentFile = this.filesManager.getTSFileByUnionType(unionType)
+      this.#messageMap.set(unionType.fullName, {
+        file: currentFile,
+      })
+      callback(currentFile)
+    }
+  }
+
   #handleScalar(_scalarType: string) {}
-  #handleEnum(_enumType: Enum) {}
+
+  #handleEnum(enumType: Enum) {
+    this.#generateContentIfNeed(enumType, (file) => {
+      const interfaceContent = this.interfaceGenerater.generateEnumContent(enumType)
+      file.write(interfaceContent)
+    })
+  }
 
   #handleType(type: Type) {
-    let result = this.#messageMap.get(type.fullName)
-    if (result === undefined) {
-      const currentFile = this.filesManager.getTSFileByProtoPath(getFilenameByType(type))
+    this.#generateContentIfNeed(type, (file) => {
       const content = this.#generateTypeContent(type)
-      result = { content, file: currentFile }
-      this.#messageMap.set(type.fullName, result)
-
-      result.file.write(result.content)
+      file.write(content)
       this.#getAndCompileDependenciesEncode(type.fieldsArray)
-    }
-    return result
+    })
   }
 
   generate(type: Type) {
-    return this.#handleType(type)
+    this.#handleType(type)
   }
   #getEncoderName(type: Type) {
     return 'encode' + upperCaseFirst(this.#nameManager.getUniqueName(type))

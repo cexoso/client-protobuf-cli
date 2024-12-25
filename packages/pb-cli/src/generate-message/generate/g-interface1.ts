@@ -1,4 +1,4 @@
-import { Field, Type, MapField } from 'protobufjs'
+import { Field, Type, MapField, Enum } from 'protobufjs'
 import { isScalarType, scalarToTypescript, isEnum } from './scalar'
 import { formatTypescript } from '../../prettier'
 import { inject, injectable } from 'inversify'
@@ -68,6 +68,15 @@ export class InterfaceGenerater implements Generator {
           }
         })
     )
+  }
+  generateEnumContent(enumType: Enum) {
+    const name = this.#nameManager.getUniqueName(enumType)
+    const content = `export enum ${name} {
+      ${Object.keys(enumType.values)
+        .map((key) => `${key}=${enumType.values[key]},`)
+        .join('\n')}
+    }`
+    return formatTypescript(content)
   }
   generateTypeContent(type: Type) {
     const content = `export interface ${this.#nameManager.getUniqueName(type)} {

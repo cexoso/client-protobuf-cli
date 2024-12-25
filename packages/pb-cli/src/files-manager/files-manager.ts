@@ -3,6 +3,8 @@ import { ProjectInfo } from '../project'
 import { File } from './file'
 import { join, isAbsolute, extname, dirname, relative } from 'path'
 import { mkdirSync, writeFileSync, lstatSync, existsSync, rmSync } from 'fs'
+import { Enum, Field, MapField, Type } from 'protobufjs'
+import { getFilenameByType } from 'src/generate-message/get-filename-by-type'
 
 @injectable()
 export class TSFilesManager {
@@ -96,6 +98,11 @@ export class TSFilesManager {
     this.#makeSureDirExists(dirName)
     writeFileSync(absolutePath, content)
   }
+
+  getTSFileByUnionType(type: Type | Field | MapField | Enum) {
+    return this.getTSFileByProtoPath(getFilenameByType(type))
+  }
+
   renderAllFileToDir(opts: {
     verbose?: boolean
     dryRun?: boolean

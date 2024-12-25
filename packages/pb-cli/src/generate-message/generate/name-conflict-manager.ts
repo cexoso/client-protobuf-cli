@@ -1,4 +1,4 @@
-import { Field, Type } from 'protobufjs'
+import { Field, Type, Enum } from 'protobufjs'
 import { camel } from 'radash'
 type ShortName = string
 type FullName = string
@@ -7,7 +7,7 @@ export class NameManager {
   #formatFullName(name: string) {
     return camel(name)
   }
-  getUniqueName(type: Type | Field) {
+  getUniqueName(type: Type | Field | Enum) {
     const fullName = this.#nameMap.get(type.name)
     const formatedFullName = this.#formatFullName(type.fullName)
     if (fullName === undefined) {

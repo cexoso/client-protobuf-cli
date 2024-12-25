@@ -1,4 +1,5 @@
-import { Type } from 'protobufjs'
+import { Enum, Type } from 'protobufjs'
 export interface Generator {
   generateTypeContent(type: Type): string
+  generateEnumContent(enumType: Enum): string
 }
