@@ -5,40 +5,11 @@ import { PBLoader } from '../../pb-loader/pb-loader'
 import { ProjectInfo } from '../../project'
 import { MessageGenerator } from '../generate-message'
 import { TSFilesManager } from '../../files-manager/files-manager'
-import dedent from 'ts-dedent'
 
 const root = join(__dirname, '../../../test-protos')
 
-describe('tranversal', () => {
-  it.only('map', async () => {
-    const container = createContainer()
-    const pbLoader = container.get(PBLoader)
-    const projectInfo = container.get(ProjectInfo)
-    projectInfo.setPbRootPath(root)
-    projectInfo.setProjectRoot('./src')
-    const files = await pbLoader.loadByPath('map.proto')
-    const messageGenerator = container.get(MessageGenerator)
-    messageGenerator.generateAllCode(files)
-    const filesManager = container.get(TSFilesManager)
-    const content = filesManager
-      .listAllFile()
-      .map((file) => file.toString())
-      .join('\n')
-    console.log(content)
-  })
-  it.only('example', async () => {
-    const container = createContainer()
-    const pbLoader = container.get(PBLoader)
-    const projectInfo = container.get(ProjectInfo)
-    projectInfo.setPbRootPath(root)
-    projectInfo.setProjectRoot('./src')
-    const files = await pbLoader.loadByPath('example.proto')
-    const messageGenerator = container.get(MessageGenerator)
-    messageGenerator.generateAllCode(files)
-    const filesManager = container.get(TSFilesManager)
-    filesManager.catAllFile()
-  })
-  it.skip('encode', async () => {
+describe('traversal', () => {
+  it('encode color', async () => {
     const container = createContainer()
     const pbLoader = container.get(PBLoader)
     const projectInfo = container.get(ProjectInfo)
@@ -48,184 +19,260 @@ describe('tranversal', () => {
     const messageGenerator = container.get(MessageGenerator)
     messageGenerator.generateAllCode(files)
     const filesManager = container.get(TSFilesManager)
-    filesManager.catAllFile()
-    // expect(fileContent.map((file) => file.toString()).join('\n'))
-    // expect(fileContent.length).eq(2)
-  })
-
-  it.skip('map interface', async () => {
-    const container = createContainer()
-    const pbLoader = container.get(PBLoader)
-    const projectInfo = container.get(ProjectInfo)
-    projectInfo.setPbRootPath(root)
-    projectInfo.setProjectRoot('./src')
-    const files = await pbLoader.loadByPath('map.proto')
-    const messageGenerator = container.get(MessageGenerator)
-    messageGenerator.generateAllCode(files, {
-      typeFullnameRegExp: 'CRpcHead',
-    })
-    const filesManager = container.get(TSFilesManager)
-    expect(filesManager.listAllFile().at(0)?.getBody({ formatWithCurrentPrettier: true }))
-      .eq(dedent`
-        export interface Book {
-          id?: number
-        }
-
-        export interface Destination {
-          ports?: Record<number, number>
-          tags?: Record<string, string>
-          books?: Record<string, Book>
-        }
-
-        export interface CRpcHead {
-          destination?: Destination
-        }
-        
-      `)
-  })
-
-  it.skip('map encode', async () => {
-    const container = createContainer()
-    const pbLoader = container.get(PBLoader)
-    const projectInfo = container.get(ProjectInfo)
-    projectInfo.setPbRootPath(root)
-    projectInfo.setProjectRoot('./src')
-    const files = await pbLoader.loadByPath('map.proto')
-    const messageGenerator = container.get(MessageGenerator)
-    messageGenerator.generateAllCode(files, {
-      typeFullnameRegExp: 'CRpcHead',
-    })
-    const filesManager = container.get(TSFilesManager)
-    expect(filesManager.listAllFile().at(0)?.toString()).eq(dedent`
-      // ./map.ts
-      import { encodeInt32ToBuffer, EncoderWithoutTag, encodeStringToBuffer, encodeMapToBuffer, encodeMessageToBuffer } from '@protobuf-es/core'
-      export const encodeBook: EncoderWithoutTag<Book> = ({ value, writer }) => {
-        if (value['id'] !== undefined) {
-          encodeInt32ToBuffer({
-            value: value['id'],
-            tag: 1,
-            writer,
-          })
-        }
+    const fileContent = filesManager.listAllFile().map((file) => file.toString())
+    expect(fileContent.join('\n')).toMatchInlineSnapshot(`
+      "// ./google/protobuf.ts
+      import {
+        readDouble,
+        defineMessage,
+        EncoderWithoutTag,
+        encodeDoubleToBuffer,
+        readFloat,
+        encodeFloatToBuffer,
+        readInt64,
+        encodeInt64ToBuffer,
+        readUint64,
+        encodeUint64ToBuffer,
+        readInt32,
+        encodeInt32ToBuffer,
+        readUint32,
+        encodeUint32ToBuffer,
+        readBool,
+        encodeBoolToBuffer,
+        readString,
+        encodeStringToBuffer,
+        readAsBytes,
+        encodeByteToBuffer,
+      } from '@protobuf-es/core'
+      export interface DoubleValue {
+        value?: number
       }
 
-      export const encodeDestination: EncoderWithoutTag<Destination> = ({ value, writer }) => {
-        if (value['ports'] !== undefined) {
-          encodeMapToBuffer(value['ports'], {
-            tag: 1,
-            writer,
-            isKeyNumber: true,
-            keyEncoderWithTag: encodeInt32ToBuffer,
-            valueEncoderWithTag: encodeInt32ToBuffer,
-          })
-        }
-
-        if (value['tags'] !== undefined) {
-          encodeMapToBuffer(value['tags'], {
-            tag: 2,
-            writer,
-            keyEncoderWithTag: encodeStringToBuffer,
-            valueEncoderWithTag: encodeStringToBuffer,
-          })
-        }
-
-        if (value['books'] !== undefined) {
-          encodeMapToBuffer(value['books'], {
-            tag: 3,
-            writer,
-            keyEncoderWithTag: encodeStringToBuffer,
-            valueEncoderWithTag: encodeBook,
-          })
-        }
-      }
-
-      export const encodeCRpcHead: EncoderWithoutTag<CRpcHead> = ({ value, writer }) => {
-        if (value['destination'] !== undefined) {
-          encodeMessageToBuffer(
-            {
-              value: value['destination'],
-              tag: 1,
-              writer,
-            },
-            encodeDestination
-          )
-        }
-      }
-      
-    `)
-  })
-
-  it.skip('map decode', async () => {
-    const container = createContainer()
-    const pbLoader = container.get(PBLoader)
-    const projectInfo = container.get(ProjectInfo)
-    projectInfo.setPbRootPath(root)
-    projectInfo.setProjectRoot('./src')
-    const files = await pbLoader.loadByPath('map.proto')
-    const messageGenerator = container.get(MessageGenerator)
-    messageGenerator.generateAllCode(files, {
-      typeFullnameRegExp: 'CRpcHead',
-    })
-    const filesManager = container.get(TSFilesManager)
-    expect(filesManager.listAllFile().at(0)?.toString()).eq(dedent`
-      // ./map.ts
-      import { defineMap, readInt32, readString, defineMessage } from '@protobuf-es/core'
-      export const decodeBook = defineMessage<Book>(
-        new Map([[1, { type: 'scalar', decode: readInt32, name: 'id' }]])
+      export const decodeDoubleValue = defineMessage<DoubleValue>(
+        new Map([[1, { type: 'scalar', decode: readDouble, name: 'value' }]])
       )
 
-      export const decodeDestination = defineMessage<Destination>(
+      export const encodeDoubleValue: EncoderWithoutTag<DoubleValue> = ({ value, writer }) => {
+        if (value['value'] !== undefined) {
+          encodeDoubleToBuffer({
+            value: value['value'],
+            tag: 1,
+            writer,
+          })
+        }
+      }
+
+      export interface FloatValue {
+        value?: number
+      }
+
+      export const decodeFloatValue = defineMessage<FloatValue>(
+        new Map([[1, { type: 'scalar', decode: readFloat, name: 'value' }]])
+      )
+
+      export const encodeFloatValue: EncoderWithoutTag<FloatValue> = ({ value, writer }) => {
+        if (value['value'] !== undefined) {
+          encodeFloatToBuffer({
+            value: value['value'],
+            tag: 1,
+            writer,
+          })
+        }
+      }
+
+      export interface Int64Value {
+        value?: string
+      }
+
+      export const decodeInt64Value = defineMessage<Int64Value>(
+        new Map([[1, { type: 'scalar', decode: readInt64, name: 'value' }]])
+      )
+
+      export const encodeInt64Value: EncoderWithoutTag<Int64Value> = ({ value, writer }) => {
+        if (value['value'] !== undefined) {
+          encodeInt64ToBuffer({
+            value: value['value'],
+            tag: 1,
+            writer,
+          })
+        }
+      }
+
+      export interface UInt64Value {
+        value?: string
+      }
+
+      export const decodeUInt64Value = defineMessage<UInt64Value>(
+        new Map([[1, { type: 'scalar', decode: readUint64, name: 'value' }]])
+      )
+
+      export const encodeUInt64Value: EncoderWithoutTag<UInt64Value> = ({ value, writer }) => {
+        if (value['value'] !== undefined) {
+          encodeUint64ToBuffer({
+            value: value['value'],
+            tag: 1,
+            writer,
+          })
+        }
+      }
+
+      export interface Int32Value {
+        value?: number
+      }
+
+      export const decodeInt32Value = defineMessage<Int32Value>(
+        new Map([[1, { type: 'scalar', decode: readInt32, name: 'value' }]])
+      )
+
+      export const encodeInt32Value: EncoderWithoutTag<Int32Value> = ({ value, writer }) => {
+        if (value['value'] !== undefined) {
+          encodeInt32ToBuffer({
+            value: value['value'],
+            tag: 1,
+            writer,
+          })
+        }
+      }
+
+      export interface UInt32Value {
+        value?: number
+      }
+
+      export const decodeUInt32Value = defineMessage<UInt32Value>(
+        new Map([[1, { type: 'scalar', decode: readUint32, name: 'value' }]])
+      )
+
+      export const encodeUInt32Value: EncoderWithoutTag<UInt32Value> = ({ value, writer }) => {
+        if (value['value'] !== undefined) {
+          encodeUint32ToBuffer({
+            value: value['value'],
+            tag: 1,
+            writer,
+          })
+        }
+      }
+
+      export interface BoolValue {
+        value?: boolean
+      }
+
+      export const decodeBoolValue = defineMessage<BoolValue>(
+        new Map([[1, { type: 'scalar', decode: readBool, name: 'value' }]])
+      )
+
+      export const encodeBoolValue: EncoderWithoutTag<BoolValue> = ({ value, writer }) => {
+        if (value['value'] !== undefined) {
+          encodeBoolToBuffer({
+            value: value['value'],
+            tag: 1,
+            writer,
+          })
+        }
+      }
+
+      export interface StringValue {
+        value?: string
+      }
+
+      export const decodeStringValue = defineMessage<StringValue>(
+        new Map([[1, { type: 'scalar', decode: readString, name: 'value' }]])
+      )
+
+      export const encodeStringValue: EncoderWithoutTag<StringValue> = ({ value, writer }) => {
+        if (value['value'] !== undefined) {
+          encodeStringToBuffer({
+            value: value['value'],
+            tag: 1,
+            writer,
+          })
+        }
+      }
+
+      export interface BytesValue {
+        value?: Uint8Array
+      }
+
+      export const decodeBytesValue = defineMessage<BytesValue>(
+        new Map([[1, { type: 'scalar', decode: readAsBytes, name: 'value' }]])
+      )
+
+      export const encodeBytesValue: EncoderWithoutTag<BytesValue> = ({ value, writer }) => {
+        if (value['value'] !== undefined) {
+          encodeByteToBuffer({
+            value: value['value'],
+            tag: 1,
+            writer,
+          })
+        }
+      }
+
+      // ./google/type/color.ts
+      import { FloatValue, decodeFloatValue, encodeFloatValue } from '../protobuf'
+      import {
+        readFloat,
+        defineMessage,
+        EncoderWithoutTag,
+        encodeFloatToBuffer,
+        encodeMessageToBuffer,
+      } from '@protobuf-es/core'
+      export interface Color {
+        red?: number
+        green?: number
+        blue?: number
+        alpha?: FloatValue
+      }
+
+      export const decodeColor = defineMessage<Color>(
         new Map([
-          [
-            1,
-            {
-              type: 'message',
-              decode: defineMap({
-                keyReader: readInt32,
-                valueReader: readInt32,
-                valueType: 'scalar',
-              }),
-              name: 'ports',
-              isMap: true,
-            },
-          ],
-          [
-            2,
-            {
-              type: 'message',
-              decode: defineMap({
-                keyReader: readString,
-                valueReader: readString,
-                valueType: 'scalar',
-              }),
-              name: 'tags',
-              isMap: true,
-            },
-          ],
-          [
-            3,
-            {
-              type: 'message',
-              decode: defineMap({
-                keyReader: readString,
-                valueReader: decodeBook,
-                valueType: 'message',
-              }),
-              name: 'books',
-              isMap: true,
-            },
-          ],
+          [1, { type: 'scalar', decode: readFloat, name: 'red' }],
+          [2, { type: 'scalar', decode: readFloat, name: 'green' }],
+          [3, { type: 'scalar', decode: readFloat, name: 'blue' }],
+          [4, { type: 'message', decode: decodeFloatValue, name: 'alpha' }],
         ])
       )
 
-      export const decodeCRpcHead = defineMessage<CRpcHead>(
-        new Map([[1, { type: 'message', decode: decodeDestination, name: 'destination' }]])
-      )
-      
+      export const encodeColor: EncoderWithoutTag<Color> = ({ value, writer }) => {
+        if (value['red'] !== undefined) {
+          encodeFloatToBuffer({
+            value: value['red'],
+            tag: 1,
+            writer,
+          })
+        }
+
+        if (value['green'] !== undefined) {
+          encodeFloatToBuffer({
+            value: value['green'],
+            tag: 2,
+            writer,
+          })
+        }
+
+        if (value['blue'] !== undefined) {
+          encodeFloatToBuffer({
+            value: value['blue'],
+            tag: 3,
+            writer,
+          })
+        }
+
+        if (value['alpha'] !== undefined) {
+          encodeMessageToBuffer(
+            {
+              value: value['alpha'],
+              tag: 4,
+              writer,
+            },
+            encodeFloatValue
+          )
+        }
+      }
+      "
     `)
+    expect(fileContent.length).eq(2)
   })
 
-  it.skip('嵌套且名字重复的消息', async () => {
+  it('嵌套且名字重复的消息', async () => {
     const container = createContainer()
     const pbLoader = container.get(PBLoader)
     const projectInfo = container.get(ProjectInfo)
@@ -234,20 +281,19 @@ describe('tranversal', () => {
     const files = await pbLoader.loadByPath('nestle-duplicate-message.proto')
     const [_, pbRoot] = [...files.entries()][0]!
     const messageGenerator = container.get(MessageGenerator)
-    const filesManager = container.get(TSFilesManager)
     messageGenerator.generateAllCode(files)
-    filesManager.catAllFile()
-    // const reqType = pbRoot.lookupType('nestle_service.GetDataReq.Reponse')
-    // const resType = pbRoot.lookupType('nestle_service.GetDataRes.Reponse')
-    // const reqTypeMember = messageGenerator.getAllMemberByType(reqType)
-    // const resTypeMember = messageGenerator.getAllMemberByType(resType)
-    // expect(reqTypeMember.tsInterface.memberName).eq('Reponse')
-    // expect(resTypeMember.tsInterface.memberName).eq('NestleServiceGetDataResReponse')
-    //
-    // expect(reqTypeMember.encoder.memberName).eq('encodeReponse')
-    // expect(resTypeMember.encoder.memberName).eq('encodeNestleServiceGetDataResReponse')
-    //
-    // expect(reqTypeMember.decoder.memberName).eq('decodeReponse')
-    // expect(resTypeMember.decoder.memberName).eq('decodeNestleServiceGetDataResReponse')
+
+    const reqType = pbRoot.lookupType('nestle_service.GetDataReq.Reponse')
+    const resType = pbRoot.lookupType('nestle_service.GetDataRes.Reponse')
+    const reqTypeMember = messageGenerator.getAllMemberByType(reqType)
+    const resTypeMember = messageGenerator.getAllMemberByType(resType)
+    expect(reqTypeMember.interfaceMember).eq('Reponse')
+    expect(resTypeMember.interfaceMember).eq('NestleServiceGetDataResReponse')
+
+    expect(reqTypeMember.encoderMember).eq('encodeReponse')
+    expect(resTypeMember.encoderMember).eq('encodeNestleServiceGetDataResReponse')
+
+    expect(reqTypeMember.decoderMember).eq('decodeReponse')
+    expect(resTypeMember.decoderMember).eq('decodeNestleServiceGetDataResReponse')
   })
 })

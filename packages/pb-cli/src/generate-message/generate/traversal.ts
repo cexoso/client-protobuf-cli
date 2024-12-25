@@ -5,9 +5,9 @@ import { inject, injectable } from 'inversify'
 import { TSFilesManager } from '../../files-manager/files-manager'
 import { File } from '../../files-manager/file'
 import { NameManager } from './name-conflict-manager'
-import { InterfaceGenerater } from './g-interface1'
-import { DecoderGenerater } from './g-decode1'
-import { EncoderGenerater } from './g-encode1'
+import { InterfaceGenerater } from './g-interface'
+import { DecoderGenerater } from './g-decode'
+import { EncoderGenerater } from './g-encode'
 import { Generator } from './type'
 
 @injectable()

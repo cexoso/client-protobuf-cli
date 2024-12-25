@@ -44,6 +44,7 @@ describe('files', async () => {
         import { add } from './a'
         const a = get({ a: 1 }, 'a')
         console.log(a)
+
       `
     )
   })
