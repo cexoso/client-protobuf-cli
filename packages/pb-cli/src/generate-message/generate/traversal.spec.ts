@@ -10,7 +10,42 @@ import dedent from 'ts-dedent'
 const root = join(__dirname, '../../../test-protos')
 
 describe('tranversal', () => {
-  it.only('example', async () => {
+  it.only('map', async () => {
+    const container = createContainer()
+    const pbLoader = container.get(PBLoader)
+    const projectInfo = container.get(ProjectInfo)
+    projectInfo.setPbRootPath(root)
+    projectInfo.setProjectRoot('./src')
+    const files = await pbLoader.loadByPath('map.proto')
+    const messageGenerator = container.get(MessageGenerator)
+    messageGenerator.generateAllCode1(files)
+    const filesManager = container.get(TSFilesManager)
+    const content = filesManager
+      .listAllFile()
+      .map((file) => file.toString())
+      .join('\n')
+    expect(content).toMatchInlineSnapshot(`
+      "// ./map.ts
+
+      export interface Book {
+        id?: number
+      }
+
+      export interface Destination {
+        ports?: Record<number, number>
+        tags?: Record<string, string>
+        books?: Record<string, Book>
+      }
+
+      export interface CRpcHead {
+        destination?: Destination
+      }
+      "
+    `)
+    // expect(fileContent.map((file) => file.toString()).join('\n'))
+    // expect(fileContent.length).eq(2)
+  })
+  it('example', async () => {
     const container = createContainer()
     const pbLoader = container.get(PBLoader)
     const projectInfo = container.get(ProjectInfo)

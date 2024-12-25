@@ -10,10 +10,8 @@ import { InterfaceGenerater } from './g-interface1'
 @injectable()
 export class Traversal {
   #nameManager = new NameManager()
-  constructor(
-    @inject(TSFilesManager) private filesManager: TSFilesManager,
-    @inject(InterfaceGenerater) private interfaceGenerater: InterfaceGenerater
-  ) {}
+  interfaceGenerater = new InterfaceGenerater()
+  constructor(@inject(TSFilesManager) private filesManager: TSFilesManager) {}
   #messageMap = new Map<string, { file: File }>()
   // 处理 张量 类型 枚举
   #handleUnionType(type: string, resolvedType: Type | Enum | null) {
