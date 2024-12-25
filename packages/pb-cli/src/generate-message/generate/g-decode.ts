@@ -1,4 +1,4 @@
-import { Field, MapField, Root, Type } from 'protobufjs'
+import { Field, MapField, Type } from 'protobufjs'
 import { isScalarType, mapScalarToDecodeMethod, isEnum } from './scalar'
 import { camel } from 'radash'
 import { upperCaseFirst } from '../../prettier/string-format'
@@ -24,21 +24,14 @@ export class DecoderGenerater {
       file: File
     }
   >()
-  #mapTypeToDecodeMethod(root: Root, type: string) {
+  #mapScalarAndEnumToDecodeMethod(type: string) {
     if (isScalarType(type)) {
-      return {
-        typeName: mapScalarToDecodeMethod(type),
-        file: '@protobuf-es/core',
-      }
+      return { typeName: mapScalarToDecodeMethod(type), file: '@protobuf-es/core' }
     }
-    if (isEnum(root.lookupTypeOrEnum(type))) {
-      return {
-        typeName: 'readEnum',
-        file: '@protobuf-es/core',
-      }
-    }
-    const decodeName = 'decode' + upperCaseFirst(type)
-    const resolvedType = root.lookupType(type)
+    return { typeName: 'readEnum', file: '@protobuf-es/core' }
+  }
+  #mapTypeToDecodeMethod(resolvedType: Type) {
+    const decodeName = this.#getDecoderName(resolvedType)
     return {
       typeName: decodeName,
       file: this.#generateMessageDecodeCodeIfNeed(resolvedType).file.finalTsAbsolutePath,
@@ -48,36 +41,47 @@ export class DecoderGenerater {
     if (fields.length === 0) {
       return []
     }
-    const root = fields[0]!.root
     return fields
       .filter((field) => !Boolean(field instanceof MapField))
       .map((field) => {
-        return this.#mapTypeToDecodeMethod(root, field.type)
+        if (isScalarType(field.type) || isEnum(field.resolvedType!)) {
+          return this.#mapScalarAndEnumToDecodeMethod(field.type)
+        }
+        return this.#mapTypeToDecodeMethod(field.resolvedType!)
       })
   }
+  #mapValueTypeToDecodeMethod(field: MapField) {
+    if (isScalarType(field.type) || isEnum(field.resolvedType as any)) {
+      return this.#mapScalarAndEnumToDecodeMethod(field.type)
+    }
+    return this.#mapTypeToDecodeMethod(field.resolvedType as any)
+  }
+  #mapKeyTypeToDecodeMethod(field: MapField) {
+    if (isScalarType(field.keyType) || isEnum(field.resolvedKeyType as any)) {
+      return this.#mapScalarAndEnumToDecodeMethod(field.keyType)
+    }
+    return this.#mapTypeToDecodeMethod(field.resolvedKeyType as any)
+  }
 
-  #transformMapType(field: MapField, writeToContent: (content: string) => void) {
-    const decodeName = 'decode' + upperCaseFirst(field.name)
-
-    const keyReader = this.#mapTypeToDecodeMethod(field.root, field.keyType)
-    const valueReader = this.#mapTypeToDecodeMethod(field.root, field.type)
+  #transformMapType(field: MapField) {
+    const keyReader = this.#mapKeyTypeToDecodeMethod(field)
+    const valueReader = this.#mapValueTypeToDecodeMethod(field)
     const valueType = isScalarType(field.type) ? 'scalar' : 'message'
 
     this.#addImport(field, '@protobuf-es/core', 'defineMap')
 
     this.#addImport(field, keyReader.file, keyReader.typeName)
     this.#addImport(field, valueReader.file, valueReader.typeName)
-    const context = `const ${decodeName} = defineMap({
+    const inlineDecoder = `defineMap({
       keyReader: ${keyReader.typeName},
       valueReader: ${valueReader.typeName},
       valueType: '${valueType}',
-    })\n`
-    writeToContent(context)
-    return decodeName
+    })`
+    return inlineDecoder
   }
 
   #generateMessageDecodeCodeIfNeed(type: Type) {
-    let result = this.#messageDecodeMap.get(type.name)
+    let result = this.#messageDecodeMap.get(type.fullName)
     if (result === undefined) {
       const currentFile = this.filesManager.getTSFileByProtoPath(getFilenameByType(type))
       let preContext = ''
@@ -85,7 +89,7 @@ export class DecoderGenerater {
         content: '',
         file: currentFile,
       }
-      this.#messageDecodeMap.set(type.name, result)
+      this.#messageDecodeMap.set(type.fullName, result)
 
       const typeName = this.#getTypeName(type)
       const name = this.#getDecoderName(type)
@@ -95,15 +99,13 @@ export class DecoderGenerater {
         const repeatedDescription = field.repeated ? 'isRepeat: true, ' : ''
         const name = camel(field.name)
         if (field instanceof MapField) {
-          const decodeName = this.#transformMapType(field, (context) => {
-            preContext += context
-          })
-          config = `{ type: 'message', decode: ${decodeName}, name: '${name}', isMap: true }`
+          const inLineDecoder = this.#transformMapType(field)
+          config = `{ type: 'message', \ndecode: ${inLineDecoder}, \nname: '${name}', \nisMap: true }`
         } else if (isScalarType(field.type) || isEnum(field.resolvedType!)) {
-          const decode = this.#mapTypeToDecodeMethod(field.root, field.type).typeName
+          const decode = this.#mapScalarAndEnumToDecodeMethod(field.type).typeName
           config = `{ type: 'scalar', ${repeatedDescription}decode: ${decode}, name: '${name}' }`
         } else {
-          const decodeName = 'decode' + upperCaseFirst(field.type)
+          const decodeName = this.#getDecoderName(field.resolvedType!)
           config = `{ type: 'message', ${repeatedDescription}decode: ${decodeName}, name: '${name}' }`
         }
         return `[${tag}, ${config}],`
@@ -132,7 +134,7 @@ export class DecoderGenerater {
         absolutePath: '@protobuf-es/core',
         member: 'defineMessage',
       })
-      this.#messageDecodeMap.set(type.name, result)
+      this.#messageDecodeMap.set(type.fullName, result)
     }
     return result
   }
@@ -151,7 +153,7 @@ export class DecoderGenerater {
   getDecoderByType(type: Type) {
     return {
       memberName: this.#getDecoderName(type),
-      ...this.#messageDecodeMap.get(type.name)!,
+      ...this.#messageDecodeMap.get(type.fullName)!,
     }
   }
 }

@@ -194,27 +194,47 @@ describe('encode', () => {
         new Map([[1, { type: 'scalar', decode: readInt32, name: 'id' }]])
       )
 
-      const decodePorts = defineMap({
-        keyReader: readInt32,
-        valueReader: readInt32,
-        valueType: 'scalar',
-      })
-      const decodeTags = defineMap({
-        keyReader: readString,
-        valueReader: readString,
-        valueType: 'scalar',
-      })
-      const decodeBooks = defineMap({
-        keyReader: readString,
-        valueReader: decodeBook,
-        valueType: 'message',
-      })
-
       export const decodeDestination = defineMessage<Destination>(
         new Map([
-          [1, { type: 'message', decode: decodePorts, name: 'ports', isMap: true }],
-          [2, { type: 'message', decode: decodeTags, name: 'tags', isMap: true }],
-          [3, { type: 'message', decode: decodeBooks, name: 'books', isMap: true }],
+          [
+            1,
+            {
+              type: 'message',
+              decode: defineMap({
+                keyReader: readInt32,
+                valueReader: readInt32,
+                valueType: 'scalar',
+              }),
+              name: 'ports',
+              isMap: true,
+            },
+          ],
+          [
+            2,
+            {
+              type: 'message',
+              decode: defineMap({
+                keyReader: readString,
+                valueReader: readString,
+                valueType: 'scalar',
+              }),
+              name: 'tags',
+              isMap: true,
+            },
+          ],
+          [
+            3,
+            {
+              type: 'message',
+              decode: defineMap({
+                keyReader: readString,
+                valueReader: decodeBook,
+                valueType: 'message',
+              }),
+              name: 'books',
+              isMap: true,
+            },
+          ],
         ])
       )
 
@@ -234,6 +254,7 @@ describe('encode', () => {
     const files = await pbLoader.loadByPath('nestle-duplicate-message.proto')
     const [_, pbRoot] = [...files.entries()][0]!
     const messageGenerator = container.get(MessageGenerator)
+    const filesManager = container.get(TSFilesManager)
     messageGenerator.generateType(files)
     messageGenerator.generateEncoder(files)
     messageGenerator.generateDecode(files)
@@ -249,5 +270,115 @@ describe('encode', () => {
 
     expect(reqTypeMember.decoder.memberName).eq('decodeReponse')
     expect(resTypeMember.decoder.memberName).eq('decodeNestleServiceGetDataResReponse')
+    const allFiles = filesManager.listAllFile()
+    expect(allFiles.map((file) => file.toString()).join('\n')).eq(dedent`
+      // ./nestle-duplicate-message.ts
+      import { encodeInt64ToBuffer, EncoderWithoutTag, encodeMapToBuffer, readInt64, defineMessage, defineMap, readString } from '@protobuf-es/core'
+      export interface Reponse {
+        a?: string
+      }
+
+      export interface GetDataReq {
+        a?: Record<string, Reponse>
+      }
+
+      export interface GetDataRes {
+        a?: Record<string, NestleServiceGetDataResReponse>
+      }
+
+      export interface NestleServiceGetDataResReponse {
+        a?: string
+      }
+
+      export const encodeReponse: EncoderWithoutTag<Reponse> = ({ value, writer }) => {
+        if (value['a'] !== undefined) {
+          encodeInt64ToBuffer({
+            value: value['a'],
+            tag: 1,
+            writer,
+          })
+        }
+      }
+
+      export const encodeGetDataReq: EncoderWithoutTag<GetDataReq> = ({ value, writer }) => {
+        if (value['a'] !== undefined) {
+          encodeMapToBuffer(value['a'], {
+            tag: 1,
+            writer,
+            keyEncoderWithTag: encodeStringToBuffer,
+            valueEncoderWithTag: encodeReponse,
+          })
+        }
+      }
+
+      export const encodeGetDataRes: EncoderWithoutTag<GetDataRes> = ({ value, writer }) => {
+        if (value['a'] !== undefined) {
+          encodeMapToBuffer(value['a'], {
+            tag: 1,
+            writer,
+            keyEncoderWithTag: encodeStringToBuffer,
+            valueEncoderWithTag: encodeReponse,
+          })
+        }
+      }
+
+      export const encodeNestleServiceGetDataResReponse: EncoderWithoutTag<Reponse> = ({
+        value,
+        writer,
+      }) => {
+        if (value['a'] !== undefined) {
+          encodeInt64ToBuffer({
+            value: value['a'],
+            tag: 1,
+            writer,
+          })
+        }
+      }
+
+      export const decodeReponse = defineMessage<Reponse>(
+        new Map([[1, { type: 'scalar', decode: readInt64, name: 'a' }]])
+      )
+
+      export const decodeGetDataReq = defineMessage<GetDataReq>(
+        new Map([
+          [
+            1,
+            {
+              type: 'message',
+              decode: defineMap({
+                keyReader: readString,
+                valueReader: decodeReponse,
+                valueType: 'message',
+              }),
+              name: 'a',
+              isMap: true,
+            },
+          ],
+        ])
+      )
+
+      export const decodeNestleServiceGetDataResReponse = defineMessage<NestleServiceGetDataResReponse>(
+        new Map([[1, { type: 'scalar', decode: readInt64, name: 'a' }]])
+      )
+
+      export const decodeGetDataRes = defineMessage<GetDataRes>(
+        new Map([
+          [
+            1,
+            {
+              type: 'message',
+              decode: defineMap({
+                keyReader: readString,
+                valueReader: decodeNestleServiceGetDataResReponse,
+                valueType: 'message',
+              }),
+              name: 'a',
+              isMap: true,
+            },
+          ],
+        ])
+      )
+      
+    `)
   })
 })
