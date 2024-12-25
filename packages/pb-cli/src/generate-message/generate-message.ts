@@ -4,6 +4,7 @@ import { getAllMessages } from './get-all-type'
 import { InterfaceGenerater } from './generate/g-interface'
 import { EncoderGenerater } from './generate/g-encode'
 import { DecoderGenerater } from './generate/g-decode'
+import { Traversal } from './generate/traversal'
 
 interface Opts {
   typeFullnameRegExp?: RegExp | string
@@ -21,7 +22,8 @@ export class MessageGenerator {
   constructor(
     @inject(InterfaceGenerater) private interfaceGenerater: InterfaceGenerater,
     @inject(EncoderGenerater) private encoderGenerater: EncoderGenerater,
-    @inject(DecoderGenerater) private decoderGenerater: DecoderGenerater
+    @inject(DecoderGenerater) private decoderGenerater: DecoderGenerater,
+    @inject(Traversal) private traversal: Traversal
   ) {}
   getAllTypes(files: Map<string, Root> | Root) {
     const dedupeMap = new Set<string>()
@@ -58,6 +60,10 @@ export class MessageGenerator {
     this.generateType(files, opts)
     this.generateEncoder(files, opts)
     this.generateDecode(files, opts)
+  }
+
+  generateAllCode1(files: Map<string, Root>, opts?: Opts) {
+    this.doForType(files, (type) => this.traversal.generate(type), opts)
   }
 
   getAllMemberByType(type: Type) {
