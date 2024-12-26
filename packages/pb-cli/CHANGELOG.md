@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.16
+
+### Patch Changes
+
+- 950108c: 修复加载 google proto 失败问题
+
 ## 0.0.15
 
 ### Patch Changes
