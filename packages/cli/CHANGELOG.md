@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.3
+
+### Patch Changes
+
+- 0ac4ce2: 修复构建会忽略 proto 文件的问题
+
 ## 0.0.2
 
 ### Patch Changes
