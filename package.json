@@ -5,7 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "CI=true pnpm run -r test --allowOnly"
+    "test": "CI=true pnpm run -r test --allowOnly",
+    "changeset": "changeset"
   },
   "keywords": [],
   "author": "",

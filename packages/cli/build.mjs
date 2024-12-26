@@ -26,11 +26,17 @@ function buildTs() {
     .pipe(tsProject())
     .pipe(gulp.dest('./dist'))
 }
+
+// 将非 ts 的文件通通移过去
+function cpOtherFile() {
+  return gulp.src(['src/**/*', '!**/*.ts']).pipe(gulp.dest('./dist/src/'))
+}
 const compilePackage = gulp.series(
   async () => {
     await deleteAsync('./dist')
   },
   buildTs,
+  cpOtherFile,
   createPkg
 )
 
