@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.18
+
+### Patch Changes
+
+- 395810c: add getAllService method
+
 ## 0.0.17
 
 ### Patch Changes
