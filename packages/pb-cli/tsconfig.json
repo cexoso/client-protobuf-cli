@@ -4,7 +4,6 @@
     "experimentalDecorators": true,
     "jsxImportSource": "vue",
     "module": "NodeNext",
-    "baseUrl": "./",
     "moduleResolution": "nodenext" /* Specify how TypeScript looks up a file from a given module specifier. */,
     /* 构建到服务器端运行，不需要关注 d.ts */
     "declaration": true,
