@@ -3,14 +3,16 @@ import { ProjectInfo } from '../project'
 import { PBLoader } from '../pb-loader/pb-loader'
 import { MessageGenerator } from '../generate-message/generate-message'
 import { TSFilesManager } from '../files-manager/files-manager'
-import { Root } from 'protobufjs'
+import { Root, Service } from 'protobufjs'
 import { InterfaceGenerater } from '../generate-message/generate/g-interface'
+import { getAllService } from '../generate-message/get-all-type'
 
 export interface Context {
   files: Map<string, Root>
   filesManager: TSFilesManager
   interfaceGenerater: InterfaceGenerater
   messageGenerator: MessageGenerator
+  getAllService: () => Service[]
 }
 export interface Plugin {
   afterGenerate?: (context: Context) => void
@@ -56,11 +58,24 @@ export class Command {
     return this.filesManager.listAllFile()
   }
   #callPlugin(phase: keyof Plugin) {
+    const files = this.files!
     const context: Context = {
       filesManager: this.filesManager,
-      files: this.files!,
+      files,
       interfaceGenerater: this.interfaceGenerater,
       messageGenerator: this.messageGenerator,
+      getAllService: function (): Service[] {
+        const serviceMap = new Map<string, Service>()
+        for (const [_, root] of files) {
+          const services = getAllService(root)
+          for (const service of services) {
+            if (!serviceMap.has(service.fullName)) {
+              serviceMap.set(service.fullName, service)
+            }
+          }
+        }
+        return [...serviceMap.values()]
+      },
     }
     this.#plugins.forEach((plugin) => {
       plugin[phase]?.(context)
