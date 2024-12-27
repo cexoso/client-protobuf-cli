@@ -1,4 +1,4 @@
-import { Root, loadSync } from 'protobufjs'
+import { FetchCallback, Root, load } from 'protobufjs'
 import { isAbsolute, join } from 'path'
 import { existsSync } from 'fs'
 import { inject, injectable } from 'inversify'
@@ -11,6 +11,19 @@ export class PBLoader {
   #root: Root
   constructor(@inject(ProjectInfo) private projectInfo: ProjectInfo) {
     this.#root = new Root()
+
+    const originFetch = this.#root.fetch
+    this.#root.fetch = (path: string, callback: FetchCallback) => {
+      if (isAbsolute(path)) {
+        return originFetch(path, callback)
+      }
+      const baseBuildin = join(buildInProtobufPath, path)
+      if (existsSync(baseBuildin)) {
+        return originFetch(baseBuildin, callback)
+      }
+      return originFetch(path, callback)
+    }
+
     this.#root.resolvePath = (origin, target) => {
       if (isAbsolute(target)) {
         return target
@@ -32,7 +45,7 @@ export class PBLoader {
       // 兜底到内置的 PB 目录来查找像：
       // validate.proto, google/type/phone_number.proto
       if (existsSync(baseBuildin)) {
-        return baseBuildin
+        return target
       }
       return target
     }
@@ -45,11 +58,13 @@ export class PBLoader {
     })
     await Promise.all(
       allPBs.map(async (pbPath) => {
-        const x = loadSync(pbPath, this.#root)
-        x.resolveAll()
+        const x = await load(pbPath, this.#root)
         this.#pbFiles.set(pbPath, x)
       })
     )
+    for (const [_, root] of this.#pbFiles) {
+      root.resolveAll()
+    }
     return this.#pbFiles
   }
 }
