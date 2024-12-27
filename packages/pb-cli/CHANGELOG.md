@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.17
+
+### Patch Changes
+
+- a6ffd7a: 修复了 pb load 加载 预设 Protobufs 失败的问题
+
 ## 0.0.16
 
 ### Patch Changes
