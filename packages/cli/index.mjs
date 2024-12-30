@@ -17,7 +17,7 @@ program
   .description('构建 ts 到 dist 目录，附带 package.json')
   .option('-f, --format <format...>', '支持 ESM 和 CommonJS')
   .action((args) => {
-    const format = args.format
+    const format = args.format || ['ESM', 'CommonJS']
     assertFormat(format)
     build({
       format,

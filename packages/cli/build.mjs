@@ -55,17 +55,13 @@ function buildESM() {
   const transform = transformPath({
     '.js': '.mjs',
   })
+  const tsProject = ts.createProject('tsconfig.json', {
+    module: 'esnext',
+    moduleResolution: 'node',
+  })
   return gulp
     .src(['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts', '!dist/**/*', '!node_modules/**/*'])
-    .pipe(
-      ts({
-        target: 'esnext',
-        module: 'esnext',
-        lib: ['esnext'],
-        moduleResolution: 'node',
-        declaration: true,
-      })
-    )
+    .pipe(tsProject())
     .pipe(
       through.obj(async (file, _enc, cb) => {
         const path = file.path
@@ -87,17 +83,13 @@ function cpOtherFile() {
 }
 
 function buildCommonJS() {
+  const tsProject = ts.createProject('tsconfig.json', {
+    module: 'CommonJS',
+    moduleResolution: 'node',
+  })
   return gulp
     .src(['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts', '!dist/**/*', '!node_modules/**/*'])
-    .pipe(
-      ts({
-        target: 'esnext',
-        module: 'CommonJS',
-        lib: ['esnext'],
-        moduleResolution: 'node',
-        declaration: true,
-      })
-    )
+    .pipe(tsProject())
     .pipe(gulp.dest('./dist'))
 }
 
