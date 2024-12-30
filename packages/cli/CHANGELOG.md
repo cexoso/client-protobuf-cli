@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.5
+
+### Patch Changes
+
+- 8c63ec3: 修复一个路径判断错误问题
+
 ## 0.0.4
 
 ### Patch Changes
