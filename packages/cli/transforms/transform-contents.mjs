@@ -2,7 +2,6 @@ import { parse } from '@babel/parser'
 import defaultExport from '@babel/traverse'
 import printExport from '@babel/generator'
 import { isStringLiteral } from '@babel/types'
-import { isAbsolute } from 'path'
 import { transformTo } from '../transforms/transform-path.mjs'
 
 let generate = printExport
@@ -21,7 +20,8 @@ export function transformContent(content) {
     ImportOrExportDeclaration(path) {
       if (isStringLiteral(path.node.source)) {
         const importPath = path.node.source.value
-        if (!isAbsolute(importPath)) {
+        if (importPath.startsWith('./') || importPath.startsWith('/')) {
+          // 之后这里是否可以改成嗅探
           path.node.source.value = transformTo(path.node.source.value, '.mjs')
         }
       }
