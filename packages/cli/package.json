@@ -7,11 +7,16 @@
     "ts-pkg-build": "index.mjs"
   },
   "dependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/generator": "^7.26.3",
+    "@babel/parser": "^7.26.3",
+    "@babel/traverse": "^7.26.4",
     "@types/gulp": "^4.0.17",
     "commander": "^12.1.0",
     "del": "^8.0.0",
     "gulp": "^5.0.0",
     "gulp-typescript": "6.0.0-alpha.1",
+    "through2": "^4.0.2",
     "zx": "^8.2.4"
   }
 }

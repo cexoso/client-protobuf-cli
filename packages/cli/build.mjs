@@ -2,6 +2,16 @@ import { readFileSync, writeFileSync } from 'fs'
 import { deleteAsync } from 'del'
 import ts from 'gulp-typescript'
 import gulp from 'gulp'
+import { Buffer } from 'buffer'
+import through from 'through2'
+import { transformPath } from './transforms/transform-path.mjs'
+
+/**
+ * @param { string } content
+ */
+function transformContent(content) {
+  return content
+}
 
 function createPkg() {
   const pkg = JSON.parse(readFileSync('./package.json').toString())
@@ -21,9 +31,25 @@ function createPkg() {
 
 function buildTs() {
   const tsProject = ts.createProject('tsconfig.json')
+  const transform = transformPath({
+    '.js': '.mjs',
+  })
   return gulp
     .src(['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts', '!dist/**/*', '!node_modules/**/*'])
     .pipe(tsProject())
+    .pipe(
+      through.obj((file, enc, cb) => {
+        const path = file.path
+        file.path = transform(path)
+        const content = file.contents.toString()
+        file.contents = Buffer.from(transformContent(content))
+
+        cb(null, file)
+      })
+      // tap((file) => {
+      //   console.log('debugger 🐛 file', file.path)
+      // })
+    )
     .pipe(gulp.dest('./dist'))
 }
 
