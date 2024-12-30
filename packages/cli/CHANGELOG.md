@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.4
+
+### Patch Changes
+
+- c711da3: 支持打包到 ESM 和 CommonJS 都支持的形式
+
 ## 0.0.3
 
 ### Patch Changes
