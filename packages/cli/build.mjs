@@ -4,24 +4,43 @@ import ts from 'gulp-typescript'
 import gulp from 'gulp'
 import { Buffer } from 'buffer'
 import through from 'through2'
-import { transformPath } from './transforms/transform-path.mjs'
+import { transformPath, transformTo } from './transforms/transform-path.mjs'
 import { transformContent } from './transforms/transform-contents.mjs'
 import { extname } from 'path'
 
-function createPkg() {
-  const pkg = JSON.parse(readFileSync('./package.json').toString())
+/**
+ * @param { Array<string> } format
+ */
+function createPkg(format) {
+  const hasESM = format.includes('ESM')
+  const hasCommonJS = format.includes('CommonJS')
+  return () => {
+    const pkg = JSON.parse(readFileSync('./package.json').toString())
 
-  const main = pkg.publishConfig?.main ?? pkg.main ?? 'index.js'
-  const newPkg = {
-    name: pkg.name,
-    dependencies: pkg.dependencies,
-    repository: pkg.repository,
-    license: pkg.license,
-    version: pkg.version,
-    main,
+    const main = pkg.publishConfig?.main ?? pkg.main ?? 'index.js'
+
+    const newPkg = {
+      name: pkg.name,
+      dependencies: pkg.dependencies,
+      repository: pkg.repository,
+      license: pkg.license,
+      version: pkg.version,
+    }
+
+    if (hasCommonJS) {
+      newPkg.main = transformTo(main, '.js')
+    }
+
+    if (hasESM) {
+      newPkg.module = transformTo(main, '.mjs')
+    }
+
+    if (format.length === 1 && hasESM) {
+      newPkg.type = 'module'
+    }
+
+    writeFileSync('./dist/package.json', JSON.stringify(newPkg, null, 2))
   }
-
-  writeFileSync('./dist/package.json', JSON.stringify(newPkg, null, 2))
 }
 
 /**
@@ -83,7 +102,7 @@ function buildCommonJS() {
 }
 
 /**
- * @property { Array<string> } format
+ * @param { Array<string> } format
  */
 function getParallelBuild(format) {
   const parallelBuild = []
@@ -107,7 +126,7 @@ export const build = (opts) => {
     },
     gulp.parallel(...parallelBuild),
     cpOtherFile,
-    createPkg
+    createPkg(opts.format)
   )
 
   return compilePackage()
