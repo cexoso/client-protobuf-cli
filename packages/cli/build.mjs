@@ -24,7 +24,15 @@ function createPkg() {
   writeFileSync('./dist/package.json', JSON.stringify(newPkg, null, 2))
 }
 
-function buildTs() {
+/**
+ * @typedef { object } Options
+ * @property { Array<string> } format
+ */
+
+/**
+ * @param {Options} opts
+ */
+function buildESM() {
   const transform = transformPath({
     '.js': '.mjs',
   })
@@ -40,7 +48,7 @@ function buildTs() {
       })
     )
     .pipe(
-      through.obj(async (file, enc, cb) => {
+      through.obj(async (file, _enc, cb) => {
         const path = file.path
         file.path = transform(path)
         const content = file.contents.toString()
@@ -58,13 +66,49 @@ function buildTs() {
 function cpOtherFile() {
   return gulp.src(['src/**/*', '!**/*.ts']).pipe(gulp.dest('./dist/src/'))
 }
-const compilePackage = gulp.series(
-  async () => {
-    await deleteAsync('./dist')
-  },
-  buildTs,
-  cpOtherFile,
-  createPkg
-)
 
-export const build = compilePackage
+function buildCommonJS() {
+  return gulp
+    .src(['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts', '!dist/**/*', '!node_modules/**/*'])
+    .pipe(
+      ts({
+        target: 'esnext',
+        module: 'CommonJS',
+        lib: ['esnext'],
+        moduleResolution: 'node',
+        declaration: true,
+      })
+    )
+    .pipe(gulp.dest('./dist'))
+}
+
+/**
+ * @property { Array<string> } format
+ */
+function getParallelBuild(format) {
+  const parallelBuild = []
+  if (format.includes('ESM')) {
+    parallelBuild.push(buildESM)
+  }
+  if (format.includes('CommonJS')) {
+    parallelBuild.push(buildCommonJS)
+  }
+  return parallelBuild
+}
+
+/**
+ * @param {Options} opts
+ */
+export const build = (opts) => {
+  const parallelBuild = getParallelBuild(opts.format)
+  const compilePackage = gulp.series(
+    async () => {
+      await deleteAsync('./dist')
+    },
+    gulp.parallel(...parallelBuild),
+    cpOtherFile,
+    createPkg
+  )
+
+  return compilePackage()
+}
