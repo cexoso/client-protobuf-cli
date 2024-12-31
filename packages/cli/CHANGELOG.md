@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.6
+
+### Patch Changes
+
+- 7c0f520: 切换成 ts 项目，并且支持 bin 的生成
+
 ## 0.0.5
 
 ### Patch Changes
