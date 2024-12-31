@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.9
+
+### Patch Changes
+
+- c4e7533: 替换 del 的实现，因为 del 是 ESM 的
+
 ## 0.0.8
 
 ### Patch Changes
