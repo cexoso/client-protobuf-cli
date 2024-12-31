@@ -1,6 +1,6 @@
 import { existsSync, lstatSync, rmSync } from 'fs'
 
-export const deleteAsync = (dirPath: string) => {
+export const deleteAsync = async (dirPath: string) => {
   if (!existsSync(dirPath)) {
     return
   }
@@ -13,6 +13,6 @@ export const deleteAsync = (dirPath: string) => {
   rmSync(dirPath, { recursive: true, force: true })
 }
 
-export const clean = () => {
-  deleteAsync('./dist')
+export const clean = async () => {
+  await deleteAsync('./dist')
 }

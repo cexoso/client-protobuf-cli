@@ -10,6 +10,7 @@
     /* 构建到服务器端运行，不需要 sourcemap，如果你关注报错堆栈，可以打开此项 */
     "sourceMap": false,
     "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
+    "allowSyntheticDefaultImports": true,
     /* Type Checking, 先默认开启严格的校验模式 */
     "strict": true,
     "noImplicitAny": true,

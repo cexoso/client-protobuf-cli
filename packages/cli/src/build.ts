@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from 'fs'
 import ts from 'gulp-typescript'
-import gulp from 'gulp'
+import { series, parallel, src, dest } from 'gulp'
 import { transformTo } from './transforms/transform-path'
 import { transformAllJsFileTask } from './transforms/index'
 import { deleteAsync } from './clean'
@@ -65,16 +65,15 @@ function buildESM() {
     module: 'esnext',
     moduleResolution: 'node',
   })
-  return gulp
-    .src(['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts', '!dist/**/*', '!node_modules/**/*'])
+  return src(['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts', '!dist/**/*', '!node_modules/**/*'])
     .pipe(tsProject())
     .pipe(transformAllJsFileTask())
-    .pipe(gulp.dest('./dist'))
+    .pipe(dest('./dist'))
 }
 
 // 将非 ts 的文件通通移过去
 function cpOtherFile() {
-  return gulp.src(['src/**/*', '!**/*.ts']).pipe(gulp.dest('./dist/src/'))
+  return src(['src/**/*', '!**/*.ts']).pipe(dest('./dist/src/'))
 }
 
 function buildCommonJS() {
@@ -82,10 +81,9 @@ function buildCommonJS() {
     module: 'CommonJS',
     moduleResolution: 'node',
   })
-  return gulp
-    .src(['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts', '!dist/**/*', '!node_modules/**/*'])
+  return src(['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts', '!dist/**/*', '!node_modules/**/*'])
     .pipe(tsProject())
-    .pipe(gulp.dest('./dist'))
+    .pipe(dest('./dist'))
 }
 
 function getParallelBuild(format: string[]) {
@@ -101,11 +99,11 @@ function getParallelBuild(format: string[]) {
 
 export const build = (opts: { format: Array<'ESM' | 'CommonJS'> }): any => {
   const parallelBuild = getParallelBuild(opts.format)
-  const compilePackage = gulp.series(
+  const compilePackage = series(
     async () => {
       await deleteAsync('./dist')
     },
-    gulp.parallel(...parallelBuild),
+    parallel(...parallelBuild),
     cpOtherFile,
     createPkg(opts.format)
   )
