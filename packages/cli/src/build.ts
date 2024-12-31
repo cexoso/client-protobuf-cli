@@ -1,9 +1,9 @@
 import { readFileSync, writeFileSync } from 'fs'
-import { deleteAsync } from 'del'
 import ts from 'gulp-typescript'
 import gulp from 'gulp'
 import { transformTo } from './transforms/transform-path'
 import { transformAllJsFileTask } from './transforms/index'
+import { deleteAsync } from './clean'
 
 interface Package {
   name: string
