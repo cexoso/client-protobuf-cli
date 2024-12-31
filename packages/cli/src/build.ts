@@ -17,6 +17,7 @@ interface Package {
   repository: string
   license: string
   version: string
+  bin?: string | Record<string, string>
 }
 
 function createPkg(format: string[]) {
@@ -45,6 +46,17 @@ function createPkg(format: string[]) {
 
     if (format.length === 1 && hasESM) {
       newPkg.type = 'module'
+    }
+
+    if (pkg.bin) {
+      if (typeof pkg.bin === 'string') {
+        newPkg.bin = transformTo(pkg.bin, hasCommonJS ? '.js' : '.mjs')
+      } else {
+        newPkg.bin = {}
+        for (const [k, v] of Object.entries(pkg.bin)) {
+          newPkg.bin[k] = transformTo(v as string, hasCommonJS ? '.js' : '.mjs')
+        }
+      }
     }
 
     writeFileSync('./dist/package.json', JSON.stringify(newPkg, null, 2))
