@@ -1,7 +1,6 @@
 {
   "name": "@cexoso/ts-pkg-build",
-  "version": "0.0.9",
-  "type": "module",
+  "version": "0.0.10",
   "license": "MIT",
   "publishConfig": {
     "directory": "dist",
@@ -12,7 +11,7 @@
     "ts-pkg-build": "src/cli.ts"
   },
   "scripts": {
-    "build": "tsx src/cli.ts build --format ESM --format CommonJS",
+    "build": "ts-node src/cli.ts build --format ESM --format CommonJS",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
@@ -31,6 +30,6 @@
     "zx": "^8.2.4"
   },
   "devDependencies": {
-    "tsx": "^4.19.2"
+    "ts-node": "^10.9.2"
   }
 }

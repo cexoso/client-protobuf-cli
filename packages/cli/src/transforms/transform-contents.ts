@@ -1,16 +1,8 @@
 import { parse } from '@babel/parser'
-import defaultExport from '@babel/traverse'
-import printExport from '@babel/generator'
+import traverse from '@babel/traverse'
+import generate from '@babel/generator'
 import { isStringLiteral } from '@babel/types'
 import { transformTo } from './transform-path'
-
-let generate = printExport
-// @ts-ignore
-generate = generate.default
-
-let traverse = defaultExport
-// @ts-ignore
-traverse = traverse.default
 
 export function transformContent(content: string): string {
   const ast = parse(content, { sourceType: 'module' })

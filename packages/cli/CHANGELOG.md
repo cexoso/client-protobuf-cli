@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.10
+
+### Patch Changes
+
+- e1c444a: 修复 tsc 在处理 commonjs 时的错误问题
+
 ## 0.0.9
 
 ### Patch Changes
