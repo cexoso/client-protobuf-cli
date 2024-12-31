@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.7
+
+### Patch Changes
+
+- 2eafbc1: 导出一个转换 js 内容的函数
+
 ## 0.0.6
 
 ### Patch Changes
