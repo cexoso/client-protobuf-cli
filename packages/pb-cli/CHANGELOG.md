@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.20
+
+### Patch Changes
+
+- a32858e: 支持多实例
+
 ## 0.0.19
 
 ### Patch Changes

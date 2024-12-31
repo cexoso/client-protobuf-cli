@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.8
+
+### Patch Changes
+
+- 73b2848: 修复了 .. 路径没有检查正确的问题
+
 ## 0.0.7
 
 ### Patch Changes
