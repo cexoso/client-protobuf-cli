@@ -2,11 +2,8 @@ import { readFileSync, writeFileSync } from 'fs'
 import { deleteAsync } from 'del'
 import ts from 'gulp-typescript'
 import gulp from 'gulp'
-import { Buffer } from 'buffer'
-import through from 'through2'
-import { transformPath, transformTo } from './transforms/transform-path'
-import { transformContent } from './transforms/transform-contents'
-import { extname } from 'path'
+import { transformTo } from './transforms/transform-path'
+import { transformAllJsFileTask } from './transforms/index'
 
 interface Package {
   name: string
@@ -64,9 +61,6 @@ function createPkg(format: string[]) {
 }
 
 function buildESM() {
-  const transform = transformPath({
-    '.js': '.mjs',
-  })
   const tsProject = ts.createProject('tsconfig.json', {
     module: 'esnext',
     moduleResolution: 'node',
@@ -74,18 +68,7 @@ function buildESM() {
   return gulp
     .src(['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts', '!dist/**/*', '!node_modules/**/*'])
     .pipe(tsProject())
-    .pipe(
-      through.obj(async (file, _enc, cb) => {
-        const path = file.path
-        file.path = transform(path)
-        const content = file.contents.toString()
-        if (extname(path) === '.js') {
-          file.contents = Buffer.from(transformContent(content))
-        }
-
-        cb(null, file)
-      })
-    )
+    .pipe(transformAllJsFileTask())
     .pipe(gulp.dest('./dist'))
 }
 

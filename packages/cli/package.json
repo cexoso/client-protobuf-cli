@@ -9,11 +9,11 @@
   },
   "main": "src/index",
   "bin": {
-    "ts-pkg-build": "src/index"
+    "ts-pkg-build": "src/cli"
   },
   "scripts": {
-    "build": "tsx src/index.ts build --format CommonJS --format ESM",
-    "prepare": "npm run build"
+    "build": "tsx src/cli.ts build --format CommonJS --format ESM",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@babel/core": "^7.26.0",
