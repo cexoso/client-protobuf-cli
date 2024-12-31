@@ -2,22 +2,22 @@ import { parse } from '@babel/parser'
 import defaultExport from '@babel/traverse'
 import printExport from '@babel/generator'
 import { isStringLiteral } from '@babel/types'
-import { transformTo } from '../transforms/transform-path.mjs'
+import { transformTo } from '../transforms/transform-path'
 
 let generate = printExport
+// @ts-ignore
 generate = generate.default
 
 let traverse = defaultExport
+// @ts-ignore
 traverse = traverse.default
-/**
- * @param {string} path
- * @param {string} content
- */
-export function transformContent(content) {
+
+export function transformContent(content: string): string {
   const ast = parse(content, { sourceType: 'module' })
 
   traverse(ast, {
-    ImportOrExportDeclaration(path) {
+    // babel 类型投毒？
+    ImportOrExportDeclaration(path: any) {
       if (isStringLiteral(path.node.source)) {
         const importPath = path.node.source.value
         if (importPath.startsWith('./') || importPath.startsWith('/')) {

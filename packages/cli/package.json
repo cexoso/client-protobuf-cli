@@ -3,20 +3,35 @@
   "version": "0.0.5",
   "type": "module",
   "license": "MIT",
+  "publishConfig": {
+    "directory": "dist",
+    "linkDirectory": false
+  },
+  "main": "src/index",
   "bin": {
-    "ts-pkg-build": "index.mjs"
+    "ts-pkg-build": "src/index"
+  },
+  "scripts": {
+    "build": "tsx src/index.ts build --format CommonJS --format ESM",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "@babel/core": "^7.26.0",
     "@babel/generator": "^7.26.3",
     "@babel/parser": "^7.26.3",
     "@babel/traverse": "^7.26.4",
+    "@types/babel__generator": "^7.6.8",
+    "@types/babel__traverse": "^7.20.6",
     "@types/gulp": "^4.0.17",
+    "@types/through2": "^2.0.41",
     "commander": "^12.1.0",
     "del": "^8.0.0",
     "gulp": "^5.0.0",
     "gulp-typescript": "6.0.0-alpha.1",
     "through2": "^4.0.2",
     "zx": "^8.2.4"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2"
   }
 }

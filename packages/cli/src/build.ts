@@ -4,14 +4,22 @@ import ts from 'gulp-typescript'
 import gulp from 'gulp'
 import { Buffer } from 'buffer'
 import through from 'through2'
-import { transformPath, transformTo } from './transforms/transform-path.mjs'
-import { transformContent } from './transforms/transform-contents.mjs'
+import { transformPath, transformTo } from './transforms/transform-path'
+import { transformContent } from './transforms/transform-contents'
 import { extname } from 'path'
 
-/**
- * @param { Array<string> } format
- */
-function createPkg(format) {
+interface Package {
+  name: string
+  module?: string
+  main?: string
+  type?: string
+  dependencies: Record<string, string>
+  repository: string
+  license: string
+  version: string
+}
+
+function createPkg(format: string[]) {
   const hasESM = format.includes('ESM')
   const hasCommonJS = format.includes('CommonJS')
   return () => {
@@ -19,7 +27,7 @@ function createPkg(format) {
 
     const main = pkg.publishConfig?.main ?? pkg.main ?? 'index.js'
 
-    const newPkg = {
+    const newPkg: Package = {
       name: pkg.name,
       dependencies: pkg.dependencies,
       repository: pkg.repository,
@@ -43,14 +51,6 @@ function createPkg(format) {
   }
 }
 
-/**
- * @typedef { object } Options
- * @property { Array<string> } format
- */
-
-/**
- * @param {Options} opts
- */
 function buildESM() {
   const transform = transformPath({
     '.js': '.mjs',
@@ -93,10 +93,7 @@ function buildCommonJS() {
     .pipe(gulp.dest('./dist'))
 }
 
-/**
- * @param { Array<string> } format
- */
-function getParallelBuild(format) {
+function getParallelBuild(format: string[]) {
   const parallelBuild = []
   if (format.includes('ESM')) {
     parallelBuild.push(buildESM)
@@ -107,10 +104,7 @@ function getParallelBuild(format) {
   return parallelBuild
 }
 
-/**
- * @param {Options} opts
- */
-export const build = (opts) => {
+export const build = (opts: { format: Array<'ESM' | 'CommonJS'> }): any => {
   const parallelBuild = getParallelBuild(opts.format)
   const compilePackage = gulp.series(
     async () => {
@@ -121,5 +115,5 @@ export const build = (opts) => {
     createPkg(opts.format)
   )
 
-  return compilePackage()
+  return compilePackage(() => {})
 }

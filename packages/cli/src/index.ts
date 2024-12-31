@@ -1,11 +1,8 @@
 import { program } from 'commander'
-import { build } from './build.mjs'
-import { clean } from './clean.mjs'
+import { build } from './build'
+import { clean } from './clean'
 
-/**
- * @param {Array<string>}format
- */
-function assertFormat(format) {
+function assertFormat(format: string[]) {
   const validItem = new Set(['ESM', 'CommonJS'])
   if (format.every((item) => validItem.has(item))) {
     new Error('--format only support ESM、CommonJS')

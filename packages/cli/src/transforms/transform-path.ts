@@ -1,12 +1,7 @@
 import { extname } from 'path'
-/**
- * @param {Record<string, number>} pairs
- */
-export function transformPath(pairs) {
-  /**
-   * @param { string } input
-   */
-  return (input) => {
+
+export function transformPath(pairs: Record<string, string>) {
+  return (input: string) => {
     const ext = extname(input)
     for (let [from, to] of Object.entries(pairs)) {
       if (ext === from) {
@@ -17,11 +12,7 @@ export function transformPath(pairs) {
   }
 }
 
-/**
- * @param {string} path
- * @param {string} suffix
- */
-export function transformTo(path, suffix) {
+export function transformTo(path: string, suffix: string) {
   const ext = extname(path)
   return path.replace(new RegExp(`${ext}$`), suffix)
 }
