@@ -66,7 +66,7 @@ importers:
     devDependencies:
       '@cexoso/ts-pkg-build':
         specifier: 'workspace: *'
-        version: link:../cli
+        version: link:../cli/dist
       '@types/node':
         specifier: ^22.0.0
         version: 22.0.0
@@ -122,7 +122,7 @@ importers:
     devDependencies:
       '@cexoso/ts-pkg-build':
         specifier: 'workspace: *'
-        version: link:../cli
+        version: link:../cli/dist
       '@protobuf-es/core':
         specifier: 'workspace: *'
         version: link:../core

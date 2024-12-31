@@ -4,7 +4,14 @@ export { getAllService } from './generate-message/get-all-type'
 export { easyRequestPlugin } from './plugins/easy-request-plugin'
 export type { Plugin, Context } from './command/command'
 
-const container = createContainer()
-export const cmd = container.get(Command)
+// 多实例
+export const getCmd = () => {
+  const container = createContainer()
+  const cmd = container.get(Command)
+  return cmd
+}
+
+// 默认 cmd
+export const cmd = getCmd()
 
 export const compileProtos = cmd.compileProtos.bind(cmd)

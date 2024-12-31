@@ -5,14 +5,14 @@
   "license": "MIT",
   "publishConfig": {
     "directory": "dist",
-    "linkDirectory": false
+    "linkDirectory": true
   },
   "main": "src/index",
   "bin": {
-    "ts-pkg-build": "src/cli"
+    "ts-pkg-build": "src/cli.ts"
   },
   "scripts": {
-    "build": "tsx src/cli.ts build --format CommonJS --format ESM",
+    "build": "tsx src/cli.ts build --format ESM",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
