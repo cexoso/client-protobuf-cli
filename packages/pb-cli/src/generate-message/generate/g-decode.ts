@@ -130,7 +130,7 @@ export class DecoderGenerater implements Generator {
     const typeName = this.#getTypeName(type)
     const name = this.#getDecoderName(type)
     const body = `export const ${name} = defineMessage<${typeName}>(
-      new Map([
+      new Map<number, TagHandler>([
         ${type.fieldsArray.map((field) => this.#genFieldDecode(type, field)).join('\n')}
       ])
     )`
@@ -138,6 +138,10 @@ export class DecoderGenerater implements Generator {
     this.filesManager.getTSFileByUnionType(type).addImport({
       absolutePath: '@protobuf-es/core',
       member: 'defineMessage',
+    })
+    this.filesManager.getTSFileByUnionType(type).addImport({
+      absolutePath: '@protobuf-es/core',
+      member: 'TagHandler',
     })
     return formatTypescript(body)
   }

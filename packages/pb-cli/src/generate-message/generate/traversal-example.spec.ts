@@ -27,6 +27,7 @@ describe('traversal', () => {
       import {
         readUint32,
         defineMessage,
+        TagHandler,
         EncoderWithoutTag,
         encodeUint32ToBuffer,
         readInt64,
@@ -52,7 +53,7 @@ describe('traversal', () => {
       }
 
       export const decodePagination = defineMessage<Pagination>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readUint32, name: 'index' }],
           [10, { type: 'scalar', decode: readUint32, name: 'pageSize' }],
         ])
@@ -80,7 +81,7 @@ describe('traversal', () => {
       }
 
       export const decodeGetDataReq = defineMessage<GetDataReq>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readInt64, name: 'uid' }],
           [
             2,
@@ -127,7 +128,7 @@ describe('traversal', () => {
       }
 
       export const decodeBook = defineMessage<Book>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readInt32, name: 'bookId' }],
           [2, { type: 'scalar', decode: readString, name: 'bookName' }],
           [3, { type: 'scalar', decode: readFloat, name: 'price' }],
@@ -182,7 +183,7 @@ describe('traversal', () => {
       }
 
       export const decodeData = defineMessage<Data>(
-        new Map([
+        new Map<number, TagHandler>([
           [
             1,
             {
@@ -213,7 +214,7 @@ describe('traversal', () => {
       }
 
       export const decodeGetDataRes = defineMessage<GetDataRes>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readInt32, name: 'code' }],
           [2, { type: 'scalar', decode: readString, name: 'message' }],
           [3, { type: 'message', decode: (reader: ReaderLike) => decodeData(reader), name: 'data' }],
@@ -251,6 +252,7 @@ describe('traversal', () => {
         readInt32,
         readString,
         defineMessage,
+        TagHandler,
         EncoderWithoutTag,
         encodeInt32ToBuffer,
         encodeStringToBuffer,
@@ -261,7 +263,7 @@ describe('traversal', () => {
       }
 
       export const decodePeople = defineMessage<People>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readInt32, name: 'userId' }],
           [2, { type: 'scalar', decode: readString, name: 'name' }],
         ])

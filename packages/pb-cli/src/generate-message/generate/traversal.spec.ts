@@ -27,6 +27,7 @@ describe('traversal', () => {
         defineMap,
         readString,
         defineMessage,
+        TagHandler,
         EncoderWithoutTag,
         encodeUint32ToBuffer,
         encodeMapToBuffer,
@@ -37,7 +38,7 @@ describe('traversal', () => {
       }
 
       export const decodeCRpcHead = defineMessage<CRpcHead>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readUint32, name: 'serverIp' }],
           [
             2,
@@ -79,6 +80,7 @@ describe('traversal', () => {
         readString,
         readBool,
         defineMessage,
+        TagHandler,
         EncoderWithoutTag,
         encodeStringToBuffer,
         encodeBoolToBuffer,
@@ -145,7 +147,7 @@ describe('traversal', () => {
       }
 
       export const decodeNamePart = defineMessage<NamePart>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readString, name: 'namePart' }],
           [2, { type: 'scalar', decode: readBool, name: 'isExtension' }],
         ])
@@ -175,7 +177,7 @@ describe('traversal', () => {
       }
 
       export const decodeUninterpretedOption = defineMessage<UninterpretedOption>(
-        new Map([
+        new Map<number, TagHandler>([
           [
             2,
             {
@@ -268,7 +270,7 @@ describe('traversal', () => {
       }
 
       export const decodeFieldOptions = defineMessage<FieldOptions>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readEnum, name: 'ctype' }],
           [2, { type: 'scalar', decode: readBool, name: 'packed' }],
           [6, { type: 'scalar', decode: readEnum, name: 'jstype' }],
@@ -370,7 +372,7 @@ describe('traversal', () => {
       }
 
       export const decodeFieldDescriptorProto = defineMessage<FieldDescriptorProto>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
           [3, { type: 'scalar', decode: readInt32, name: 'number' }],
           [4, { type: 'scalar', decode: readEnum, name: 'label' }],
@@ -485,7 +487,7 @@ describe('traversal', () => {
       }
 
       export const decodeEnumValueOptions = defineMessage<EnumValueOptions>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readBool, name: 'deprecated' }],
           [
             999,
@@ -526,7 +528,7 @@ describe('traversal', () => {
       }
 
       export const decodeEnumValueDescriptorProto = defineMessage<EnumValueDescriptorProto>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
           [2, { type: 'scalar', decode: readInt32, name: 'number' }],
           [
@@ -579,7 +581,7 @@ describe('traversal', () => {
       }
 
       export const decodeEnumOptions = defineMessage<EnumOptions>(
-        new Map([
+        new Map<number, TagHandler>([
           [2, { type: 'scalar', decode: readBool, name: 'allowAlias' }],
           [3, { type: 'scalar', decode: readBool, name: 'deprecated' }],
           [
@@ -628,7 +630,7 @@ describe('traversal', () => {
       }
 
       export const decodeEnumReservedRange = defineMessage<EnumReservedRange>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readInt32, name: 'start' }],
           [2, { type: 'scalar', decode: readInt32, name: 'end' }],
         ])
@@ -664,7 +666,7 @@ describe('traversal', () => {
       }
 
       export const decodeEnumDescriptorProto = defineMessage<EnumDescriptorProto>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
           [
             2,
@@ -749,7 +751,7 @@ describe('traversal', () => {
       }
 
       export const decodeExtensionRangeOptions = defineMessage<ExtensionRangeOptions>(
-        new Map([
+        new Map<number, TagHandler>([
           [
             999,
             {
@@ -784,7 +786,7 @@ describe('traversal', () => {
       }
 
       export const decodeExtensionRange = defineMessage<ExtensionRange>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readInt32, name: 'start' }],
           [2, { type: 'scalar', decode: readInt32, name: 'end' }],
           [
@@ -832,7 +834,7 @@ describe('traversal', () => {
       }
 
       export const decodeOneofOptions = defineMessage<OneofOptions>(
-        new Map([
+        new Map<number, TagHandler>([
           [
             999,
             {
@@ -863,7 +865,7 @@ describe('traversal', () => {
       }
 
       export const decodeOneofDescriptorProto = defineMessage<OneofDescriptorProto>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
           [
             2,
@@ -910,7 +912,7 @@ describe('traversal', () => {
       }
 
       export const decodeMessageOptions = defineMessage<MessageOptions>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readBool, name: 'messageSetWireFormat' }],
           [2, { type: 'scalar', decode: readBool, name: 'noStandardDescriptorAccessor' }],
           [3, { type: 'scalar', decode: readBool, name: 'deprecated' }],
@@ -986,7 +988,7 @@ describe('traversal', () => {
       }
 
       export const decodeReservedRange = defineMessage<ReservedRange>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readInt32, name: 'start' }],
           [2, { type: 'scalar', decode: readInt32, name: 'end' }],
         ])
@@ -1024,7 +1026,7 @@ describe('traversal', () => {
       }
 
       export const decodeDescriptorProto = defineMessage<DescriptorProto>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
           [
             2,
@@ -1211,7 +1213,7 @@ describe('traversal', () => {
       }
 
       export const decodeMethodOptions = defineMessage<MethodOptions>(
-        new Map([
+        new Map<number, TagHandler>([
           [33, { type: 'scalar', decode: readBool, name: 'deprecated' }],
           [34, { type: 'scalar', decode: readEnum, name: 'idempotencyLevel' }],
           [
@@ -1282,7 +1284,7 @@ describe('traversal', () => {
       }
 
       export const decodeMethodDescriptorProto = defineMessage<MethodDescriptorProto>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
           [2, { type: 'scalar', decode: readString, name: 'inputType' }],
           [3, { type: 'scalar', decode: readString, name: 'outputType' }],
@@ -1362,7 +1364,7 @@ describe('traversal', () => {
       }
 
       export const decodeServiceOptions = defineMessage<ServiceOptions>(
-        new Map([
+        new Map<number, TagHandler>([
           [33, { type: 'scalar', decode: readBool, name: 'deprecated' }],
           [
             999,
@@ -1412,7 +1414,7 @@ describe('traversal', () => {
       }
 
       export const decodeServiceDescriptorProto = defineMessage<ServiceDescriptorProto>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
           [
             2,
@@ -1500,7 +1502,7 @@ describe('traversal', () => {
       }
 
       export const decodeFileOptions = defineMessage<FileOptions>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readString, name: 'javaPackage' }],
           [8, { type: 'scalar', decode: readString, name: 'javaOuterClassname' }],
           [10, { type: 'scalar', decode: readBool, name: 'javaMultipleFiles' }],
@@ -1723,7 +1725,7 @@ describe('traversal', () => {
       }
 
       export const decodeLocation = defineMessage<Location>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', isRepeat: true, decode: readInt32, name: 'path' }],
           [2, { type: 'scalar', isRepeat: true, decode: readInt32, name: 'span' }],
           [3, { type: 'scalar', decode: readString, name: 'leadingComments' }],
@@ -1767,7 +1769,7 @@ describe('traversal', () => {
       }
 
       export const decodeSourceCodeInfo = defineMessage<SourceCodeInfo>(
-        new Map([
+        new Map<number, TagHandler>([
           [
             1,
             {
@@ -1807,7 +1809,7 @@ describe('traversal', () => {
       }
 
       export const decodeFileDescriptorProto = defineMessage<FileDescriptorProto>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
           [2, { type: 'scalar', decode: readString, name: 'package' }],
           [3, { type: 'scalar', isRepeat: true, decode: readString, name: 'dependency' }],
@@ -1977,7 +1979,7 @@ describe('traversal', () => {
       }
 
       export const decodeFileDescriptorSet = defineMessage<FileDescriptorSet>(
-        new Map([
+        new Map<number, TagHandler>([
           [
             1,
             {
@@ -2013,7 +2015,7 @@ describe('traversal', () => {
       }
 
       export const decodeAnnotation = defineMessage<Annotation>(
-        new Map([
+        new Map<number, TagHandler>([
           [1, { type: 'scalar', isRepeat: true, decode: readInt32, name: 'path' }],
           [2, { type: 'scalar', decode: readString, name: 'sourceFile' }],
           [3, { type: 'scalar', decode: readInt32, name: 'begin' }],
@@ -2056,7 +2058,7 @@ describe('traversal', () => {
       }
 
       export const decodeGeneratedCodeInfo = defineMessage<GeneratedCodeInfo>(
-        new Map([
+        new Map<number, TagHandler>([
           [
             1,
             {

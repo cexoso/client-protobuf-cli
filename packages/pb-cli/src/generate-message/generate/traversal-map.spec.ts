@@ -29,6 +29,7 @@ describe('traversal', () => {
       import {
         readInt32,
         defineMessage,
+        TagHandler,
         EncoderWithoutTag,
         encodeInt32ToBuffer,
         defineMap,
@@ -42,7 +43,7 @@ describe('traversal', () => {
       }
 
       export const decodeBook = defineMessage<Book>(
-        new Map([[1, { type: 'scalar', decode: readInt32, name: 'id' }]])
+        new Map<number, TagHandler>([[1, { type: 'scalar', decode: readInt32, name: 'id' }]])
       )
 
       export const encodeBook: EncoderWithoutTag<Book> = ({ value, writer }) => {
@@ -62,7 +63,7 @@ describe('traversal', () => {
       }
 
       export const decodeDestination = defineMessage<Destination>(
-        new Map([
+        new Map<number, TagHandler>([
           [
             1,
             {
@@ -140,7 +141,7 @@ describe('traversal', () => {
       }
 
       export const decodeCRpcHead = defineMessage<CRpcHead>(
-        new Map([
+        new Map<number, TagHandler>([
           [
             1,
             {
