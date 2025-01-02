@@ -14,31 +14,65 @@ export class DecoderGenerater implements Generator {
     @inject(TSFilesManager) private filesManager: TSFilesManager,
     @inject(NameManager) private nameManager: NameManager
   ) {}
+
   generateEnumContent(_enumType: Enum): string {
     throw new Error('Method not implemented.')
   }
-  #mapUnionTypeToDecodeMethod(type: string, unionType: Type | Enum | null) {
+
+  #mapUnionTypeToDecodeMethod(
+    type: string,
+    unionType: Type | Enum | null
+  ): {
+    typeName: string
+    imports?: { absolutePath: string; member: string }[]
+  } {
     if (isScalarType(type)) {
-      return { typeName: mapScalarToDecodeMethod(type), file: '@protobuf-es/core' }
+      const typeName = mapScalarToDecodeMethod(type)
+      return {
+        typeName,
+        imports: [{ absolutePath: '@protobuf-es/core', member: typeName }],
+      }
     }
     if (unionType instanceof Enum) {
-      return { typeName: 'readEnum', file: '@protobuf-es/core' }
+      return {
+        typeName: 'readEnum',
+        imports: [{ absolutePath: '@protobuf-es/core', member: 'readEnum' }],
+      }
     }
 
     const typeName = this.#getDecoderName(unionType!)
+    const wrapResult = this.#wrapAsFunction(typeName)
     return {
-      typeName,
-      file: this.filesManager.getTSFileByUnionType(unionType!).finalTsAbsolutePath,
+      typeName: wrapResult.typeName,
+      imports: [
+        ...(wrapResult.imports ?? []),
+        {
+          absolutePath: this.filesManager.getTSFileByUnionType(unionType!).finalTsAbsolutePath,
+          member: typeName,
+        },
+      ],
     }
   }
 
   #getTypeName(type: Type | Enum) {
     return upperCaseFirst(this.nameManager.getUniqueName(type))
   }
+
   #getDecoderName(type: Type | Enum) {
     const typeName = this.#getTypeName(type)
     const name = 'decode' + typeName
     return name
+  }
+
+  #wrapAsFunction(decodeName: string): {
+    typeName: string
+    imports?: { absolutePath: string; member: string }[]
+  } {
+    const wrapAsFunction = `(reader: ReaderLike) => ${decodeName}(reader)`
+    return {
+      typeName: wrapAsFunction,
+      imports: [{ absolutePath: '@protobuf-es/core', member: 'ReaderLike' }],
+    }
   }
 
   #transformMapType(type: Type, field: MapField) {
@@ -48,10 +82,12 @@ export class DecoderGenerater implements Generator {
     const valueType = isScalarType(field.type) ? 'scalar' : 'message'
 
     originFile.addImport({ absolutePath: '@protobuf-es/core', member: 'defineMap' })
-
-    originFile.addImport({ absolutePath: keyReader.file, member: keyReader.typeName })
-
-    originFile.addImport({ absolutePath: valueReader.file, member: valueReader.typeName })
+    keyReader.imports?.forEach((importItem) => {
+      originFile.addImport(importItem)
+    })
+    valueReader.imports?.forEach((importItem) => {
+      originFile.addImport(importItem)
+    })
     const inlineDecoder = `defineMap({
       keyReader: ${keyReader.typeName},
       valueReader: ${valueReader.typeName},
@@ -71,8 +107,10 @@ export class DecoderGenerater implements Generator {
       config = `{ type: 'message', \ndecode: ${inLineDecoder}, \nname: '${name}', \nisMap: true }`
     } else if (isScalarType(field.type) || isEnum(field.resolvedType!)) {
       const method = this.#mapUnionTypeToDecodeMethod(field.type, field.resolvedType)
-      const { typeName, file } = method
-      originFile.addImport({ absolutePath: file, member: typeName })
+      const { typeName } = method
+      method.imports?.forEach((importItem) => {
+        originFile.addImport(importItem)
+      })
       config = `{ type: 'scalar', ${repeatedDescription}decode: ${typeName}, name: '${name}' }`
     } else {
       const decodeName = this.#getDecoderName(field.resolvedType!)
@@ -80,7 +118,11 @@ export class DecoderGenerater implements Generator {
         absolutePath: this.filesManager.getTSFileByUnionType(field.resolvedType!),
         member: decodeName,
       })
-      config = `{ type: 'message', ${repeatedDescription}decode: ${decodeName}, name: '${name}' }`
+      const wrapResult = this.#wrapAsFunction(decodeName)
+      wrapResult.imports?.forEach((importItem) => {
+        originFile.addImport(importItem)
+      })
+      config = `{ type: 'message', ${repeatedDescription}decode: ${wrapResult.typeName}, name: '${name}' }`
     }
     return `[${tag}, ${config}],`
   }

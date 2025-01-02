@@ -19,11 +19,10 @@ describe('traversal', () => {
     const messageGenerator = container.get(MessageGenerator)
     messageGenerator.generateAllCode(files)
     const filesManager = container.get(TSFilesManager)
-    const content = filesManager
-      .listAllFile()
-      .map((file) => file.toString())
-      .join('\n')
-    expect(content).toMatchInlineSnapshot(`
+    const content = filesManager.listAllFile()
+    expect(content).lengthOf(2)
+
+    expect(content[0]?.toString()).toMatchInlineSnapshot(`
       "// ./example.ts
       import {
         readUint32,
@@ -31,6 +30,7 @@ describe('traversal', () => {
         EncoderWithoutTag,
         encodeUint32ToBuffer,
         readInt64,
+        ReaderLike,
         encodeInt64ToBuffer,
         encodeMessageToBuffer,
         readInt32,
@@ -82,7 +82,14 @@ describe('traversal', () => {
       export const decodeGetDataReq = defineMessage<GetDataReq>(
         new Map([
           [1, { type: 'scalar', decode: readInt64, name: 'uid' }],
-          [2, { type: 'message', decode: decodePagination, name: 'pagination' }],
+          [
+            2,
+            {
+              type: 'message',
+              decode: (reader: ReaderLike) => decodePagination(reader),
+              name: 'pagination',
+            },
+          ],
         ])
       )
 
@@ -125,7 +132,7 @@ describe('traversal', () => {
           [2, { type: 'scalar', decode: readString, name: 'bookName' }],
           [3, { type: 'scalar', decode: readFloat, name: 'price' }],
           [4, { type: 'scalar', decode: readBool, name: 'isFavorite' }],
-          [5, { type: 'message', decode: decodePeople, name: 'author' }],
+          [5, { type: 'message', decode: (reader: ReaderLike) => decodePeople(reader), name: 'author' }],
           [6, { type: 'scalar', decode: readEnum, name: 'status' }],
         ])
       )
@@ -175,7 +182,17 @@ describe('traversal', () => {
       }
 
       export const decodeData = defineMessage<Data>(
-        new Map([[1, { type: 'message', isRepeat: true, decode: decodeBook, name: 'books' }]])
+        new Map([
+          [
+            1,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeBook(reader),
+              name: 'books',
+            },
+          ],
+        ])
       )
 
       export const encodeData: EncoderWithoutTag<Data> = ({ value, writer }) => {
@@ -199,7 +216,7 @@ describe('traversal', () => {
         new Map([
           [1, { type: 'scalar', decode: readInt32, name: 'code' }],
           [2, { type: 'scalar', decode: readString, name: 'message' }],
-          [3, { type: 'message', decode: decodeData, name: 'data' }],
+          [3, { type: 'message', decode: (reader: ReaderLike) => decodeData(reader), name: 'data' }],
         ])
       )
 
@@ -226,8 +243,10 @@ describe('traversal', () => {
           )
         }
       }
-
-      // ./people.ts
+      "
+    `)
+    expect(content[1]?.toString()).toMatchInlineSnapshot(`
+      "// ./people.ts
       import {
         readInt32,
         readString,

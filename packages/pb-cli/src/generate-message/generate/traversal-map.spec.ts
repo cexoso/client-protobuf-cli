@@ -33,6 +33,7 @@ describe('traversal', () => {
         encodeInt32ToBuffer,
         defineMap,
         readString,
+        ReaderLike,
         encodeMapToBuffer,
         encodeMessageToBuffer,
       } from '@protobuf-es/core'
@@ -94,7 +95,7 @@ describe('traversal', () => {
               type: 'message',
               decode: defineMap({
                 keyReader: readString,
-                valueReader: decodeBook,
+                valueReader: (reader: ReaderLike) => decodeBook(reader),
                 valueType: 'message',
               }),
               name: 'books',
@@ -139,7 +140,16 @@ describe('traversal', () => {
       }
 
       export const decodeCRpcHead = defineMessage<CRpcHead>(
-        new Map([[1, { type: 'message', decode: decodeDestination, name: 'destination' }]])
+        new Map([
+          [
+            1,
+            {
+              type: 'message',
+              decode: (reader: ReaderLike) => decodeDestination(reader),
+              name: 'destination',
+            },
+          ],
+        ])
       )
 
       export const encodeCRpcHead: EncoderWithoutTag<CRpcHead> = ({ value, writer }) => {

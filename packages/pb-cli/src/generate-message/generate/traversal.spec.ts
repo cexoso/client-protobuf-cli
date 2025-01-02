@@ -82,6 +82,7 @@ describe('traversal', () => {
         EncoderWithoutTag,
         encodeStringToBuffer,
         encodeBoolToBuffer,
+        ReaderLike,
         readUint64,
         readInt64,
         readDouble,
@@ -175,7 +176,15 @@ describe('traversal', () => {
 
       export const decodeUninterpretedOption = defineMessage<UninterpretedOption>(
         new Map([
-          [2, { type: 'message', isRepeat: true, decode: decodeNamePart, name: 'name' }],
+          [
+            2,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeNamePart(reader),
+              name: 'name',
+            },
+          ],
           [3, { type: 'scalar', decode: readString, name: 'identifierValue' }],
           [4, { type: 'scalar', decode: readUint64, name: 'positiveIntValue' }],
           [5, { type: 'scalar', decode: readInt64, name: 'negativeIntValue' }],
@@ -271,7 +280,7 @@ describe('traversal', () => {
             {
               type: 'message',
               isRepeat: true,
-              decode: decodeUninterpretedOption,
+              decode: (reader: ReaderLike) => decodeUninterpretedOption(reader),
               name: 'uninterpretedOption',
             },
           ],
@@ -371,7 +380,14 @@ describe('traversal', () => {
           [7, { type: 'scalar', decode: readString, name: 'defaultValue' }],
           [9, { type: 'scalar', decode: readInt32, name: 'oneofIndex' }],
           [10, { type: 'scalar', decode: readString, name: 'jsonName' }],
-          [8, { type: 'message', decode: decodeFieldOptions, name: 'options' }],
+          [
+            8,
+            {
+              type: 'message',
+              decode: (reader: ReaderLike) => decodeFieldOptions(reader),
+              name: 'options',
+            },
+          ],
         ])
       )
 
@@ -476,7 +492,7 @@ describe('traversal', () => {
             {
               type: 'message',
               isRepeat: true,
-              decode: decodeUninterpretedOption,
+              decode: (reader: ReaderLike) => decodeUninterpretedOption(reader),
               name: 'uninterpretedOption',
             },
           ],
@@ -513,7 +529,14 @@ describe('traversal', () => {
         new Map([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
           [2, { type: 'scalar', decode: readInt32, name: 'number' }],
-          [3, { type: 'message', decode: decodeEnumValueOptions, name: 'options' }],
+          [
+            3,
+            {
+              type: 'message',
+              decode: (reader: ReaderLike) => decodeEnumValueOptions(reader),
+              name: 'options',
+            },
+          ],
         ])
       )
 
@@ -564,7 +587,7 @@ describe('traversal', () => {
             {
               type: 'message',
               isRepeat: true,
-              decode: decodeUninterpretedOption,
+              decode: (reader: ReaderLike) => decodeUninterpretedOption(reader),
               name: 'uninterpretedOption',
             },
           ],
@@ -643,11 +666,31 @@ describe('traversal', () => {
       export const decodeEnumDescriptorProto = defineMessage<EnumDescriptorProto>(
         new Map([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
-          [2, { type: 'message', isRepeat: true, decode: decodeEnumValueDescriptorProto, name: 'value' }],
-          [3, { type: 'message', decode: decodeEnumOptions, name: 'options' }],
+          [
+            2,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeEnumValueDescriptorProto(reader),
+              name: 'value',
+            },
+          ],
+          [
+            3,
+            {
+              type: 'message',
+              decode: (reader: ReaderLike) => decodeEnumOptions(reader),
+              name: 'options',
+            },
+          ],
           [
             4,
-            { type: 'message', isRepeat: true, decode: decodeEnumReservedRange, name: 'reservedRange' },
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeEnumReservedRange(reader),
+              name: 'reservedRange',
+            },
           ],
           [5, { type: 'scalar', isRepeat: true, decode: readString, name: 'reservedName' }],
         ])
@@ -712,7 +755,7 @@ describe('traversal', () => {
             {
               type: 'message',
               isRepeat: true,
-              decode: decodeUninterpretedOption,
+              decode: (reader: ReaderLike) => decodeUninterpretedOption(reader),
               name: 'uninterpretedOption',
             },
           ],
@@ -744,7 +787,14 @@ describe('traversal', () => {
         new Map([
           [1, { type: 'scalar', decode: readInt32, name: 'start' }],
           [2, { type: 'scalar', decode: readInt32, name: 'end' }],
-          [3, { type: 'message', decode: decodeExtensionRangeOptions, name: 'options' }],
+          [
+            3,
+            {
+              type: 'message',
+              decode: (reader: ReaderLike) => decodeExtensionRangeOptions(reader),
+              name: 'options',
+            },
+          ],
         ])
       )
 
@@ -788,7 +838,7 @@ describe('traversal', () => {
             {
               type: 'message',
               isRepeat: true,
-              decode: decodeUninterpretedOption,
+              decode: (reader: ReaderLike) => decodeUninterpretedOption(reader),
               name: 'uninterpretedOption',
             },
           ],
@@ -815,7 +865,14 @@ describe('traversal', () => {
       export const decodeOneofDescriptorProto = defineMessage<OneofDescriptorProto>(
         new Map([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
-          [2, { type: 'message', decode: decodeOneofOptions, name: 'options' }],
+          [
+            2,
+            {
+              type: 'message',
+              decode: (reader: ReaderLike) => decodeOneofOptions(reader),
+              name: 'options',
+            },
+          ],
         ])
       )
 
@@ -863,7 +920,7 @@ describe('traversal', () => {
             {
               type: 'message',
               isRepeat: true,
-              decode: decodeUninterpretedOption,
+              decode: (reader: ReaderLike) => decodeUninterpretedOption(reader),
               name: 'uninterpretedOption',
             },
           ],
@@ -969,14 +1026,77 @@ describe('traversal', () => {
       export const decodeDescriptorProto = defineMessage<DescriptorProto>(
         new Map([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
-          [2, { type: 'message', isRepeat: true, decode: decodeFieldDescriptorProto, name: 'field' }],
-          [6, { type: 'message', isRepeat: true, decode: decodeFieldDescriptorProto, name: 'extension' }],
-          [3, { type: 'message', isRepeat: true, decode: decodeDescriptorProto, name: 'nestedType' }],
-          [4, { type: 'message', isRepeat: true, decode: decodeEnumDescriptorProto, name: 'enumType' }],
-          [5, { type: 'message', isRepeat: true, decode: decodeExtensionRange, name: 'extensionRange' }],
-          [8, { type: 'message', isRepeat: true, decode: decodeOneofDescriptorProto, name: 'oneofDecl' }],
-          [7, { type: 'message', decode: decodeMessageOptions, name: 'options' }],
-          [9, { type: 'message', isRepeat: true, decode: decodeReservedRange, name: 'reservedRange' }],
+          [
+            2,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeFieldDescriptorProto(reader),
+              name: 'field',
+            },
+          ],
+          [
+            6,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeFieldDescriptorProto(reader),
+              name: 'extension',
+            },
+          ],
+          [
+            3,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeDescriptorProto(reader),
+              name: 'nestedType',
+            },
+          ],
+          [
+            4,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeEnumDescriptorProto(reader),
+              name: 'enumType',
+            },
+          ],
+          [
+            5,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeExtensionRange(reader),
+              name: 'extensionRange',
+            },
+          ],
+          [
+            8,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeOneofDescriptorProto(reader),
+              name: 'oneofDecl',
+            },
+          ],
+          [
+            7,
+            {
+              type: 'message',
+              decode: (reader: ReaderLike) => decodeMessageOptions(reader),
+              name: 'options',
+            },
+          ],
+          [
+            9,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeReservedRange(reader),
+              name: 'reservedRange',
+            },
+          ],
           [10, { type: 'scalar', isRepeat: true, decode: readString, name: 'reservedName' }],
         ])
       )
@@ -1099,7 +1219,7 @@ describe('traversal', () => {
             {
               type: 'message',
               isRepeat: true,
-              decode: decodeUninterpretedOption,
+              decode: (reader: ReaderLike) => decodeUninterpretedOption(reader),
               name: 'uninterpretedOption',
             },
           ],
@@ -1166,7 +1286,14 @@ describe('traversal', () => {
           [1, { type: 'scalar', decode: readString, name: 'name' }],
           [2, { type: 'scalar', decode: readString, name: 'inputType' }],
           [3, { type: 'scalar', decode: readString, name: 'outputType' }],
-          [4, { type: 'message', decode: decodeMethodOptions, name: 'options' }],
+          [
+            4,
+            {
+              type: 'message',
+              decode: (reader: ReaderLike) => decodeMethodOptions(reader),
+              name: 'options',
+            },
+          ],
           [5, { type: 'scalar', decode: readBool, name: 'clientStreaming' }],
           [6, { type: 'scalar', decode: readBool, name: 'serverStreaming' }],
         ])
@@ -1242,7 +1369,7 @@ describe('traversal', () => {
             {
               type: 'message',
               isRepeat: true,
-              decode: decodeUninterpretedOption,
+              decode: (reader: ReaderLike) => decodeUninterpretedOption(reader),
               name: 'uninterpretedOption',
             },
           ],
@@ -1287,8 +1414,23 @@ describe('traversal', () => {
       export const decodeServiceDescriptorProto = defineMessage<ServiceDescriptorProto>(
         new Map([
           [1, { type: 'scalar', decode: readString, name: 'name' }],
-          [2, { type: 'message', isRepeat: true, decode: decodeMethodDescriptorProto, name: 'method' }],
-          [3, { type: 'message', decode: decodeServiceOptions, name: 'options' }],
+          [
+            2,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeMethodDescriptorProto(reader),
+              name: 'method',
+            },
+          ],
+          [
+            3,
+            {
+              type: 'message',
+              decode: (reader: ReaderLike) => decodeServiceOptions(reader),
+              name: 'options',
+            },
+          ],
         ])
       )
 
@@ -1384,7 +1526,7 @@ describe('traversal', () => {
             {
               type: 'message',
               isRepeat: true,
-              decode: decodeUninterpretedOption,
+              decode: (reader: ReaderLike) => decodeUninterpretedOption(reader),
               name: 'uninterpretedOption',
             },
           ],
@@ -1625,7 +1767,17 @@ describe('traversal', () => {
       }
 
       export const decodeSourceCodeInfo = defineMessage<SourceCodeInfo>(
-        new Map([[1, { type: 'message', isRepeat: true, decode: decodeLocation, name: 'location' }]])
+        new Map([
+          [
+            1,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeLocation(reader),
+              name: 'location',
+            },
+          ],
+        ])
       )
 
       export const encodeSourceCodeInfo: EncoderWithoutTag<SourceCodeInfo> = ({ value, writer }) => {
@@ -1661,12 +1813,58 @@ describe('traversal', () => {
           [3, { type: 'scalar', isRepeat: true, decode: readString, name: 'dependency' }],
           [10, { type: 'scalar', isRepeat: true, decode: readInt32, name: 'publicDependency' }],
           [11, { type: 'scalar', isRepeat: true, decode: readInt32, name: 'weakDependency' }],
-          [4, { type: 'message', isRepeat: true, decode: decodeDescriptorProto, name: 'messageType' }],
-          [5, { type: 'message', isRepeat: true, decode: decodeEnumDescriptorProto, name: 'enumType' }],
-          [6, { type: 'message', isRepeat: true, decode: decodeServiceDescriptorProto, name: 'service' }],
-          [7, { type: 'message', isRepeat: true, decode: decodeFieldDescriptorProto, name: 'extension' }],
-          [8, { type: 'message', decode: decodeFileOptions, name: 'options' }],
-          [9, { type: 'message', decode: decodeSourceCodeInfo, name: 'sourceCodeInfo' }],
+          [
+            4,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeDescriptorProto(reader),
+              name: 'messageType',
+            },
+          ],
+          [
+            5,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeEnumDescriptorProto(reader),
+              name: 'enumType',
+            },
+          ],
+          [
+            6,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeServiceDescriptorProto(reader),
+              name: 'service',
+            },
+          ],
+          [
+            7,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeFieldDescriptorProto(reader),
+              name: 'extension',
+            },
+          ],
+          [
+            8,
+            {
+              type: 'message',
+              decode: (reader: ReaderLike) => decodeFileOptions(reader),
+              name: 'options',
+            },
+          ],
+          [
+            9,
+            {
+              type: 'message',
+              decode: (reader: ReaderLike) => decodeSourceCodeInfo(reader),
+              name: 'sourceCodeInfo',
+            },
+          ],
           [12, { type: 'scalar', decode: readString, name: 'syntax' }],
         ])
       )
@@ -1780,7 +1978,15 @@ describe('traversal', () => {
 
       export const decodeFileDescriptorSet = defineMessage<FileDescriptorSet>(
         new Map([
-          [1, { type: 'message', isRepeat: true, decode: decodeFileDescriptorProto, name: 'file' }],
+          [
+            1,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeFileDescriptorProto(reader),
+              name: 'file',
+            },
+          ],
         ])
       )
 
@@ -1850,7 +2056,17 @@ describe('traversal', () => {
       }
 
       export const decodeGeneratedCodeInfo = defineMessage<GeneratedCodeInfo>(
-        new Map([[1, { type: 'message', isRepeat: true, decode: decodeAnnotation, name: 'annotation' }]])
+        new Map([
+          [
+            1,
+            {
+              type: 'message',
+              isRepeat: true,
+              decode: (reader: ReaderLike) => decodeAnnotation(reader),
+              name: 'annotation',
+            },
+          ],
+        ])
       )
 
       export const encodeGeneratedCodeInfo: EncoderWithoutTag<GeneratedCodeInfo> = ({
