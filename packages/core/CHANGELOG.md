@@ -1,5 +1,11 @@
 # @protobuf-es/core
 
+## 0.0.11
+
+### Patch Changes
+
+- c455db4: add TagHandler type export
+
 ## 0.0.10
 
 ### Patch Changes

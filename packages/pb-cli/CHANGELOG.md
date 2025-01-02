@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.22
+
+### Patch Changes
+
+- 7ab2056: 生成器现在会标 decode 的类型，以减少编译类型报错的问题
+
 ## 0.0.21
 
 ### Patch Changes
