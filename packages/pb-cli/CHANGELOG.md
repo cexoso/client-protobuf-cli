@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.21
+
+### Patch Changes
+
+- 2cd1ce9: 修复循环嵌套导致的依赖未定义变量的问题
+
 ## 0.0.20
 
 ### Patch Changes
