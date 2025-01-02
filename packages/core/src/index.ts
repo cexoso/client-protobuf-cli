@@ -1,4 +1,4 @@
-export { defineMessage, defineMap } from './decode'
+export { defineMessage, defineMap, TagHandler } from './decode'
 export {
   readInt32,
   createReader,

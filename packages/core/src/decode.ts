@@ -1,7 +1,7 @@
 import { forkReader, ReaderLike, readTag, readUint32, skip } from './reader'
 import { WireType } from './wire-type'
 
-interface TagHandler {
+export interface TagHandler {
   decode: (...o: any) => any
   type: 'scalar' | 'message'
   isRepeat?: boolean
