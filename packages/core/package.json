@@ -7,7 +7,7 @@
     "linkDirectory": false
   },
   "files": [
-    "dist/**/*"
+    "src/**/*"
   ],
   "main": "src/index.ts",
   "repository": "https://github.com/cexoso/client-protobuf-cli",
