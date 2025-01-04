@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.11
+
+### Patch Changes
+
+- 0661976: support sideEffect
+
 ## 0.0.10
 
 ### Patch Changes
