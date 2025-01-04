@@ -1,6 +1,6 @@
 {
   "name": "@protobuf-es/core",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "",
   "publishConfig": {
     "directory": "dist",
