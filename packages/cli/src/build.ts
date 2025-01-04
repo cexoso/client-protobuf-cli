@@ -26,11 +26,7 @@ function createPkg(format: string[]) {
     const main = pkg.publishConfig?.main ?? pkg.main ?? 'index.js'
 
     const newPkg: Package = {
-      name: pkg.name,
-      dependencies: pkg.dependencies,
-      repository: pkg.repository,
-      license: pkg.license,
-      version: pkg.version,
+      ...pkg,
     }
 
     if (hasCommonJS) {

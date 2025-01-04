@@ -18,6 +18,7 @@
     "release": "npm run ts-lint && vitest --run && npm run build",
     "prepublishOnly": "npm run release"
   },
+  "sideEffects": false,
   "keywords": [],
   "author": "",
   "license": "MIT",
