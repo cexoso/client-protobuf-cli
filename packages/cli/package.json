@@ -1,6 +1,6 @@
 {
   "name": "@cexoso/ts-pkg-build",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "license": "MIT",
   "publishConfig": {
     "directory": "dist",

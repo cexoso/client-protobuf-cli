@@ -1,5 +1,12 @@
 # cli
 
+## 0.0.13
+
+### Patch Changes
+
+- 810110a: declare babel/types dependency
+- b541ed2: 支持重写 exports
+
 ## 0.0.12
 
 ### Patch Changes
