@@ -26,6 +26,9 @@ importers:
       '@babel/traverse':
         specifier: ^7.26.4
         version: 7.26.4
+      '@babel/types':
+        specifier: ^7.26.3
+        version: 7.26.3
       '@types/babel__generator':
         specifier: ^7.6.8
         version: 7.6.8
