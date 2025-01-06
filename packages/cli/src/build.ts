@@ -52,6 +52,18 @@ function createPkg(format: string[]) {
       }
     }
 
+    if (pkg.exports) {
+      // 这里只能处理类型，以下结构类型的
+      // "exports": {
+      // ".": "./dist/index.js",
+      // "./package": "./package.json",
+      // "./package.json": "./package.json",
+      // }
+      for (const [k, v] of Object.entries(pkg.exports)) {
+        pkg.exports[k] = transformTo(v as string, hasCommonJS ? '.js' : '.mjs')
+      }
+    }
+
     writeFileSync('./dist/package.json', JSON.stringify(newPkg, null, 2))
   }
 }
