@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.15
+
+### Patch Changes
+
+- a8bca46: 修复当不包含 d.ts 文件时，会出现编译类型缺失报错的问题
+
 ## 0.0.14
 
 ### Patch Changes
