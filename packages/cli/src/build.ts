@@ -64,6 +64,14 @@ function createPkg(format: string[]) {
       }
     }
 
+    if (process.env['CHANGE_LINK_DIRECTORY'] === 'true') {
+
+      // 这个改动是用于修复 pnpm deploy 时不会应用 publishConfig 的bug
+      if (pkg.publishConfig) {
+        pkg.publishConfig.linkDirectory = true
+      }
+      writeFileSync('./package.json', JSON.stringify(pkg, null, 2))
+    }
     writeFileSync('./dist/package.json', JSON.stringify(newPkg, null, 2))
   }
 }
