@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.14
+
+### Patch Changes
+
+- b9064cc: 支持 pnpm 内使用环境变量构建，deploy 后能依赖到构建后的目录
+
 ## 0.0.13
 
 ### Patch Changes
