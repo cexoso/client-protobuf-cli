@@ -65,7 +65,6 @@ function createPkg(format: string[]) {
     }
 
     if (process.env['CHANGE_LINK_DIRECTORY'] === 'true') {
-
       // 这个改动是用于修复 pnpm deploy 时不会应用 publishConfig 的bug
       if (pkg.publishConfig) {
         pkg.publishConfig.linkDirectory = true
@@ -81,7 +80,7 @@ function buildESM() {
     module: 'esnext',
     moduleResolution: 'node',
   })
-  return src(['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts', '!dist/**/*', '!node_modules/**/*'])
+  return src(['**/*.ts', '!**/*.spec.ts', '!dist/**/*', '!node_modules/**/*'])
     .pipe(tsProject())
     .pipe(transformAllJsFileTask())
     .pipe(dest('./dist'))
@@ -97,7 +96,7 @@ function buildCommonJS() {
     module: 'CommonJS',
     moduleResolution: 'node',
   })
-  return src(['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts', '!dist/**/*', '!node_modules/**/*'])
+  return src(['**/*.ts', '!**/*.spec.ts', '!dist/**/*', '!node_modules/**/*'])
     .pipe(tsProject())
     .pipe(dest('./dist'))
 }
