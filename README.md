@@ -8,9 +8,6 @@
 
 - core，实现了 PB 编解码逻辑
 - pb-cli，实现代码生成逻辑，pb-cli 会将 proto 生成调用包
-- client（example）,用于演示的前端代码
-- gateway（example）,用于演示的网关代码。网关的作用主要是为了将流量透传到对应的微服务上
-- example（example）,示例 proto 生成的 npm 包，client 会直接调用该包发请求
 
 # 安装
 
