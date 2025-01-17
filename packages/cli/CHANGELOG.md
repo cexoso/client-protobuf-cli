@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.16
+
+### Patch Changes
+
+- d82951f: 支持编译时自动嗅探到目标文件
+
 ## 0.0.15
 
 ### Patch Changes
