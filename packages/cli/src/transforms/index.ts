@@ -11,7 +11,7 @@ export function transformAllJsFileTask() {
     file.path = transform(path)
     const content = file.contents.toString()
     if (extname(path) === '.js') {
-      file.contents = Buffer.from(transformContent(content))
+      file.contents = Buffer.from(transformContent(content, path))
     }
 
     cb(null, file)

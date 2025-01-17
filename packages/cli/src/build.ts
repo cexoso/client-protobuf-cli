@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs'
 import ts from 'gulp-typescript'
 import { series, parallel, src, dest } from 'gulp'
 import { transformTo } from './transforms/transform-path'
-import { transformAllJsFileTask } from './transforms/index'
+import { transformAllJsFileTask } from './transforms'
 import { deleteAsync } from './clean'
 
 interface Package {
