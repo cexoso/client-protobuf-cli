@@ -25,7 +25,7 @@ export class TSFilesManager {
   #transformToFinalTSAbsolutePath(path: string) {
     const absolutePath = this.#pathToKey(path)
     let x = relative(this.projectInfo.pbRootPath, absolutePath)
-    const result = join(this.projectInfo.projectRoot, x)
+    const result = join(this.projectInfo.basepath, x)
     return this.#transformExtToTs(result)
   }
   // 获取或创建一个相对当前文件的新文件
@@ -44,7 +44,7 @@ export class TSFilesManager {
     let file = this.#files.get(finalTSAbsolutePath)
     if (!file) {
       file = new File(finalTSAbsolutePath, {
-        projectRoot: this.projectInfo.projectRoot,
+        projectRoot: this.projectInfo.basepath,
         pbRootPath: this.projectInfo.pbRootPath,
       })
       this.#files.set(finalTSAbsolutePath, file)
@@ -52,7 +52,7 @@ export class TSFilesManager {
     return file
   }
   getFileByTs(path: string): File | undefined {
-    const absolutePath = isAbsolute(path) ? path : join(this.projectInfo.projectRoot, path)
+    const absolutePath = isAbsolute(path) ? path : join(this.projectInfo.basepath, path)
     const key = this.#transformExtToTs(absolutePath)
 
     return this.#files.get(key)
@@ -71,14 +71,14 @@ export class TSFilesManager {
   }
 
   #cleanAndMakeOutDir() {
-    if (existsSync(this.projectInfo.projectRoot)) {
+    if (existsSync(this.projectInfo.basepath)) {
       // 这个命令有点危险，我不确定要不要检查 projectRoot 是一个合法的目录
-      rmSync(this.projectInfo.projectRoot, {
+      rmSync(this.projectInfo.basepath, {
         recursive: true,
         force: true,
       })
     }
-    mkdirSync(this.projectInfo.projectRoot, { recursive: true })
+    mkdirSync(this.projectInfo.basepath, { recursive: true })
   }
 
   #makeSureDirExists(dirName: string) {

@@ -11,7 +11,7 @@ describe('files', async () => {
     const container = createContainer()
     const projectInfo = container.get(ProjectInfo)
     projectInfo.setPbRootPath(root)
-    projectInfo.setProjectRoot('./src')
+    projectInfo.setBasepath('./src')
     const filesManager = container.get(TSFilesManager)
     const x = filesManager.getTSFileByProtoPath('./x.proto')
     x.addImport({
@@ -52,7 +52,7 @@ describe('files', async () => {
     const container = createContainer()
     const filesManager = container.get(TSFilesManager)
     const projectInfo = container.get(ProjectInfo)
-    projectInfo.setProjectRoot('./src')
+    projectInfo.setBasepath('./src')
     projectInfo.setPbRootPath(join(__dirname, '../../test-protos'))
     const x = filesManager.getTSFileByProtoPath('./dir1/x.proto')
     const y = filesManager.getTSFileByProtoPath('./dir2/y.proto')

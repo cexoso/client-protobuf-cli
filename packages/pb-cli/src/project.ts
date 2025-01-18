@@ -6,8 +6,10 @@ import { isAbsolute, join } from 'path'
 export class ProjectInfo {
   // PB 存放的位置
   #pbRootPath: string = ''
-  // 最后产物生成的项目位置
-  #projectRoot: string = ''
+
+  // 文件会基于当前值生成基础路径
+  // 这个基础路径是可以在生成过程中修改的
+  #basepath: string = ''
   #getPathSafely(path: string, ignoreNotFound: boolean = false) {
     const absolutePath = isAbsolute(path)
       ? path
@@ -34,10 +36,10 @@ export class ProjectInfo {
   get pbRootPath() {
     return this.#pbRootPath
   }
-  setProjectRoot(path: string) {
-    this.#projectRoot = this.#getPathSafely(path, true)
+  setBasepath(path: string) {
+    this.#basepath = this.#getPathSafely(path, true)
   }
-  get projectRoot() {
-    return this.#projectRoot
+  get basepath() {
+    return this.#basepath
   }
 }

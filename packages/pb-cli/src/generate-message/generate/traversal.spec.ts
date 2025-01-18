@@ -14,7 +14,7 @@ describe('traversal', () => {
     const pbLoader = container.get(PBLoader)
     const projectInfo = container.get(ProjectInfo)
     projectInfo.setPbRootPath(root)
-    projectInfo.setProjectRoot('./src')
+    projectInfo.setBasepath('./src')
     const files = await pbLoader.loadByPath('**/srpc.proto')
     const messageGenerator = container.get(MessageGenerator)
     messageGenerator.generateAllCode(files)
@@ -2094,7 +2094,7 @@ describe('traversal', () => {
     const pbLoader = container.get(PBLoader)
     const projectInfo = container.get(ProjectInfo)
     projectInfo.setPbRootPath(root)
-    projectInfo.setProjectRoot('./src')
+    projectInfo.setBasepath('./src')
     const files = await pbLoader.loadByPath('nestle-duplicate-message.proto')
     const [_, pbRoot] = [...files.entries()][0]!
     const messageGenerator = container.get(MessageGenerator)

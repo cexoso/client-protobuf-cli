@@ -42,7 +42,7 @@ export class Command {
     typeFullnameRegExp?: RegExp | string
   }) {
     this.projectInfo.setPbRootPath(opts.protoDir)
-    this.projectInfo.setProjectRoot(opts.outDir)
+    this.projectInfo.setBasepath(opts.outDir)
     const glob = opts.protoGlob ?? '**/*.proto'
     this.files = await this.loader.loadByPath(glob)
     this.messageGenerator.generateAllCode(this.files, {

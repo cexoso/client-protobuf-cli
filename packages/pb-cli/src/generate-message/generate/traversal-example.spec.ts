@@ -14,7 +14,7 @@ describe('traversal', () => {
     const pbLoader = container.get(PBLoader)
     const projectInfo = container.get(ProjectInfo)
     projectInfo.setPbRootPath(root)
-    projectInfo.setProjectRoot('./src')
+    projectInfo.setBasepath('./src')
     const files = await pbLoader.loadByPath('example.proto')
     const messageGenerator = container.get(MessageGenerator)
     messageGenerator.generateAllCode(files)
