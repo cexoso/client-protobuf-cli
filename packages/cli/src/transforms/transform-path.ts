@@ -1,18 +1,20 @@
-import { extname, relative, dirname } from 'path'
-import { Module } from 'module'
+import { extname, relative, dirname, join } from 'path'
+import { statSync, existsSync } from 'fs'
+
+function isDirectory(path: string) {
+  if (!existsSync(path)) {
+    return false
+  }
+
+  return statSync(path).isDirectory()
+}
 
 function customResolve(moduleName: string, basedir: string) {
-  try {
-    // @ts-ignore
-    return Module._resolveFilename(moduleName, {
-      id: basedir,
-      filename: basedir,
-      // @ts-ignore
-      paths: Module._nodeModulePaths(basedir),
-    })
-  } catch (err) {
-    return null
+  const path = join(dirname(basedir), moduleName)
+  if (isDirectory(path)) {
+    return join(path, 'index.mjs')
   }
+  return path
 }
 
 export function transformPath(pairs: Record<string, string>) {
