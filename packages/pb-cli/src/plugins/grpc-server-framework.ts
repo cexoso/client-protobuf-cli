@@ -1,9 +1,14 @@
+import { join } from 'path'
 import { Plugin } from '../command/command'
 import dedent from 'ts-dedent'
 
 export const GrpcServerFramework = (): Plugin => {
   return {
+    beforeGenerate(ctx) {
+      ctx.updateBasepath((originpath) => join(originpath, './message'))
+    },
     afterGenerate(ctx) {
+      ctx.updateBasepath((originpath) => originpath)
       const { filesManager, messageGenerator, getAllService } = ctx
 
       const services = getAllService()

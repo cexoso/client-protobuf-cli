@@ -8,6 +8,10 @@ import { getFilenameByType } from '../generate-message/get-filename-by-type'
 
 @injectable()
 export class TSFilesManager {
+  // 这是因为 command 现在支持动态修改，文件生成路径了，但是为了使用者方便
+  // 在特定的 api 上，我希望可以使用记录还原之前的路径，所以需要添加该对象记录
+  // 这个属性应该应用在 type 等统一标识对路径的映射上
+  #pathToAbsolutePathMap = new Map<string, string>()
   #files = new Map<string, File>()
   constructor(@inject(ProjectInfo) private projectInfo: ProjectInfo) {}
   #pathToKey(path: string) {
@@ -36,8 +40,23 @@ export class TSFilesManager {
     const finalTSAbsolutePath = join(file.finalTsAbsolutePath, '..', relativePath)
     return this.#getOrCreateFile(finalTSAbsolutePath)
   }
-  public getTSFileByProtoPath(path: string) {
-    const finalTSAbsolutePath = this.#transformToFinalTSAbsolutePath(path)
+  public getTSFileByProtoPath(path: string, record = false) {
+    // 是相对路径
+    let finalTSAbsolutePath = this.#pathToAbsolutePathMap.get(path)
+
+    if (finalTSAbsolutePath) {
+      // 且命中了之前的记录
+      return this.#getOrCreateFile(finalTSAbsolutePath)
+    }
+
+    // 到这里都是没有办法命中记录的
+    finalTSAbsolutePath = this.#transformToFinalTSAbsolutePath(path)
+
+    if (record) {
+      // 如果需要记录，且传入的是相对路径时，对需要记录
+      this.#pathToAbsolutePathMap.set(path, finalTSAbsolutePath)
+    }
+
     return this.#getOrCreateFile(finalTSAbsolutePath)
   }
   #getOrCreateFile(finalTSAbsolutePath: string) {
@@ -102,7 +121,7 @@ export class TSFilesManager {
   }
 
   public getTSFileByUnionType(type: Type | Field | MapField | Enum) {
-    return this.getTSFileByProtoPath(getFilenameByType(type))
+    return this.getTSFileByProtoPath(getFilenameByType(type), true)
   }
 
   public renderAllFileToDir(opts: {
