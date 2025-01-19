@@ -27,6 +27,63 @@ describe('grpc server framework, 为自己写的 grpc 框架生成代码', () =>
     const allFile = files.map((file) => file.toString())
 
     expect(files[0]?.fileNameWithProject).eq('./helloworld.ts')
-    expect(allFile).lengthOf(2)
+    expect(allFile).lengthOf(5)
+    expect(allFile.at(1)?.toString()).toMatchInlineSnapshot(`
+      "// ./message/index.ts
+      import { MetaDataManager } from '@protobuf-es/grpc-frame-work'
+      import { decodeHelloRequest, encodeHelloReply } from './helloworld'
+      import { wrapDecode, wrapEncode } from '@protobuf-es/core'
+      export const metadataManager = new MetaDataManager()
+      metadataManager.setMetaData('helloworld.Greeter', 'SayHello', {
+        requestDecoder: wrapDecode(decodeHelloRequest),
+        responseEncoder: wrapEncode(encodeHelloReply),
+      })
+      export const getMetadata: MetadataManager['getMetadata'] =
+        metadataManager.getMetadata.bind(metadataManager)
+      "
+    `)
+    expect(allFile.at(2)?.toString()).toMatchInlineSnapshot(`
+      "// ./index.ts
+      import { createModule } from '@protobuf-es/grpc-frame-work'
+      import { Greeter as helloworldGreeter } from './helloworld/greeter'
+      /**
+       ****************************************
+       * 命令行生成的文件，不要直接修改该文件 *
+       ****************************************
+       */
+      export const microservicesModule = createModule(() => {
+        return {
+          injectables: [helloworldGreeter],
+        }
+      })
+      "
+    `)
+    expect(allFile.at(3)?.toString()).toMatchInlineSnapshot(`
+      "// ./helloworld/greeter.ts
+      import { Controller, GrpcMethod } from '@protobuf-es/grpc-frame-work'
+      import { GreeterInterface } from './greeter-interface'
+      import { HelloRequest, HelloReply } from '../../message/helloworld'
+      @Controller('helloworld.Greeter')
+      export class Greeter implements GreeterInterface {
+        @GrpcMethod('SayHello')
+        public sayHello(_input: HelloRequest): HelloReply {
+          throw new Error('TO IMPLEMENTS')
+        }
+      }
+      "
+    `)
+    expect(allFile.at(4)?.toString()).toMatchInlineSnapshot(`
+      "// ./helloworld/greeter-interface.ts
+      import { HelloRequest, HelloReply } from '../../message/helloworld'
+      /**
+       ****************************************
+       * 命令行生成的文件，不要直接修改该文件 *
+       ****************************************
+       */
+      export interface GreeterInterface {
+        sayHello: (input: HelloRequest) => HelloReply
+      }
+      "
+    `)
   })
 })
