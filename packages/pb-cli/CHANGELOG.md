@@ -1,5 +1,12 @@
 # @protobuf-es/cli
 
+## 0.0.23
+
+### Patch Changes
+
+- 05d0c3c: 支持 grpc framework 的生成逻辑
+- 8754568: add grpc server framework code generate plugin
+
 ## 0.0.22
 
 ### Patch Changes

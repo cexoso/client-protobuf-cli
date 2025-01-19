@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.17
+
+### Patch Changes
+
+- 2f8c274: 修复 exports 生成逻辑
+
 ## 0.0.16
 
 ### Patch Changes
