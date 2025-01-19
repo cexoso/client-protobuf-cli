@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'fs'
 import ts from 'gulp-typescript'
+import { extname } from 'path'
 import { series, parallel, src, dest } from 'gulp'
 import { transformTo } from './transforms/transform-path'
 import { transformAllJsFileTask } from './transforms'
@@ -60,7 +61,21 @@ function createPkg(format: string[]) {
       // "./package.json": "./package.json",
       // }
       for (const [k, v] of Object.entries(pkg.exports)) {
-        pkg.exports[k] = transformTo(v as string, hasCommonJS ? '.js' : '.mjs')
+        if (typeof v === 'string') {
+          if (extname(v) === '.json') {
+            continue
+          }
+          if (format.length !== 1) {
+            pkg.exports[k] = {
+              require: transformTo(v, '.js'),
+              import: transformTo(v, '.mjs'),
+            }
+          } else {
+            pkg.exports[k] = transformTo(v, hasCommonJS ? '.js' : '.mjs')
+          }
+        } else {
+          throw new Error(`暂不支持的 exports 配置：${pkg.exports}, name: ${pkg.name}`)
+        }
       }
     }
 
