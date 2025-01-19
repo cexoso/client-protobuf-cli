@@ -4,6 +4,16 @@ import { isAbsolute, join } from 'path'
 
 @injectable()
 export class ProjectInfo {
+  // 脚本一开始设置的项目路径
+  #originProjectPath: string | undefined = undefined
+
+  get originProjectPath() {
+    if (this.#originProjectPath === undefined) {
+      // 这个设置是框架保证的
+      throw new Error('you should set project path first')
+    }
+    return this.#originProjectPath
+  }
   // PB 存放的位置
   #pbRootPath: string = ''
 
@@ -38,6 +48,9 @@ export class ProjectInfo {
   }
   setBasepath(path: string) {
     this.#basepath = this.#getPathSafely(path, true)
+    if (this.#originProjectPath === undefined) {
+      this.#originProjectPath = this.#basepath
+    }
   }
   get basepath() {
     return this.#basepath

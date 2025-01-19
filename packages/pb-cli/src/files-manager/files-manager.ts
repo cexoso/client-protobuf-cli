@@ -29,14 +29,14 @@ export class TSFilesManager {
     return this.#transformExtToTs(result)
   }
   // 获取或创建一个相对当前文件的新文件
-  getNewFileByRelativePathWithCurrentFile(file: File, relativePath: string) {
+  public getNewFileByRelativePathWithCurrentFile(file: File, relativePath: string) {
     if (isAbsolute(relativePath)) {
       throw new Error(`only support relative path, by get ${relativePath}`)
     }
     const finalTSAbsolutePath = join(file.finalTsAbsolutePath, '..', relativePath)
     return this.#getOrCreateFile(finalTSAbsolutePath)
   }
-  getTSFileByProtoPath(path: string) {
+  public getTSFileByProtoPath(path: string) {
     const finalTSAbsolutePath = this.#transformToFinalTSAbsolutePath(path)
     return this.#getOrCreateFile(finalTSAbsolutePath)
   }
@@ -51,6 +51,7 @@ export class TSFilesManager {
     }
     return file
   }
+
   getFileByTs(path: string): File | undefined {
     const absolutePath = isAbsolute(path) ? path : join(this.projectInfo.basepath, path)
     const key = this.#transformExtToTs(absolutePath)
@@ -93,17 +94,18 @@ export class TSFilesManager {
     }
     console.log(`${dirName} 已经存在，且不是一个有效的目录`)
   }
-  writeFileWithCreateDir(absolutePath: string, content: string) {
+
+  #writeFileWithCreateDir(absolutePath: string, content: string) {
     const dirName = dirname(absolutePath)
     this.#makeSureDirExists(dirName)
     writeFileSync(absolutePath, content)
   }
 
-  getTSFileByUnionType(type: Type | Field | MapField | Enum) {
+  public getTSFileByUnionType(type: Type | Field | MapField | Enum) {
     return this.getTSFileByProtoPath(getFilenameByType(type))
   }
 
-  renderAllFileToDir(opts: {
+  public renderAllFileToDir(opts: {
     verbose?: boolean
     dryRun?: boolean
     autoClean?: boolean
@@ -121,7 +123,7 @@ export class TSFilesManager {
         return
       }
 
-      this.writeFileWithCreateDir(
+      this.#writeFileWithCreateDir(
         path,
         file.getBody({
           formatWithCurrentPrettier: opts.withPrettier,

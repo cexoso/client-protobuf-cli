@@ -13,9 +13,12 @@ export interface Context {
   interfaceGenerater: InterfaceGenerater
   messageGenerator: MessageGenerator
   getAllService: () => Service[]
+  // 根据文件生成的基础路径，这个能力是用于插件修改不同类型文件生成目录的
+  updateBasepath: (callback: (originProjectPath: string) => string) => void
 }
 export interface Plugin {
   afterGenerate?: (context: Context) => void
+  beforeGenerate?: (context: Context) => void
 }
 
 @injectable()
@@ -43,6 +46,7 @@ export class Command {
   }) {
     this.projectInfo.setPbRootPath(opts.protoDir)
     this.projectInfo.setBasepath(opts.outDir)
+    this.#callPlugin('beforeGenerate')
     const glob = opts.protoGlob ?? '**/*.proto'
     this.files = await this.loader.loadByPath(glob)
     this.messageGenerator.generateAllCode(this.files, {
@@ -64,6 +68,10 @@ export class Command {
       files,
       interfaceGenerater: this.interfaceGenerater,
       messageGenerator: this.messageGenerator,
+      updateBasepath: (callback) => {
+        const nextPath = callback(this.projectInfo.originProjectPath)
+        this.projectInfo.setBasepath(nextPath)
+      },
       getAllService: function (): Service[] {
         const serviceMap = new Map<string, Service>()
         for (const [_, root] of files) {
