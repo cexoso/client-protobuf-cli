@@ -1,5 +1,6 @@
 import { createContainer } from './container'
 import { Command } from './command/command'
+export { GrpcServerFramework } from './plugins/grpc-server-framework'
 export { getAllService } from './generate-message/get-all-type'
 export type { Plugin, Context } from './command/command'
 

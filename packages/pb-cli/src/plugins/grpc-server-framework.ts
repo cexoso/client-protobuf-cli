@@ -151,7 +151,7 @@ export const GrpcServerFramework = (): Plugin => {
       ctx.updateBasepath((originpath) => join(originpath, messagePath))
     },
     afterGenerate(ctx) {
-      const { file: index } = generateIndex(ctx)
+      generateIndex(ctx)
       generateBusiness(ctx)
     },
   }

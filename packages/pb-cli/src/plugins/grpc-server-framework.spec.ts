@@ -21,7 +21,7 @@ describe('grpc server framework, 为自己写的 grpc 框架生成代码', () =>
       autoClean: true,
       withPrettier: true,
       // 把这个改成 false, 会真实的在 dist 目录输出文件
-      dryRun: false,
+      dryRun: true,
     })
 
     const allFile = files.map((file) => file.toString())
