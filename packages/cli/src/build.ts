@@ -93,8 +93,8 @@ function createPkg(format: string[]) {
 
 function buildESM() {
   const tsProject = ts.createProject('tsconfig.json', {
-    module: 'esnext',
-    moduleResolution: 'node',
+    module: 'node16',
+    moduleResolution: 'node16',
   })
   return src(['**/*.ts', '!**/*.spec.ts', '!dist/**/*', '!node_modules/**/*'])
     .pipe(tsProject())
