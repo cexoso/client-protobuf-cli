@@ -24,17 +24,18 @@ function createPkg(format: string[]) {
   return () => {
     const pkg = JSON.parse(readFileSync('./package.json').toString())
 
-    const main = pkg.publishConfig?.main ?? pkg.main ?? 'index.js'
+    const main = pkg.publishConfig?.main ?? pkg.main ?? ''
+    const module = pkg.publishConfig?.module ?? pkg.module ?? ''
 
     const newPkg: Package = {
       ...pkg,
     }
 
-    if (hasCommonJS) {
+    if (hasCommonJS && main) {
       newPkg.main = transformTo(main, '.js')
     }
 
-    if (hasESM) {
+    if (hasESM && module) {
       newPkg.module = transformTo(main, '.mjs')
     }
 
