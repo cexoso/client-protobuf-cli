@@ -3,8 +3,7 @@
   "version": "0.0.23",
   "publishConfig": {
     "directory": "dist",
-    "linkDirectory": false,
-    "main": "src/index.js"
+    "linkDirectory": false
   },
   "scripts": {
     "test": "vitest --reporter=dot",
@@ -13,10 +12,7 @@
     "release": "npm run ts-lint && vitest --run && npm run build",
     "prepublishOnly": "npm run release"
   },
-  "main": "src/index.js",
-  "files": [
-    "dist/**/*"
-  ],
+  "main": "src/index.ts",
   "license": "MIT",
   "dependencies": {
     "@prettier/sync": "^0.5.2",
