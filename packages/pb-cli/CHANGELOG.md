@@ -1,5 +1,11 @@
 # @protobuf-es/cli
 
+## 0.0.24
+
+### Patch Changes
+
+- 70e05af: update main
+
 ## 0.0.23
 
 ### Patch Changes
