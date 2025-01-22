@@ -29,7 +29,7 @@ describe('grpc server framework, 为自己写的 grpc 框架生成代码', () =>
     expect(files[0]?.fileNameWithProject).eq('./helloworld.ts')
     expect(allFile).lengthOf(5)
     expect(allFile.at(1)?.toString()).toMatchInlineSnapshot(`
-      "// ./message/index.ts
+      "// ./messages/index.ts
       import { MetaDataManager } from '@protobuf-es/grpc-frame-work'
       import { decodeHelloRequest, encodeHelloReply } from './helloworld'
       import { wrapDecode, wrapEncode } from '@protobuf-es/core'
@@ -62,7 +62,7 @@ describe('grpc server framework, 为自己写的 grpc 框架生成代码', () =>
       "// ./helloworld/greeter.ts
       import { Controller, GrpcMethod } from '@protobuf-es/grpc-frame-work'
       import { GreeterInterface } from './greeter-interface'
-      import { HelloRequest, HelloReply } from '../../message/helloworld'
+      import { HelloRequest, HelloReply } from '../../messages/helloworld'
       @Controller('helloworld.Greeter')
       export class Greeter implements GreeterInterface {
         @GrpcMethod('SayHello')
@@ -74,7 +74,7 @@ describe('grpc server framework, 为自己写的 grpc 框架生成代码', () =>
     `)
     expect(allFile.at(4)?.toString()).toMatchInlineSnapshot(`
       "// ./helloworld/greeter-interface.ts
-      import { HelloRequest, HelloReply } from '../../message/helloworld'
+      import { HelloRequest, HelloReply } from '../../messages/helloworld'
       /**
        ****************************************
        * 命令行生成的文件，不要直接修改该文件 *

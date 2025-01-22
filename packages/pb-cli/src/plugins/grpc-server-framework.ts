@@ -5,7 +5,7 @@ import { dash, camel } from 'radash'
 import { lowerCaseFirst } from '../prettier/string-format'
 import { Service } from 'protobufjs'
 
-const messagePath = './message'
+const messagePath = './messages'
 
 const notUpdateTips = dedent`
 /**
