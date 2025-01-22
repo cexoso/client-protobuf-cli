@@ -30,9 +30,9 @@ export const GrpcServerFramework = (): Plugin => {
     const index = filesManager.getTSFileByProtoPath(join(messagePath, 'index.ts'))
     index.addImport({
       absolutePath: '@protobuf-es/grpc-frame-work',
-      member: 'MetaDataManager',
+      member: 'MetadataManager',
     })
-    index.write('export const metadataManager = new MetaDataManager()')
+    index.write('export const metadataManager = new MetadataManager()')
     for (const service of services) {
       const { grpcServiceName: serviceName } = getServiceName(service)
       service.methodsArray.forEach((method) => {
