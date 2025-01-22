@@ -112,7 +112,7 @@ export const GrpcServerFramework = (): Plugin => {
         const methodName = lowerCaseFirst(method.name)
 
         interfaceFile.write(
-          `${methodName}: (input: ${req.interfaceMember}) => ${res.interfaceMember}`
+          `${methodName}: (input: ${req.interfaceMember}) => Promise<${res.interfaceMember}>`
         )
 
         controllerFile.addImport({
@@ -125,7 +125,7 @@ export const GrpcServerFramework = (): Plugin => {
 
         controllerFile.write(dedent`
           @GrpcMethod("${originMethodName}")
-          public ${methodName}(_input: ${req.interfaceMember}): ${res.interfaceMember} {
+          public async ${methodName}(_input: ${req.interfaceMember}): Promise<${res.interfaceMember}> {
             throw new Error("TO IMPLEMENTS")
           }
         `)

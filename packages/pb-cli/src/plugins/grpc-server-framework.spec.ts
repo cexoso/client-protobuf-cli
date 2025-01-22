@@ -30,10 +30,10 @@ describe('grpc server framework, 为自己写的 grpc 框架生成代码', () =>
     expect(allFile).lengthOf(5)
     expect(allFile.at(1)?.toString()).toMatchInlineSnapshot(`
       "// ./messages/index.ts
-      import { MetaDataManager } from '@protobuf-es/grpc-frame-work'
+      import { MetadataManager } from '@protobuf-es/grpc-frame-work'
       import { decodeHelloRequest, encodeHelloReply } from './helloworld'
       import { wrapDecode, wrapEncode } from '@protobuf-es/core'
-      export const metadataManager = new MetaDataManager()
+      export const metadataManager = new MetadataManager()
       metadataManager.setMetaData('helloworld.Greeter', 'SayHello', {
         requestDecoder: wrapDecode(decodeHelloRequest),
         responseEncoder: wrapEncode(encodeHelloReply),
@@ -66,7 +66,7 @@ describe('grpc server framework, 为自己写的 grpc 框架生成代码', () =>
       @Controller('helloworld.Greeter')
       export class Greeter implements GreeterInterface {
         @GrpcMethod('SayHello')
-        public sayHello(_input: HelloRequest): HelloReply {
+        public async sayHello(_input: HelloRequest): Promise<HelloReply> {
           throw new Error('TO IMPLEMENTS')
         }
       }
@@ -81,7 +81,7 @@ describe('grpc server framework, 为自己写的 grpc 框架生成代码', () =>
        ****************************************
        */
       export interface GreeterInterface {
-        sayHello: (input: HelloRequest) => HelloReply
+        sayHello: (input: HelloRequest) => Promise<HelloReply>
       }
       "
     `)
