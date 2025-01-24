@@ -5,6 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "rm_node_modules": "pnpm -r exec rm -rf node_modules && pnpm exec rm -rf node_modules",
     "test": "CI=true pnpm run -r test --allowOnly",
     "changeset": "changeset"
   },

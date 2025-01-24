@@ -1,0 +1,8 @@
+{
+  "name": "protos",
+  "private": true,
+  "scripts": {},
+  "devDependencies": {
+    "@protobuf-es/cli": "workspace: *"
+  }
+}

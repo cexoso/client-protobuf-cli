@@ -1,0 +1,23 @@
+{
+  "name": "@protobuf-es/http2-client",
+  "publishConfig": {
+    "directory": "dist",
+    "linkDirectory": false
+  },
+  "scripts": {
+    "test": "vitest",
+    "build": "ts-pkg-build build",
+    "prepublishOnly": "npm run build"
+  },
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "dependencies": {
+    "@protobuf-es/grpc-utils": "workspace: *"
+  },
+  "devDependencies": {
+    "@cexoso/ts-pkg-build": "workspace: *",
+    "@types/node": "^22.10.8",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}
