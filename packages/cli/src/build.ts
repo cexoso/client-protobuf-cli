@@ -93,8 +93,9 @@ function createPkg(format: string[]) {
 
 function buildESM() {
   const tsProject = ts.createProject('tsconfig.json', {
-    module: 'node16',
-    moduleResolution: 'node16',
+    module: 'esnext',
+    moduleResolution: 'node',
+    isolatedModules: true,
   })
   return src(['**/*.ts', '!**/*.spec.ts', '!dist/**/*', '!node_modules/**/*'])
     .pipe(tsProject())
@@ -109,8 +110,9 @@ function cpOtherFile() {
 
 function buildCommonJS() {
   const tsProject = ts.createProject('tsconfig.json', {
-    module: 'CommonJS',
-    moduleResolution: 'node',
+    module: 'node16',
+    moduleResolution: 'node16',
+    isolatedModules: true,
   })
   return src(['**/*.ts', '!**/*.spec.ts', '!dist/**/*', '!node_modules/**/*'])
     .pipe(tsProject())
