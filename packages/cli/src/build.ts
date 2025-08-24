@@ -18,6 +18,8 @@ interface Package {
   bin?: string | Record<string, string>
 }
 
+const compileFiles = ['**/*.ts', '**/*.tsx']
+
 function createPkg(format: string[]) {
   const hasESM = format.includes('ESM')
   const hasCommonJS = format.includes('CommonJS')
@@ -100,7 +102,7 @@ function buildESM() {
     // isolatedModules (boolean) - Compiles files seperately and doesn't check types, which causes a big speed increase. You have to use gulp-plumber and TypeScript 1.5+.
     isolatedModules: false, // isolatedModules true 会导致无法生成 d.ts
   })
-  return src(['**/*.ts', '!**/*.spec.ts', '!dist/**/*', '!node_modules/**/*'])
+  return src([...compileFiles, '!**/*.spec.ts', '!dist/**/*', '!node_modules/**/*'])
     .pipe(tsProject())
     .pipe(transformAllJsFileTask())
     .pipe(dest('./dist'))
@@ -108,7 +110,7 @@ function buildESM() {
 
 // 将非 ts 的文件通通移过去
 function cpOtherFile() {
-  return src(['src/**/*', '!**/*.ts']).pipe(dest('./dist/src/'))
+  return src(['src/**/*', ...compileFiles.map((item) => `!${item}`)]).pipe(dest('./dist/src/'))
 }
 
 function buildCommonJS() {
@@ -120,7 +122,7 @@ function buildCommonJS() {
     // isolated: true 会影响 d.ts 的生成，这里先暂时使用 esm 下来生成 d.ts
     isolatedModules: true,
   })
-  return src(['**/*.ts', '!**/*.spec.ts', '!dist/**/*', '!node_modules/**/*'])
+  return src([...compileFiles, '!**/*.spec.ts', '!dist/**/*', '!node_modules/**/*'])
     .pipe(tsProject())
     .pipe(dest('./dist'))
 }
