@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.24
+
+### Patch Changes
+
+- a1bf2b3: 编译文件包含 tsx
+
 ## 0.0.23
 
 ### Patch Changes
