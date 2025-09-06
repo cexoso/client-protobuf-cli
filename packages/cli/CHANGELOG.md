@@ -1,5 +1,11 @@
 # cli
 
+## 0.0.25
+
+### Patch Changes
+
+- 53bdb3a: support api mode
+
 ## 0.0.24
 
 ### Patch Changes
