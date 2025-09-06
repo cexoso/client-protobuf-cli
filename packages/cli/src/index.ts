@@ -1,1 +1,1 @@
-export { transformAllJsFileTask } from './transforms/index'
+export { build } from './build'
