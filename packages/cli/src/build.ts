@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, copyFileSync, readdirSync } from 'fs'
 import ts from 'gulp-typescript'
 import { extname } from 'path'
 import { series, parallel, src, dest } from 'gulp'
@@ -138,6 +138,16 @@ function getParallelBuild(format: string[]) {
   return parallelBuild
 }
 
+function cpDocs() {
+  const entries = readdirSync('.')
+  for (const target of ['README.md', 'CHANGELOG.md']) {
+    const found = entries.find((f) => f.toLowerCase() === target.toLowerCase())
+    if (found) {
+      copyFileSync(`./${found}`, `./dist/${target}`)
+    }
+  }
+}
+
 export const build = (opts: { format: Array<'ESM' | 'CommonJS'> }): any => {
   const parallelBuild = getParallelBuild(opts.format)
   const compilePackage = series(
@@ -146,7 +156,8 @@ export const build = (opts: { format: Array<'ESM' | 'CommonJS'> }): any => {
     },
     parallel(...parallelBuild),
     cpOtherFile,
-    createPkg(opts.format)
+    createPkg(opts.format),
+    cpDocs
   )
 
   return compilePackage(() => {})
